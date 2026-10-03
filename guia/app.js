@@ -23,6 +23,16 @@ const S = {
   mode: store.get("mode", "foot"),
   lookEvery: store.get("lookEvery", "turns"),
   rate: store.get("rate", 1.5),
+  livePace: store.get("livePace", "continuo"),
+  live: false,
+  liveBusy: false,
+  liveReadyAt: 0,
+  liveSaid: [],
+  liveErrors: 0,
+  livePois: [],
+  livePoisAt: null,
+  compass: null,
+  compassAt: 0,
   voice: store.get("voice", false),
   pos: null,           // {lat, lon, acc, heading, speed, t}
   address: null,
@@ -59,9 +69,15 @@ function bearing(a, b) {
 }
 const CARD = ["norte", "nordeste", "leste", "sudeste", "sul", "sudoeste", "oeste", "noroeste"];
 const cardinal = (deg) => CARD[Math.round(deg / 45) % 8];
+// Para onde o celular aponta: bússola (se recente) ou direção do movimento
+function facing() {
+  if (S.compass != null && Date.now() - S.compassAt < 3000) return S.compass;
+  return S.pos?.heading ?? null;
+}
 function relative(deg) {
-  if (S.pos?.heading == null) return null;
-  const r = (deg - S.pos.heading + 360) % 360;
+  const f = facing();
+  if (f == null) return null;
+  const r = (deg - f + 360) % 360;
   if (r < 30 || r > 330) return "à frente";
   if (r < 150) return "à direita";
   if (r <= 210) return "atrás";
@@ -122,6 +138,7 @@ function speak(text, { interrupt = false } = {}) {
   u.lang = "pt-BR";
   if (ptVoice) u.voice = ptVoice;
   u.rate = S.rate;
+  u.onend = u.onerror = () => { S.lastSpeechEnd = Date.now(); };
   speechSynthesis.speak(u);
 }
 
@@ -287,7 +304,7 @@ function stopRoute() {
   if (routeLine) { routeLine.remove(); routeLine = null; }
   if (destMarker) { destMarker.remove(); destMarker = null; }
   $("banner").hidden = true;
-  keepAwake(false);
+  if (!S.live) keepAwake(false);
 }
 
 function remaining() {
@@ -388,6 +405,7 @@ async function setCamera(on) {
       S.camOn = false;
     }
   } else {
+    if (S.live) setLive(false);
     stream?.getTracks().forEach((t) => t.stop()); stream = null;
     $("cam").hidden = true; $("stage").classList.remove("cam-big"); S.camOn = false;
   }
@@ -561,6 +579,179 @@ async function lookAndGuide(kind, ctx = {}) {
   }
 }
 
+// ---------- Guia ao vivo ----------
+// Narração contínua: olha a câmera, cruza com pontos de interesse do mapa e vai contando o que há em volta.
+const LIVE_GAP = { continuo: 2500, normal: 10000, calmo: 25000 };
+
+const LIVE_SYSTEM = `Você é um guia turístico ao vivo, caminhando ao lado da pessoa. A cada momento você recebe a imagem da câmera do celular (o que ela está vendo agora), a localização, para onde a câmera aponta, lugares do mapa ao redor com distância e direção relativa, e o que você já contou.
+
+Sua fala: de 1 a 3 frases, até umas 45 palavras, em português do Brasil, em tom de conversa, para ser ouvida. Sem markdown, listas ou emojis.
+
+O que contar, variando a cada vez:
+- O que aparece na imagem: prédios, igrejas, monumentos, praças, arte de rua, estilo arquitetônico, detalhes curiosos.
+- Lugares por perto que valem um olhar, dizendo para onde virar: "olhe à sua esquerda", "atrás de você", "logo à frente".
+- História do lugar, do bairro e da cidade; quem morou ou trabalhou ali; o que funciona naquele prédio hoje.
+- Comida e vida local: restaurantes e cafés conhecidos, áreas de compras, mercados, vida noturna.
+- Se houver rota ativa, você pode lembrar a direção a seguir quando ajudar.
+
+Regras:
+- Não repita o que já contou. Se a cena não mudou, fale de outra coisa do entorno, do bairro ou da cidade.
+- Fatos: use os dados do mapa e conhecimento que você tem com segurança. Se não tiver certeza (estrela Michelin, data, "o prédio mais alto", quem projetou), não afirme; diga "parece" ou deixe de fora. Nunca invente nomes.
+- As direções relativas dos lugares vêm prontas nos dados; use-as. Se a direção for desconhecida, descreva pela imagem ou diga a distância.
+- Se a imagem estiver escura, tremida ou sem nada útil, fale do entorno pelos dados do mapa.
+- Só se realmente não houver nada novo para dizer, responda exatamente [SILENCIO].`;
+
+const LIVE_FILTERS = [
+  '["tourism"~"^(attraction|museum|viewpoint|artwork|gallery|theme_park|zoo)$"]',
+  '["historic"]',
+  '["amenity"~"^(place_of_worship|theatre|arts_centre|townhall|library|university|courthouse|cinema|marketplace)$"]',
+  '["amenity"~"^(restaurant|cafe|bar|pub)$"]',
+  '["leisure"~"^(park|garden|stadium)$"]',
+  '["shop"~"^(mall|department_store)$"]',
+  '["office"="government"]',
+  '["building"]["wikidata"]',
+  '["man_made"~"^(tower|lighthouse)$"]',
+];
+
+async function refreshLivePois() {
+  if (!S.pos) return;
+  if (S.livePoisAt && dist(S.livePoisAt, S.pos) < 120 && Date.now() - S.livePoisAt.t < 5 * 60000) return;
+  const parts = LIVE_FILTERS.map((f) => `nwr${f}["name"](around:350,${S.pos.lat},${S.pos.lon});`).join("");
+  const q = `[out:json][timeout:20];(${parts});out center tags 200;`;
+  const res = await fetch(OVERPASS, { method: "POST", body: "data=" + encodeURIComponent(q), headers: { "Content-Type": "application/x-www-form-urlencoded" } });
+  if (!res.ok) throw new Error("overpass " + res.status);
+  const j = await res.json();
+  S.livePois = j.elements.map((e) => {
+    const t = e.tags || {};
+    const lat = e.lat ?? e.center?.lat, lon = e.lon ?? e.center?.lon;
+    if (lat == null) return null;
+    const isFood = /^(restaurant|cafe|bar|pub)$/.test(t.amenity || "");
+    let score = 0;
+    if (t.wikidata || t.wikipedia) score += 4;
+    if (t.heritage || t["heritage:operator"]) score += 3;
+    if (t.historic || t.tourism) score += 2;
+    if (t.start_date || t.architect || t.height || t["building:levels"]) score += 1;
+    if (isFood && !(t.wikidata || t.wikipedia)) score -= 1;
+    const info = [
+      t.tourism || t.historic && `histórico (${t.historic})` || t.amenity || t.leisure || t.shop || t.office || t.man_made || (t.building && "edifício"),
+      t.religion && t.religion, t.cuisine && `cozinha ${t.cuisine}`, t.start_date && `desde ${t.start_date}`,
+      t.architect && `arquiteto ${t.architect}`, t.height && `${t.height} m de altura`, t["building:levels"] && `${t["building:levels"]} andares`,
+      t.heritage && "patrimônio tombado", t.wikipedia && `wikipedia: ${t.wikipedia}`, t.description,
+    ].filter(Boolean).join(", ");
+    return { nome: t.name, info, lat, lon, score };
+  }).filter(Boolean);
+  S.livePoisAt = { lat: S.pos.lat, lon: S.pos.lon, t: Date.now() };
+}
+
+function livePoiLines() {
+  return S.livePois
+    .map((p) => ({ ...p, d: dist(S.pos, p) }))
+    .sort((a, b) => (b.score - a.score) || (a.d - b.d))
+    .slice(0, 25)
+    .sort((a, b) => a.d - b.d)
+    .map((p) => {
+      const b = bearing(S.pos, p);
+      return `- ${p.nome} (${p.info}) — ${Math.round(p.d)} m, ${relative(b) || "direção desconhecida"}, a ${cardinal(b)}`;
+    }).join("\n");
+}
+
+async function liveNarrate() {
+  S.liveBusy = true;
+  try {
+    await refreshLivePois().catch(() => {});
+    const img = grabFrame();
+    const f = facing();
+    const lines = [
+      `Hora local: ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}. Modo: ${MODE_LABEL[S.mode]}.`,
+      S.address ? `Local: ${S.address.completo}` : "Local: endereço ainda desconhecido",
+      S.pos ? `Coordenadas: ${S.pos.lat.toFixed(5)}, ${S.pos.lon.toFixed(5)} (±${Math.round(S.pos.acc)} m)` : "Sem GPS no momento.",
+      `Câmera apontando para: ${f != null ? cardinal(f) : "direção desconhecida"}${S.pos?.speed > 0.5 ? `; andando a ${Math.round(S.pos.speed * 3.6)} km/h` : ""}.`,
+    ];
+    if (S.route) { const n = S.route.steps[S.stepIdx + 1]; lines.push(`Rota ativa até ${S.route.dest.nome}; próxima manobra: ${n ? instruction(n) + " em " + fmtDist(dist(S.pos, n.at)) : "chegada"}.`); }
+    if (S.pos && S.livePois.length) lines.push(`\nLugares do mapa por perto (até 350 m):\n${livePoiLines()}`);
+    lines.push(S.liveSaid.length ? `\nO que você já contou (não repita):\n${S.liveSaid.map((t) => "- " + t).join("\n")}` : "\nVocê ainda não falou nada; comece se apresentando em poucas palavras e contando onde a pessoa está.");
+    lines.push(img ? "\nA imagem anexada é o que a pessoa vê agora." : "\nSem imagem da câmera neste momento.");
+
+    const content = [];
+    if (img) content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: img } });
+    content.push({ type: "text", text: lines.join("\n") });
+    const resp = await claudeCreate({ max_tokens: 2000, system: LIVE_SYSTEM, output_config: { effort: "low" }, messages: [{ role: "user", content }] });
+    if (!S.live) return;
+    S.liveErrors = 0;
+    const text = resp.stop_reason === "refusal" ? "" : resp.content.filter((b) => b.type === "text").map((b) => b.text).join(" ").trim();
+    if (!text || text.includes("[SILENCIO]")) { S.liveReadyAt = Date.now() + LIVE_GAP[S.livePace] + 5000; return; }
+    S.liveSaid.push(text);
+    if (S.liveSaid.length > 12) S.liveSaid.shift();
+    addMsg(text, "bot");
+    speak(text);
+    // Se a voz estiver desligada, dá tempo de ler antes da próxima
+    const readMs = S.voice ? 0 : (text.split(/\s+/).length / 3) * 1000;
+    S.liveReadyAt = Date.now() + readMs + LIVE_GAP[S.livePace];
+  } catch (e) {
+    S.liveErrors++;
+    if (e instanceof Anthropic.AuthenticationError || S.liveErrors >= 3) {
+      addMsg(explainError(e) + " Guia ao vivo desligado.", "err");
+      setLive(false);
+    } else {
+      S.liveReadyAt = Date.now() + 15000;
+    }
+  } finally {
+    S.liveBusy = false;
+  }
+}
+
+function liveTick() {
+  if (!S.live) return;
+  const speaking = "speechSynthesis" in window && (speechSynthesis.speaking || speechSynthesis.pending);
+  const idle = !speaking && !S.liveBusy && !S.busy && !S.guideBusy && !rec && document.visibilityState === "visible";
+  const sinceSpeech = Date.now() - (S.lastSpeechEnd || 0);
+  if (idle && Date.now() >= S.liveReadyAt && (!S.voice || sinceSpeech >= LIVE_GAP[S.livePace])) liveNarrate();
+  S.liveTimer = setTimeout(liveTick, 1000);
+}
+
+function onOrient(e) {
+  let h = null;
+  if (e.webkitCompassHeading != null) h = e.webkitCompassHeading;
+  else if (e.absolute && e.alpha != null) h = 360 - e.alpha;
+  if (h == null) return;
+  S.compass = (h + (screen.orientation?.angle || 0) + 360) % 360;
+  S.compassAt = Date.now();
+}
+let compassOn = false;
+async function enableCompass() {
+  if (compassOn) return;
+  try {
+    if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+      if ((await DeviceOrientationEvent.requestPermission()) !== "granted") return;
+    }
+    window.addEventListener("deviceorientationabsolute", onOrient);
+    window.addEventListener("deviceorientation", onOrient);
+    compassOn = true;
+  } catch {}
+}
+
+async function setLive(on) {
+  if (on) {
+    if (!client) { openSettings(); return; }
+    enableCompass();
+    if (!S.camOn && !(await setCamera(true))) return;
+    if (!S.voice) setVoice(true);
+    S.live = true; S.liveSaid = []; S.liveErrors = 0; S.liveReadyAt = 0; S.lastSpeechEnd = 0;
+    keepAwake(true);
+    addMsg("Guia ao vivo ligado. Aponte a câmera para a rua e eu vou contando o que há por aqui.", "sys");
+    clearTimeout(S.liveTimer);
+    S.liveTimer = setTimeout(liveTick, 800);
+  } else {
+    S.live = false;
+    clearTimeout(S.liveTimer);
+    if ("speechSynthesis" in window) speechSynthesis.cancel();
+    if (!S.route) keepAwake(false);
+    addMsg("Guia ao vivo desligado.", "sys");
+  }
+  $("liveBtn").setAttribute("aria-pressed", String(S.live));
+  $("liveBtn").querySelector("span").textContent = S.live ? "Guia ao vivo · tocar para parar" : "Guia ao vivo";
+}
+
 // ---------- Voz (entrada) ----------
 const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null;
@@ -588,13 +779,13 @@ function listen() {
 
 // ---------- Ajustes ----------
 function openSettings() {
-  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("rate").value = String(S.rate);
+  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("rate").value = String(S.rate); $("livePace").value = S.livePace;
   $("settings").showModal();
 }
 $("settings").addEventListener("close", () => {
   if ($("settings").returnValue !== "save") return;
-  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.rate = +$("rate").value;
-  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("rate", S.rate);
+  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.rate = +$("rate").value; S.livePace = $("livePace").value;
+  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("rate", S.rate); store.set("livePace", S.livePace);
   client = S.key ? new Anthropic({ apiKey: S.key, dangerouslyAllowBrowser: true }) : null;
   if (S.route) startRoute(S.route.dest).catch((e) => addMsg(e.message, "err"));
 });
@@ -611,6 +802,7 @@ $("voiceBtn").addEventListener("click", () => {
   else if ("speechSynthesis" in window) speechSynthesis.cancel();
 });
 $("camBtn").addEventListener("click", () => setCamera(!S.camOn));
+$("liveBtn").addEventListener("click", () => setLive(!S.live));
 $("cam").addEventListener("click", () => $("stage").classList.toggle("cam-big"));
 $("micBtn").addEventListener("click", listen);
 $("settingsBtn").addEventListener("click", openSettings);

@@ -8,6 +8,7 @@ Assistente de localização e viagem para o celular. Ele usa o GPS, o mapa e, qu
 - **O que tem por perto:** restaurantes, cafés, farmácias, mercados, caixas eletrônicos, postos, transporte, pontos turísticos e outros, com distância e direção.
 - **Me leve até…:** procura o lugar, traça a rota (a pé, de carro ou de bicicleta) e guia passo a passo. Se você sair da rota, ele recalcula.
 - **Câmera:** com a câmera ligada, o Claude olha a cena perto de cada conversão e na chegada para dar referências visuais. O botão **Olhar** pede uma descrição na hora.
+- **Guia ao vivo:** o botão no alto do mapa liga uma narração contínua. O Claude olha pela câmera, cruza a imagem com os pontos de interesse do mapa num raio de 350 m (monumentos, igrejas, museus, prédios históricos, parques, restaurantes, shoppings) e vai contando o que há em volta: "olhe à sua esquerda, aquele é o MASP…". Ele não repete o que já contou e só para quando você toca no botão de novo. Usa a bússola do celular para saber para onde você está olhando. O ritmo (contínuo, normal ou calmo) muda em Ajustes.
 - **Voz:** o botão do alto-falante liga a fala, e todas as respostas e avisos de rota passam a ser lidos em voz alta, em 1,5x por padrão (a velocidade muda em Ajustes, de 1x a 2x). O botão do microfone deixa você perguntar falando.
 
 ## Como usar
@@ -28,6 +29,7 @@ No repositório, abra **Settings → Pages**, escolha "Deploy from a branch", se
 - Mapa, endereços, lugares e rotas vêm do OpenStreetMap (Nominatim, Overpass e roteamento FOSSGIS), que são gratuitos. Esses serviços públicos têm limite de uso justo e servem bem para uso pessoal.
 - As respostas do Claude são cobradas na sua conta da Anthropic. Cada pergunta com imagem custa poucos centavos de dólar. Durante uma rota com câmera, ele consulta o Claude perto de cada conversão. Defina um limite de gastos no console.
 - A chave da API fica salva apenas no navegador deste celular e é enviada direto para a Anthropic. Não use esse modo em um site aberto a outras pessoas, porque qualquer pessoa com acesso ao aparelho pode ver a chave.
+- O **Guia ao vivo** consulta o Claude a cada fala: no modo contínuo são cerca de 3 a 5 consultas por minuto, o que dá uns 2 a 4 dólares por hora de passeio. Nos modos normal e calmo sai bem mais barato.
 - As imagens da câmera vão para o Claude só no momento da pergunta e não ficam guardadas pelo app.
 
 ## Limitações
