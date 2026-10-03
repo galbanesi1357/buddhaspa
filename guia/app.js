@@ -16,7 +16,7 @@ const NAV = {
 };
 
 // Versão deste código. Ao publicar, aumente aqui, em version.json e em app.js?v= no index.html.
-const APP_VERSION = 24;
+const APP_VERSION = 25;
 
 const store = {
   get(k, d) { try { const v = localStorage.getItem("guia." + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
@@ -38,6 +38,7 @@ const S = {
   lastLogPos: null,
   lastClip: 0,
   recording: false,
+  clipAudio: store.get("clipAudio", true),
   memory: [],
   chatModel: store.get("chatModel", "sonnet"),
   guideModel: store.get("guideModel2", "sonnet"),
@@ -355,13 +356,23 @@ function logTrack() {
 // Clipe curto da câmera para o diário
 async function recordClip(sec = 10, manual = false) {
   if (!stream || S.recording || typeof MediaRecorder === "undefined" || !S.diaryOn) return;
-  const type = ["video/mp4", "video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"].find((t) => MediaRecorder.isTypeSupported(t));
+  const type = ["video/mp4", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"].find((t) => MediaRecorder.isTypeSupported(t));
   if (!type) { if (manual) addMsg("Este navegador não grava vídeo.", "err"); return; }
   S.recording = true; S.lastClip = Date.now();
   $("clipBtn").classList.add("recording"); $("clipBtn").textContent = "● Gravando…";
+  let mic = null;
   try {
+    // Som ambiente: o microfone fica ligado só durante o clipe
+    if (S.clipAudio && !rec) {
+      try {
+        mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      } catch {
+        if (manual && !S.micWarned) { S.micWarned = true; addMsg("Sem permissão do microfone: o clipe sai sem som. Libere o microfone para o site nas configurações do navegador.", "sys"); }
+      }
+    }
+    const recStream = mic ? new MediaStream([...stream.getVideoTracks(), ...mic.getAudioTracks()]) : stream;
     const chunks = [];
-    const mr = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 800000 });
+    const mr = new MediaRecorder(recStream, { mimeType: type, videoBitsPerSecond: 800000, audioBitsPerSecond: 64000 });
     mr.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
     const stopped = new Promise((r) => { mr.onstop = r; });
     mr.start();
@@ -376,6 +387,7 @@ async function recordClip(sec = 10, manual = false) {
   } catch (e) {
     if (manual) addMsg("Não consegui gravar o clipe.", "err");
   } finally {
+    mic?.getTracks().forEach((t) => t.stop());
     S.recording = false;
     $("clipBtn").classList.remove("recording"); $("clipBtn").textContent = "● Gravar 10 s";
   }
@@ -1188,7 +1200,7 @@ function listen() {
 
 // ---------- Ajustes ----------
 function openSettings() {
-  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("liveDirections").value = S.liveDirections ? "on" : "off"; $("chatModel").value = S.chatModel; $("guideModel").value = S.guideModel; $("diaryOn").value = S.diaryOn ? "on" : "off"; $("clipEvery").value = S.clipEvery; $("navVoice").value = S.navVoice ? "on" : "off"; $("livePace").value = S.livePace;
+  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("liveDirections").value = S.liveDirections ? "on" : "off"; $("chatModel").value = S.chatModel; $("guideModel").value = S.guideModel; $("diaryOn").value = S.diaryOn ? "on" : "off"; $("clipEvery").value = S.clipEvery; $("clipAudio").value = S.clipAudio ? "on" : "off"; $("navVoice").value = S.navVoice ? "on" : "off"; $("livePace").value = S.livePace;
   fillVoiceSelect();
   $("openaiKey").value = S.openaiKey; $("openaiVoice").value = S.openaiVoice;
   $("settings").showModal();
@@ -1200,8 +1212,8 @@ $("settings").addEventListener("close", () => {
   if (newKey !== S.openaiKey) { cloudFailed = false; audioUnlocked = false; }
   S.openaiKey = newKey; S.openaiVoice = $("openaiVoice").value;
   store.set("openaiKey", S.openaiKey); store.set("openaiVoice", S.openaiVoice);
-  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.liveDirections = $("liveDirections").value === "on"; if ($("chatModel").value !== S.chatModel) S.history = []; S.chatModel = $("chatModel").value; S.guideModel = $("guideModel").value; S.diaryOn = $("diaryOn").value === "on"; S.clipEvery = $("clipEvery").value; S.navVoice = $("navVoice").value === "on"; S.livePace = $("livePace").value;
-  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("chatModel", S.chatModel); store.set("guideModel2", S.guideModel); store.set("diaryOn", S.diaryOn); store.set("clipEvery", S.clipEvery); store.set("navVoice", S.navVoice); store.set("livePace", S.livePace);
+  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.liveDirections = $("liveDirections").value === "on"; if ($("chatModel").value !== S.chatModel) S.history = []; S.chatModel = $("chatModel").value; S.guideModel = $("guideModel").value; S.diaryOn = $("diaryOn").value === "on"; S.clipEvery = $("clipEvery").value; S.clipAudio = $("clipAudio").value === "on"; S.navVoice = $("navVoice").value === "on"; S.livePace = $("livePace").value;
+  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("chatModel", S.chatModel); store.set("guideModel2", S.guideModel); store.set("diaryOn", S.diaryOn); store.set("clipEvery", S.clipEvery); store.set("clipAudio", S.clipAudio); store.set("navVoice", S.navVoice); store.set("livePace", S.livePace);
   client = S.key ? new Anthropic({ apiKey: S.key, dangerouslyAllowBrowser: true }) : null;
   if (S.route) startRoute(S.route.dest).catch((e) => addMsg(e.message, "err"));
 });

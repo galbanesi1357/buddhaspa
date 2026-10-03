@@ -325,6 +325,11 @@ dialog input[type=password], dialog select {
       <option value="on">Guardar trajeto, falas, fotos e notas</option>
       <option value="off">Não guardar nada</option>
     </select>
+    <label for="clipAudio">Som nos clipes de vídeo</label>
+    <select id="clipAudio">
+      <option value="on">Gravar com som ambiente</option>
+      <option value="off">Sem som</option>
+    </select>
     <label for="clipEvery">Clipes de vídeo automáticos no guia ao vivo</label>
     <select id="clipEvery">
       <option value="2">Um clipe de 6 s a cada 2 min</option>
@@ -463,6 +468,6 @@ dialog input[type=password], dialog select {
   </form>
 </dialog>
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=24"></script>
+<script type="module" src="app.js?v=25"></script>
 </body>
 </html>
