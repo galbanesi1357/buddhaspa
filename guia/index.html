@@ -203,6 +203,11 @@ dialog input[type=password], dialog select {
       <option value="car">De carro</option>
       <option value="bike">De bicicleta</option>
     </select>
+    <label for="navVoice">Avisos de navegação ("em 90 metros, vire à esquerda")</label>
+    <select id="navVoice">
+      <option value="off">Só na tela, sem falar</option>
+      <option value="on">Falar em voz alta</option>
+    </select>
     <label for="liveDirections">Guia ao vivo: indicar para onde olhar</label>
     <select id="liveDirections">
       <option value="off">Não, só contar o que há em volta</option>
@@ -230,6 +235,6 @@ dialog input[type=password], dialog select {
 </dialog>
 
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=7"></script>
+<script type="module" src="app.js?v=8"></script>
 </body>
 </html>

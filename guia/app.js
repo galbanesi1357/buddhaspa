@@ -25,6 +25,7 @@ const S = {
   rate: store.get("rate", 1.5),
   livePace: store.get("livePace", "continuo"),
   liveDirections: store.get("liveDirections", false),
+  navVoice: store.get("navVoice", false),
   live: false,
   liveBusy: false,
   liveReadyAt: 0,
@@ -335,8 +336,8 @@ function updateNav() {
   if (dDest < cfg.arrive + Math.min(S.pos.acc, 30) && !S.arrived) {
     S.arrived = true;
     const fala = `Você chegou${r.dest.nome ? " a " + r.dest.nome : ""}.`;
-    if (S.camOn && !S.ann.near) lookAndGuide("arrive").then((t) => say(t || fala, true));
-    else say(fala, true);
+    if (S.camOn && S.navVoice && !S.ann.near) lookAndGuide("arrive").then((t) => navSay(t || fala, true));
+    else navSay(fala, true);
     setTimeout(stopRoute, 4000);
     return;
   }
@@ -346,7 +347,7 @@ function updateNav() {
   while (next && next.maneuver.type !== "arrive" && dist(S.pos, next.at) < cfg.pass) {
     S.stepIdx++; S.ann = {}; next = r.steps[S.stepIdx + 1];
     const cur = r.steps[S.stepIdx];
-    if (cur.distance > 150 && cur.name) say(`Agora siga pela ${cur.name} por ${spokenDist(cur.distance)}.`);
+    if (cur.distance > 150 && cur.name) navSay(`Agora siga pela ${cur.name} por ${spokenDist(cur.distance)}.`);
   }
   renderBanner();
   if (!next) return;
@@ -357,13 +358,13 @@ function updateNav() {
   const ahead = isArrive ? `O destino fica a ${spokenDist(d)}.` : `Em ${spokenDist(d)}, ${instr.charAt(0).toLowerCase() + instr.slice(1)}.`;
   if (d <= cfg.near && !S.ann.near) {
     S.ann.near = true;
-    if (S.camOn) lookAndGuide(isArrive ? "arrive" : "turn", { instr, d }).then((t) => say(t || ahead, true));
-    else say(ahead, true);
+    if (S.camOn && S.navVoice) lookAndGuide(isArrive ? "arrive" : "turn", { instr, d }).then((t) => navSay(t || ahead, true));
+    else navSay(ahead, true);
   } else if (d <= cfg.far && d > cfg.near + 25 && !S.ann.far) {
     S.ann.far = true;
-    say(ahead);
-  } else if (S.camOn && S.lookEvery !== "turns" && d > cfg.near + 30 && Date.now() - S.lastLook > +S.lookEvery * 1000) {
-    lookAndGuide("periodic", { instr, d }).then((t) => t && say(t));
+    navSay(ahead);
+  } else if (S.camOn && S.navVoice && S.lookEvery !== "turns" && d > cfg.near + 30 && Date.now() - S.lastLook > +S.lookEvery * 1000) {
+    lookAndGuide("periodic", { instr, d }).then((t) => t && navSay(t));
   }
 
   // Saiu da rota? Recalcula depois de 3 leituras seguidas fora
@@ -371,12 +372,19 @@ function updateNav() {
   else S.offCount = 0;
   if (S.offCount >= 3 && Date.now() - S.lastReroute > 20000) {
     S.lastReroute = Date.now(); S.offCount = 0;
-    say("Você saiu da rota. Recalculando.", true);
+    navSay("Você saiu da rota. Recalculando.", true);
     startRoute(r.dest).then(() => {
       const n = S.route.steps[1];
-      if (n) say(`Nova rota. Em ${spokenDist(dist(S.pos, n.at))}, ${instruction(n).toLowerCase()}.`);
+      if (n) navSay(`Nova rota. Em ${spokenDist(dist(S.pos, n.at))}, ${instruction(n).toLowerCase()}.`);
     }).catch((e) => addMsg(e.message, "err"));
   }
+}
+
+// Avisos da navegação: falados só se a pessoa quiser; senão ficam só no texto
+function navSay(text, interrupt = false) {
+  if (!text) return;
+  if (S.navVoice) say(text, interrupt);
+  else addMsg(text, "bot");
 }
 
 function say(text, interrupt = false) {
@@ -431,12 +439,12 @@ Como trabalhar:
 - Use as ferramentas para dados reais de localização, lugares e rotas. Nunca invente nomes, endereços, distâncias ou horários.
 - Quando houver uma imagem da câmera, ela mostra o que está à frente da pessoa. Use o que aparece (cor das fachadas, placas, lojas, árvores, faixas, esquinas) para orientar: "o restaurante fica depois daquela casa amarela à direita". Só cite o que de fato está visível.
 - Para levar a pessoa a algum lugar: encontre o destino (buscar_lugar ou buscar_proximos) e chame iniciar_rota. Se houver várias opções parecidas, escolha a mais próxima e diga qual escolheu, sem perguntar, a menos que a dúvida seja real.
-- A partir daí o app fala as conversões sozinho; você não precisa repetir a rota inteira. Diga só o primeiro passo e o tempo estimado.
+- A partir daí o app mostra as conversões na tela (e fala, se a pessoa ativou os avisos falados); você não precisa repetir a rota inteira. Diga só o primeiro passo e o tempo estimado.
 
 Estilo: português do Brasil, frases curtas e naturais, pensadas para serem ouvidas. Até 3 frases, salvo se pedirem detalhes. Sem markdown, listas ou emojis. Distâncias arredondadas ("uns 200 metros").
 
 Não leia coordenadas numéricas (latitude e longitude) a menos que a pessoa peça.
-Se a pessoa pedir para falar mais rápido ou devagar, ou para o guia ao vivo indicar (ou parar de indicar) para onde olhar, use ajustar_preferencias e confirme em poucas palavras.
+Se a pessoa pedir para falar mais rápido ou devagar, ou para o guia ao vivo indicar (ou parar de indicar) para onde olhar, ou para falar ou silenciar os avisos de navegação, use ajustar_preferencias e confirme em poucas palavras.
 
 Segurança: se a pessoa estiver de carro, seja ainda mais breve e nunca peça para ela olhar a tela.`;
 
@@ -460,8 +468,8 @@ const TOOLS = [
   { name: "status_rota", description: "Situação da navegação em andamento: próxima manobra, distância até ela, quanto falta e próximos passos.", input_schema: { type: "object", properties: {} } },
   {
     name: "ajustar_preferencias",
-    description: "Muda preferências do app: velocidade da fala (1, 1.5 ou 2) e se o guia ao vivo deve indicar para onde olhar e virar.",
-    input_schema: { type: "object", properties: { velocidade_fala: { type: "number", enum: [1, 1.5, 2] }, direcoes_no_guia_ao_vivo: { type: "boolean" } } },
+    description: "Muda preferências do app: velocidade da fala (1, 1.5 ou 2), se o guia ao vivo deve indicar para onde olhar e virar, e se os avisos de navegação (conversões da rota) devem ser falados em voz alta.",
+    input_schema: { type: "object", properties: { velocidade_fala: { type: "number", enum: [1, 1.5, 2] }, direcoes_no_guia_ao_vivo: { type: "boolean" }, avisos_de_navegacao_falados: { type: "boolean" } } },
   },
   { name: "parar_rota", description: "Encerra a navegação em andamento.", input_schema: { type: "object", properties: {} } },
 ];
@@ -484,7 +492,8 @@ async function runTool(name, input) {
     case "ajustar_preferencias": {
       if (SPEEDS.includes(input.velocidade_fala)) setRate(input.velocidade_fala);
       if (typeof input.direcoes_no_guia_ao_vivo === "boolean") { S.liveDirections = input.direcoes_no_guia_ao_vivo; store.set("liveDirections", S.liveDirections); }
-      return { velocidade_fala: speedLabel(S.rate), direcoes_no_guia_ao_vivo: S.liveDirections ? "ligadas" : "desligadas" };
+      if (typeof input.avisos_de_navegacao_falados === "boolean") { S.navVoice = input.avisos_de_navegacao_falados; store.set("navVoice", S.navVoice); }
+      return { velocidade_fala: speedLabel(S.rate), direcoes_no_guia_ao_vivo: S.liveDirections ? "ligadas" : "desligadas", avisos_de_navegacao_falados: S.navVoice ? "sim" : "não, só na tela" };
     }
     case "parar_rota": stopRoute(); return { resultado: "Navegação encerrada." };
     default: return { erro: "Ferramenta desconhecida." };
@@ -796,13 +805,13 @@ function listen() {
 
 // ---------- Ajustes ----------
 function openSettings() {
-  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("liveDirections").value = S.liveDirections ? "on" : "off"; $("livePace").value = S.livePace;
+  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("liveDirections").value = S.liveDirections ? "on" : "off"; $("navVoice").value = S.navVoice ? "on" : "off"; $("livePace").value = S.livePace;
   $("settings").showModal();
 }
 $("settings").addEventListener("close", () => {
   if ($("settings").returnValue !== "save") return;
-  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.liveDirections = $("liveDirections").value === "on"; S.livePace = $("livePace").value;
-  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("livePace", S.livePace);
+  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.liveDirections = $("liveDirections").value === "on"; S.navVoice = $("navVoice").value === "on"; S.livePace = $("livePace").value;
+  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("navVoice", S.navVoice); store.set("livePace", S.livePace);
   client = S.key ? new Anthropic({ apiKey: S.key, dangerouslyAllowBrowser: true }) : null;
   if (S.route) startRoute(S.route.dest).catch((e) => addMsg(e.message, "err"));
 });
