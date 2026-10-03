@@ -203,6 +203,10 @@ dialog input[type=password], dialog select {
 #updateBar { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: var(--signal); color: #1d1600; font-size: .9rem; }
 #updateBar span { flex: 1; min-width: 0; }
 #updateBar button { border: 0; border-radius: 8px; padding: 7px 12px; background: #1d1600; color: #fff; font-weight: 700; }
+.warn { background: color-mix(in srgb, var(--signal) 22%, var(--surface)); border: 1px solid var(--signal); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; font-size: .9rem; }
+.backup { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); }
+.backup h3 { font: 600 1.05rem var(--font-display); margin: 0 0 4px; }
+.chk { display: flex; gap: 8px; align-items: center; font-size: .9rem; margin-top: 6px; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } #liveBtn[aria-pressed="true"] i { animation: none; } }
 </style>
 </head>
@@ -371,7 +375,19 @@ dialog input[type=password], dialog select {
     <button id="tab-new" role="tab" aria-selected="false">Novo relatório</button>
   </div>
   <div class="ov-scroll" id="panel-list">
+    <div class="warn" id="storageWarn" hidden><strong>Atenção:</strong> este navegador pode apagar o diário e os relatórios (por exemplo, o navegador embutido do app do Claude). Abra o Guia sempre pelo ícone da Tela de Início e faça backups.</div>
     <div id="reportList"></div>
+    <section class="backup">
+      <h3>Backup</h3>
+      <p class="note">Guarda todos os relatórios, notas, fotos e o trajeto num arquivo (em Arquivos, iCloud ou Drive). Use "Restaurar" para trazer tudo de volta, aqui ou em outro celular. Também aceita relatórios exportados (.html).</p>
+      <label class="chk"><input type="checkbox" id="bkClips"> Incluir clipes de vídeo (arquivo bem maior)</label>
+      <div class="voice-row" style="margin-top:8px">
+        <button class="btn primary" id="bkBtn">Fazer backup</button>
+        <label class="btn" for="bkFile" style="text-align:center">Restaurar</label>
+      </div>
+      <input type="file" id="bkFile" accept=".json,.html,application/json,text/html" hidden>
+      <div class="status" id="bkStatus"></div>
+    </section>
     <div class="status" id="storageInfo"></div>
   </div>
   <div class="ov-scroll" id="panel-new" hidden>
@@ -428,6 +444,6 @@ dialog input[type=password], dialog select {
   </form>
 </dialog>
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=19"></script>
+<script type="module" src="app.js?v=20"></script>
 </body>
 </html>

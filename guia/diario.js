@@ -316,8 +316,7 @@ async function renderList() {
     card.addEventListener("click", () => openReport(r.id));
     box.appendChild(card);
   }
-  const est = await navigator.storage?.estimate?.().catch(() => null);
-  $("storageInfo").textContent = est ? `Espaço usado pelo diário neste celular: ${(est.usage / 1048576).toFixed(0)} MB` : "";
+  renderStorageInfo();
 }
 
 async function updatePreview() {
@@ -447,8 +446,8 @@ async function exportReport() {
       budget -= m.blob.size;
       data.set(mid, await blobToDataURL(m.blob));
     }
-    const fig = (h) => h.clipe != null && data.has(h.clipe) ? `<video controls playsinline src="${data.get(h.clipe)}"></video>`
-      : h.foto != null && data.has(h.foto) ? `<img alt="${esc(h.lugar)}" src="${data.get(h.foto)}">` : "";
+    const fig = (h) => h.clipe != null && data.has(h.clipe) ? `<video controls playsinline data-mid="${h.clipe}" src="${data.get(h.clipe)}"></video>`
+      : h.foto != null && data.has(h.foto) ? `<img alt="${esc(h.lugar)}" data-mid="${h.foto}" src="${data.get(h.foto)}">` : "";
     const center = r.line.length ? r.line[Math.floor(r.line.length / 2)] : null;
     const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(r.title)}</title>
@@ -465,7 +464,7 @@ img,video,svg{width:100%;height:auto;border-radius:12px;display:block;margin:10p
 article{border-top:1px solid var(--line);padding:14px 0}.t{font:600 .85rem system-ui,sans-serif;color:var(--acc);margin-right:6px}
 a{color:var(--acc)}footer{margin-top:40px;font:13px system-ui,sans-serif;color:var(--mut)}
 </style></head><body><main>
-${r.cover != null && data.has(r.cover) ? `<img class="cover" alt="" src="${data.get(r.cover)}">` : ""}
+${r.cover != null && data.has(r.cover) ? `<img class="cover" alt="" data-mid="${r.cover}" src="${data.get(r.cover)}">` : ""}
 <h1>${esc(r.title)}</h1><p class="sub">${esc(r.subtitle)} · ${esc(fmtPeriod(r.from, r.to))}</p>
 <div class="stats"><span><b>${r.stats.km.toFixed(1).replace(".", ",")}</b> km</span><span><b>${r.stats.days}</b> dia(s)</span><span><b>${r.stats.stops}</b> paradas</span><span><b>${r.stats.photos}</b> fotos</span></div>
 ${routeSVG(r.line)}
@@ -479,18 +478,127 @@ ${r.facts.length ? `<h2>Curiosidades do caminho</h2><ul>${r.facts.map((f) => `<l
 <script type="application/json" id="dados">${JSON.stringify({ ...r, line: r.line }).replace(/</g, "\\u003c")}</script>
 </body></html>`;
     const name = `viagem-${r.fromStr}${r.toStr !== r.fromStr ? "_a_" + r.toStr : ""}.html`;
-    const file = new File([html], name, { type: "text/html" });
-    if (navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], title: r.title }).catch(() => {});
-    } else {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(file); a.download = name;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-    }
+    await saveFile(new File([html], name, { type: "text/html" }), r.title);
   } finally {
     $("exportBtn").textContent = "Exportar";
   }
+}
+
+// Salva um arquivo: no celular abre o menu Compartilhar (Salvar em Arquivos, Drive…); no computador baixa
+async function saveFile(file, title) {
+  if (navigator.canShare?.({ files: [file] })) {
+    try { await navigator.share({ files: [file], title }); return true; } catch (e) { if (e.name === "AbortError") return false; }
+  }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(file); a.download = file.name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  return true;
+}
+
+// ---------- Backup completo e restauração ----------
+async function getAll(name) { return done((await store(name)).getAll()); }
+async function backupAll() {
+  const withClips = $("bkClips").checked;
+  $("bkStatus").textContent = "Preparando o backup…";
+  try {
+    const [events, reports, media] = await Promise.all([getAll("events"), getAll("reports"), getAll("media")]);
+    const clipIds = new Set(events.filter((e) => e.type === "clipe").map((e) => e.mediaId));
+    const out = [];
+    for (const m of media) {
+      if (!withClips && clipIds.has(m.id)) continue;
+      out.push({ id: m.id, type: m.type, t: m.t, data: await blobToDataURL(m.blob) });
+    }
+    const kept = new Set(out.map((m) => m.id));
+    const json = JSON.stringify({
+      format: "guia-backup", v: 1, created: Date.now(),
+      events: events.map((e) => (e.mediaId != null && !kept.has(e.mediaId) ? { ...e, mediaId: null } : e)),
+      reports, media: out,
+    });
+    const name = `guia-backup-${isoDay(Date.now())}.json`;
+    const ok = await saveFile(new File([json], name, { type: "application/json" }), "Backup do Guia de Rua");
+    if (ok) { try { localStorage.setItem("guia.lastBackup", String(Date.now())); } catch {} }
+    $("bkStatus").textContent = ok ? `Backup pronto (${(json.length / 1048576).toFixed(1)} MB): ${reports.length} relatórios, ${events.filter((e) => e.type !== "pos").length} registros, ${out.length} fotos/clipes.` : "Backup cancelado.";
+  } catch (e) {
+    $("bkStatus").textContent = "Não consegui gerar o backup: " + (e.message || e);
+  }
+  renderStorageInfo();
+}
+
+function dataURLToBlob(url) {
+  const [head, b64] = url.split(",");
+  return b64ToBlob(b64, head.match(/data:([^;]+)/)?.[1] || "application/octet-stream");
+}
+async function addMedia(blob, t = Date.now()) { return done((await store("media", "readwrite")).add({ blob, type: blob.type, t })); }
+function remapReport(r, map) {
+  const m = (id) => (id != null && map.has(id) ? map.get(id) : null);
+  const copy = structuredClone(r);
+  delete copy.id;
+  copy.cover = m(copy.cover);
+  for (const d of copy.days || []) for (const h of d.destaques || []) { h.foto = m(h.foto); h.clipe = m(h.clipe); }
+  return copy;
+}
+
+// Restaura um backup completo (.json) ou um relatório exportado (.html), sem duplicar o que já existe
+async function restoreFile(file) {
+  $("bkStatus").textContent = "Lendo o arquivo…";
+  try {
+    const text = await file.text();
+    const existingReports = await getAll("reports");
+    const reportKey = (r) => `${r.created}|${r.title}`;
+    const haveReports = new Set(existingReports.map(reportKey));
+    let addedReports = 0, addedEvents = 0;
+
+    if (text.trimStart().startsWith("{")) {
+      const bk = JSON.parse(text);
+      if (bk.format !== "guia-backup") throw new Error("Este arquivo não é um backup do Guia.");
+      const map = new Map();
+      for (const m of bk.media || []) map.set(m.id, await addMedia(dataURLToBlob(m.data), m.t));
+      const evKey = (e) => `${e.t}|${e.type}|${e.text || ""}|${e.lat || ""}`;
+      const haveEvents = new Set((await getAll("events")).map(evKey));
+      const evStore = await store("events", "readwrite");
+      for (const e of bk.events || []) {
+        if (haveEvents.has(evKey(e))) continue;
+        const copy = { ...e, mediaId: e.mediaId != null && map.has(e.mediaId) ? map.get(e.mediaId) : null };
+        delete copy.id;
+        evStore.add(copy); addedEvents++;
+      }
+      for (const r of bk.reports || []) {
+        if (haveReports.has(reportKey(r))) continue;
+        await putReport(remapReport(r, map)); addedReports++;
+      }
+    } else {
+      const doc = new DOMParser().parseFromString(text, "text/html");
+      const raw = doc.getElementById("dados")?.textContent;
+      if (!raw) throw new Error("Este arquivo não é um relatório exportado pelo Guia.");
+      const r = JSON.parse(raw);
+      if (!haveReports.has(reportKey(r))) {
+        const map = new Map();
+        for (const el of doc.querySelectorAll("[data-mid]")) {
+          const id = +el.dataset.mid;
+          const src = el.getAttribute("src") || "";
+          if (!map.has(id) && src.startsWith("data:")) map.set(id, await addMedia(dataURLToBlob(src)));
+        }
+        await putReport(remapReport(r, map)); addedReports++;
+      }
+    }
+    $("bkStatus").textContent = addedReports || addedEvents
+      ? `Restaurado: ${addedReports} relatório(s) e ${addedEvents} registro(s) do diário.`
+      : "Tudo deste arquivo já estava no app.";
+    renderList();
+  } catch (e) {
+    $("bkStatus").textContent = e.message || "Não consegui ler esse arquivo.";
+  }
+}
+
+async function renderStorageInfo() {
+  const est = await navigator.storage?.estimate?.().catch(() => null);
+  const persisted = await navigator.storage?.persisted?.().catch(() => false);
+  let last = 0;
+  try { last = +localStorage.getItem("guia.lastBackup") || 0; } catch {}
+  const lastTxt = last ? `Último backup: ${new Date(last).toLocaleString("pt-BR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}.` : "Nenhum backup feito ainda.";
+  $("storageInfo").textContent = [est ? `Espaço usado: ${(est.usage / 1048576).toFixed(0)} MB.` : "", lastTxt].filter(Boolean).join(" ");
+  $("storageWarn").hidden = !!persisted;
 }
 
 async function onGenerate() {
@@ -501,7 +609,8 @@ async function onGenerate() {
     const r = await generateReport(f, t, (s) => { $("dStatus").textContent = s; });
     $("dStatus").textContent = "";
     showTab("list");
-    openReport(r.id);
+    await openReport(r.id);
+    offerCopy();
   } catch (e) {
     $("dStatus").textContent = deps.explain ? deps.explain(e) : e.message;
   } finally {
@@ -518,6 +627,12 @@ export async function shrinkImage(file, max = 1600) {
   c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
   bmp.close?.();
   return new Promise((res) => c.toBlob(res, "image/jpeg", 0.85));
+}
+
+// Depois de gerar um relatório, sugere guardar uma cópia fora do app
+export async function offerCopy() {
+  const ok = await confirmBox("Relatório pronto e guardado no app. Quer salvar também uma cópia em Arquivos ou no Drive? Assim ele nunca se perde, mesmo se o navegador apagar os dados.", "Salvar cópia");
+  if (ok) exportReport();
 }
 
 export async function addNote(text) {
@@ -568,5 +683,7 @@ export function initDiary(d) {
   $("deleteBtn").addEventListener("click", onDelete);
   $("pinBtn").addEventListener("click", onPin);
   $("exportBtn").addEventListener("click", exportReport);
+  $("bkBtn").addEventListener("click", backupAll);
+  $("bkFile").addEventListener("change", () => { const f = $("bkFile").files[0]; if (f) restoreFile(f); $("bkFile").value = ""; });
 }
 export { openReport };

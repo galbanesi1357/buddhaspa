@@ -1,5 +1,5 @@
 import Anthropic from "./vendor/anthropic-sdk.js";
-import { initDiary, addEvent, addNote, b64ToBlob, generateReport, openDiary, openReport, loadMemory, memoryNear, memorySearch, describeMemory, sessionSummary, discardBetween, shrinkImage } from "./diario.js?v=4";
+import { initDiary, addEvent, addNote, b64ToBlob, generateReport, openDiary, openReport, loadMemory, memoryNear, memorySearch, describeMemory, sessionSummary, discardBetween, shrinkImage, offerCopy } from "./diario.js?v=5";
 
 // ---------- Configuração ----------
 const MODEL = "claude-opus-5-5";
@@ -15,7 +15,7 @@ const NAV = {
 };
 
 // Versão deste código. Ao publicar, aumente aqui, em version.json e em app.js?v= no index.html.
-const APP_VERSION = 19;
+const APP_VERSION = 20;
 
 const store = {
   get(k, d) { try { const v = localStorage.getItem("guia." + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
@@ -758,7 +758,7 @@ async function runTool(name, input) {
       return { resultado: "Nota guardada." };
     case "gerar_relatorio": {
       const r = await generateReport(input.de, input.ate, (st) => { if (st) addMsg(st, "sys"); });
-      openDiary("list"); openReport(r.id);
+      openDiary("list"); await openReport(r.id); offerCopy();
       return { resultado: "Relatório gerado e aberto na tela.", titulo: r.title, periodo: `${input.de} a ${input.ate}` };
     }
     case "consultar_memoria": {

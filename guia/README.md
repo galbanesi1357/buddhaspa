@@ -24,6 +24,8 @@ Enquanto você usa o app, ele guarda **só no celular** o trajeto do GPS, o que 
 - **Fotos do rolo da câmera:** toque no **＋** dentro da caixa de mensagem, escolha a foto, escreva um comentário ("almoço com a Vanderlar no Coal Office") e envie. O Claude vê a foto e responde, e ela fica no diário com o comentário. Fotos antigas ficam com a data em que foram tiradas. Também dá para anexar várias de uma vez em **Diário → Novo relatório → 📷 Adicionar fotos da galeria**.
 - **Selfie:** com a câmera ligada, o botão **⇄ Selfie** sobre o mapa vira para a câmera frontal (e **⇄ Traseira** volta). Fotos e clipes do diário saem com você no quadro; o guia ao vivo passa a comentar o cenário atrás de você.
 - **Foto:** com a câmera ligada, o botão **◉ Foto** guarda o momento no diário; essas fotos têm prioridade no relatório.
+- **Backup e restauração:** em **Diário → Relatórios → Backup**, toque em **Fazer backup** para salvar tudo (relatórios, notas, fotos, trajeto e, se marcar, os clipes) num arquivo em Arquivos, iCloud ou Drive. **Restaurar** traz tudo de volta, sem duplicar, no mesmo celular ou em outro. Também aceita um relatório exportado (`.html`).
+- Ao gerar um relatório, o app oferece salvar uma cópia em Arquivos na hora. Se o navegador não garantir o armazenamento (como o navegador embutido do app do Claude), aparece um aviso no Diário.
 - Desligue em **Ajustes → Diário de viagem** se não quiser guardar nada.
 
 ## Voz mais natural
