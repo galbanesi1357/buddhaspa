@@ -27,6 +27,8 @@ const S = {
   liveDirections: store.get("liveDirections", false),
   navVoice: store.get("navVoice", false),
   voiceURI: store.get("voiceURI", ""),
+  openaiKey: store.get("openaiKey", ""),
+  openaiVoice: store.get("openaiVoice", "coral"),
   live: false,
   liveBusy: false,
   liveReadyAt: 0,
@@ -166,6 +168,8 @@ if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged 
 const speechQ = [];
 function enqueueSpeech(text) {
   const item = { text, idx: 0, queuedAt: Date.now(), startedAt: 0, dead: false };
+  if (cloudVoiceOn()) { cloudEnqueue(item); return; }
+  if (!("speechSynthesis" in window)) return;
   const u = new SpeechSynthesisUtterance(text);
   u.lang = "pt-BR";
   if (ptVoice) u.voice = ptVoice;
@@ -183,15 +187,16 @@ function enqueueSpeech(text) {
   speechSynthesis.speak(u);
 }
 function speak(text, { interrupt = false } = {}) {
-  if (!S.voice || !("speechSynthesis" in window) || !text) return;
+  if (!S.voice || !text || !(cloudVoiceOn() || "speechSynthesis" in window)) return;
   if (interrupt) stopSpeech();
   const clean = text.replace(/[*_#`>|]/g, "").replace(/\s+/g, " ").trim();
   const parts = clean.match(/[^.!?…]+[.!?…]*/g) || [clean];
   parts.map((p) => p.trim()).filter(Boolean).forEach(enqueueSpeech);
 }
 function stopSpeech() {
-  speechQ.splice(0).forEach((i) => { i.dead = true; });
+  speechQ.splice(0).forEach((i) => { i.dead = true; i.finish?.(); });
   if ("speechSynthesis" in window) speechSynthesis.cancel();
+  cloudStop();
 }
 // Está falando? Ignora sinais presos (alguns celulares nunca avisam que terminaram)
 function isSpeaking() {
@@ -199,21 +204,110 @@ function isSpeaking() {
     const h = speechQ[0];
     const est = (h.text.split(" ").length / (2.6 * S.rate)) * 1000 + 3000;
     const t0 = h.startedAt || Math.max(h.queuedAt, S.lastSpeechEnd || 0);
-    const limit = h.startedAt ? est : est + 2000;
+    // A voz da nuvem precisa baixar o áudio antes de começar
+    const limit = h.startedAt ? est : est + (h.cloud ? 15000 : 2000);
     if (Date.now() - t0 <= limit) break;
     h.dead = true; speechQ.shift(); S.lastSpeechEnd = Date.now();
-    if (!speechQ.length) speechSynthesis.cancel();
+    h.finish?.();
+    if (!speechQ.length && "speechSynthesis" in window) speechSynthesis.cancel();
   }
   return speechQ.length > 0;
 }
 // Retoma o que falta na nova velocidade, a partir da última palavra falada
 function respeakAtCurrentRate() {
-  if (!speechQ.length) return;
+  if (cloudAudio) { cloudAudio.defaultPlaybackRate = cloudAudio.playbackRate = S.rate; }
+  if (!speechQ.length || speechQ[0].cloud) return;
   const items = speechQ.splice(0);
   items.forEach((i) => { i.dead = true; });
   speechSynthesis.cancel();
   const rest = items.map((it, k) => (k === 0 && it.startedAt ? it.text.slice(it.idx) : it.text).trim()).filter(Boolean);
   setTimeout(() => rest.forEach(enqueueSpeech), 80);
+}
+
+// ---------- Voz natural na nuvem (OpenAI, opcional) ----------
+// Só é usada se houver uma chave da OpenAI em Ajustes; senão fica a voz do celular.
+const OPENAI_TTS = "https://api.openai.com/v1/audio/speech";
+const TTS_STYLE = "Fale em português do Brasil, com sotaque brasileiro natural, em tom caloroso e animado de guia turístico, com ritmo fluido.";
+const SILENT_WAV = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=";
+const cloudAudio = typeof Audio === "function" ? new Audio() : null;
+if (cloudAudio) { cloudAudio.preservesPitch = true; cloudAudio.webkitPreservesPitch = true; }
+let cloudCtrl = new AbortController(), cloudPumping = false, cloudFailed = false, audioUnlocked = false;
+
+function cloudVoiceOn() { return !!(S.openaiKey && cloudAudio && !cloudFailed); }
+
+// iPhone só deixa tocar áudio depois de um toque; destrava o player no primeiro toque
+function unlockAudio() {
+  if (audioUnlocked || !cloudAudio || !S.openaiKey) return;
+  audioUnlocked = true;
+  cloudAudio.src = SILENT_WAV;
+  cloudAudio.play().catch(() => { audioUnlocked = false; });
+}
+document.addEventListener("click", unlockAudio, true);
+
+async function fetchTTS(text, key = S.openaiKey, voice = S.openaiVoice, signal = cloudCtrl.signal) {
+  const r = await fetch(OPENAI_TTS, {
+    method: "POST", signal,
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ model: "gpt-4o-mini-tts", voice, input: text, instructions: TTS_STYLE, response_format: "mp3" }),
+  });
+  if (!r.ok) {
+    let detail = "";
+    try { detail = (await r.json())?.error?.code || ""; } catch {}
+    const msg = r.status === 401 ? "A chave da OpenAI não foi aceita."
+      : r.status === 429 && /quota/.test(detail) ? "A conta da OpenAI está sem créditos."
+      : r.status === 429 ? "Muitas solicitações à OpenAI seguidas."
+      : `A OpenAI respondeu com erro (${r.status}).`;
+    const e = new Error(msg); e.status = r.status; throw e;
+  }
+  return URL.createObjectURL(await r.blob());
+}
+
+function cloudEnqueue(item) {
+  item.cloud = true;
+  item.audio = fetchTTS(item.text); // já baixa enquanto a frase anterior toca
+  item.audio.catch(() => {});
+  speechQ.push(item);
+  cloudPump();
+}
+
+async function cloudPump() {
+  if (cloudPumping) return;
+  cloudPumping = true;
+  try {
+    while (speechQ.length && speechQ[0].cloud) {
+      const it = speechQ[0];
+      let url;
+      try { url = await it.audio; } catch (e) {
+        if (it.dead || e.name === "AbortError") { if (speechQ[0] === it) speechQ.shift(); continue; }
+        // Falhou: avisa uma vez e passa a usar a voz do celular
+        cloudFailed = true;
+        addMsg(`${e.message} Usando a voz do celular.`, "err");
+        const rest = speechQ.splice(0).filter((i) => !i.dead);
+        rest.forEach((i) => { i.dead = true; });
+        rest.forEach((i) => enqueueSpeech(i.text));
+        break;
+      }
+      if (it.dead) { URL.revokeObjectURL(url); continue; }
+      it.startedAt = Date.now();
+      cloudAudio.src = url;
+      cloudAudio.defaultPlaybackRate = cloudAudio.playbackRate = S.rate;
+      await new Promise((res) => {
+        it.finish = res;
+        cloudAudio.onended = cloudAudio.onerror = res;
+        cloudAudio.play().catch(res);
+      });
+      URL.revokeObjectURL(url);
+      if (speechQ[0] === it) { speechQ.shift(); S.lastSpeechEnd = Date.now(); }
+    }
+  } finally {
+    cloudPumping = false;
+  }
+}
+
+function cloudStop() {
+  cloudCtrl.abort();
+  cloudCtrl = new AbortController();
+  if (cloudAudio && !cloudAudio.paused) cloudAudio.pause();
 }
 
 // ---------- Interface de conversa ----------
@@ -913,17 +1007,37 @@ function listen() {
 function openSettings() {
   $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("liveDirections").value = S.liveDirections ? "on" : "off"; $("navVoice").value = S.navVoice ? "on" : "off"; $("livePace").value = S.livePace;
   fillVoiceSelect();
+  $("openaiKey").value = S.openaiKey; $("openaiVoice").value = S.openaiVoice;
   $("settings").showModal();
 }
 $("settings").addEventListener("close", () => {
   if ($("settings").returnValue !== "save") { pickVoice(); return; }
   S.voiceURI = $("voiceSel").value; store.set("voiceURI", S.voiceURI); pickVoice();
+  const newKey = $("openaiKey").value.trim();
+  if (newKey !== S.openaiKey) { cloudFailed = false; audioUnlocked = false; }
+  S.openaiKey = newKey; S.openaiVoice = $("openaiVoice").value;
+  store.set("openaiKey", S.openaiKey); store.set("openaiVoice", S.openaiVoice);
   S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.liveDirections = $("liveDirections").value === "on"; S.navVoice = $("navVoice").value === "on"; S.livePace = $("livePace").value;
   store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("navVoice", S.navVoice); store.set("livePace", S.livePace);
   client = S.key ? new Anthropic({ apiKey: S.key, dangerouslyAllowBrowser: true }) : null;
   if (S.route) startRoute(S.route.dest).catch((e) => addMsg(e.message, "err"));
 });
 
+$("cloudTest").addEventListener("click", async () => {
+  const key = $("openaiKey").value.trim();
+  if (!key) { $("cloudStatus").textContent = "Cole a chave da OpenAI primeiro."; return; }
+  stopSpeech();
+  cloudAudio.src = SILENT_WAV; cloudAudio.play().catch(() => {}); // destrava o áudio dentro do toque
+  $("cloudStatus").textContent = "Gerando a voz…";
+  try {
+    const url = await fetchTTS("Olá! Esta é a minha voz natural. Vamos passear pela cidade?", key, $("openaiVoice").value, undefined);
+    cloudAudio.src = url; cloudAudio.defaultPlaybackRate = cloudAudio.playbackRate = S.rate;
+    await cloudAudio.play();
+    $("cloudStatus").textContent = "Funcionou. Toque em Salvar para usar esta voz.";
+  } catch (e) {
+    $("cloudStatus").textContent = e.message || "Não foi possível testar.";
+  }
+});
 $("voiceTest").addEventListener("click", () => {
   const v = ptVoices().find((x) => x.voiceURI === $("voiceSel").value) || ptVoices()[0];
   if (!v) return;

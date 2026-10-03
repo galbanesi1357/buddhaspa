@@ -211,6 +211,23 @@ dialog input[type=password], dialog select {
       <button type="button" class="btn" id="voiceTest">Testar</button>
     </div>
     <div class="note">As vozes vêm do próprio celular. Para vozes bem mais naturais: no iPhone, Ajustes → Acessibilidade → Conteúdo Falado → Vozes → Português (Brasil) e baixe uma voz "Aprimorada" ou "Premium" (ex.: Luciana ou Felipe). No Android, instale "Serviços de fala do Google" e, em Configurações → Conversão de texto em voz, baixe o português (Brasil). Depois volte aqui e escolha a voz.</div>
+    <label for="openaiKey">Voz natural de IA (opcional, OpenAI)</label>
+    <input type="password" id="openaiKey" placeholder="sk-… (deixe vazio para usar a voz do celular)" autocomplete="off">
+    <div class="voice-row" style="margin-top:8px">
+      <select id="openaiVoice">
+        <option value="coral">Coral (feminina, calorosa)</option>
+        <option value="nova">Nova (feminina, animada)</option>
+        <option value="shimmer">Shimmer (feminina, suave)</option>
+        <option value="sage">Sage (feminina, calma)</option>
+        <option value="ash">Ash (masculina, clara)</option>
+        <option value="ballad">Ballad (masculina, expressiva)</option>
+        <option value="onyx">Onyx (masculina, grave)</option>
+        <option value="echo">Echo (masculina, neutra)</option>
+        <option value="verse">Verse (masculina, narrador)</option>
+      </select>
+      <button type="button" class="btn" id="cloudTest">Testar</button>
+    </div>
+    <div class="note" id="cloudStatus">Com uma chave da OpenAI, as falas usam uma voz neural com sotaque brasileiro (cerca de US$ 1 por hora de fala, cobrado pela OpenAI). Crie em platform.openai.com → API keys.</div>
     <label for="navVoice">Avisos de navegação ("em 90 metros, vire à esquerda")</label>
     <select id="navVoice">
       <option value="off">Só na tela, sem falar</option>
@@ -243,6 +260,6 @@ dialog input[type=password], dialog select {
 </dialog>
 
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=11"></script>
+<script type="module" src="app.js?v=12"></script>
 </body>
 </html>

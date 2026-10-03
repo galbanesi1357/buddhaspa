@@ -18,6 +18,10 @@ O app usa as vozes instaladas no celular e escolhe sozinho a mais natural em por
 - **iPhone:** Ajustes → Acessibilidade → Conteúdo Falado → Vozes → Português (Brasil). Baixe uma voz "Aprimorada" ou "Premium" (Luciana ou Felipe).
 - **Android:** instale ou atualize "Serviços de fala do Google" e, em Configurações → Conversão de texto em voz, baixe o português (Brasil).
 
+### Voz de IA (OpenAI, opcional)
+
+Para uma voz neural, bem mais natural, cole uma chave da OpenAI em **Ajustes → Voz natural de IA**, escolha a voz e toque em **Testar**. Cada frase é gerada pelo modelo `gpt-4o-mini-tts`, com sotaque brasileiro. O custo é cobrado pela OpenAI, cerca de US$ 1 por hora de fala. Se a chave falhar ou acabarem os créditos, o app avisa e volta para a voz do celular.
+
 ## Como usar
 
 1. Abra o endereço publicado no navegador do celular (Chrome no Android ou Safari no iPhone). É preciso usar **https**, porque sem ele o celular bloqueia o GPS e a câmera.
@@ -33,7 +37,7 @@ No repositório, abra **Settings → Pages**, escolha "Deploy from a branch", se
 
 ## Atualizações
 
-O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=12`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
+O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=13`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
 
 ## Custos e privacidade
 
@@ -42,6 +46,7 @@ O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma n
 - A chave da API fica salva apenas no navegador deste celular e é enviada direto para a Anthropic. Não use esse modo em um site aberto a outras pessoas, porque qualquer pessoa com acesso ao aparelho pode ver a chave.
 - Com os avisos de navegação silenciados, a rota não consulta o Claude pela câmera nas conversões, o que economiza.
 - O **Guia ao vivo** consulta o Claude a cada fala: no modo contínuo são 6 consultas por minuto, o que dá uns 4 a 6 dólares por hora de passeio. Nos modos normal e calmo sai bem mais barato.
+- A chave da OpenAI, se usada, também fica só neste navegador e vai direto para a OpenAI, junto com o texto de cada fala.
 - As imagens da câmera vão para o Claude só no momento da pergunta e não ficam guardadas pelo app.
 
 ## Limitações
