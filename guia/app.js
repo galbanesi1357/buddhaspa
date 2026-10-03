@@ -2,7 +2,8 @@ import Anthropic from "./vendor/anthropic-sdk.js";
 import { initDiary, addEvent, addNote, b64ToBlob, generateReport, openDiary, openReport, loadMemory, memoryNear, memorySearch, describeMemory, sessionSummary, discardBetween, shrinkImage, offerCopy } from "./diario.js?v=5";
 
 // ---------- Configuração ----------
-const MODEL = "claude-opus-5-5";
+// Modelos: o chat usa o Sonnet por padrão (mais barato); guia ao vivo, câmera e relatórios usam o Opus por padrão
+const MODELS = { sonnet: "claude-sonnet-5-5", opus: "claude-opus-5-5" };
 const NOMINATIM = "https://nominatim.openstreetmap.org";
 const OVERPASS = "https://overpass-api.de/api/interpreter";
 const ROUTER = { foot: "routed-foot", car: "routed-car", bike: "routed-bike" };
@@ -15,7 +16,7 @@ const NAV = {
 };
 
 // Versão deste código. Ao publicar, aumente aqui, em version.json e em app.js?v= no index.html.
-const APP_VERSION = 22;
+const APP_VERSION = 23;
 
 const store = {
   get(k, d) { try { const v = localStorage.getItem("guia." + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
@@ -38,6 +39,8 @@ const S = {
   lastClip: 0,
   recording: false,
   memory: [],
+  chatModel: store.get("chatModel", "sonnet"),
+  guideModel: store.get("guideModel", "opus"),
   facing: "environment", // "user" = câmera frontal (selfie)
   liveSessionStart: 0,
   openaiVoice: store.get("openaiVoice", "coral"),
@@ -415,7 +418,7 @@ async function reverseGeocode(p) {
   const rua = [a.road, a.house_number].filter(Boolean).join(", ");
   const bairro = a.suburb || a.neighbourhood || a.quarter || "";
   const cidade = a.city || a.town || a.village || a.municipality || "";
-  return { completo: j.display_name, curto: [rua, bairro, cidade].filter(Boolean).join(" · "), rua: a.road, bairro, cidade, estado: a.state, lugar: j.name || null };
+  return { completo: j.display_name, curto: [rua, bairro, cidade].filter(Boolean).join(" · "), rua: a.road, bairro, cidade, estado: a.state, pais: a.country, lugar: j.name || null };
 }
 
 // ---------- Busca de lugares ----------
@@ -435,6 +438,9 @@ const CATEGORIES = {
   transporte: ['["highway"="bus_stop"]', '["railway"~"^(station|subway_entrance)$"]', '["amenity"="taxi"]'],
   compras: ['["shop"]'],
   spa_bem_estar: ['["leisure"~"^(spa|fitness_centre|sauna)$"]', '["shop"~"^(beauty|massage|hairdresser)$"]'],
+  livraria: ['["shop"~"^(books|stationery)$"]'],
+  museu_galeria: ['["tourism"~"^(museum|gallery)$"]', '["amenity"="arts_centre"]'],
+  parque: ['["leisure"~"^(park|garden)$"]'],
   qualquer: ['["amenity"]', '["shop"]', '["tourism"]'],
 };
 
@@ -679,15 +685,17 @@ function grabFrame() {
 }
 
 // ---------- Claude ----------
-const SYSTEM = `Você é o Guia de Rua, um assistente de localização e viagem que acompanha a pessoa pelo celular enquanto ela anda, pedala ou dirige.
+const SYSTEM = `Você é o Guia de Rua, um assistente de viagem que acompanha a pessoa pelo celular enquanto ela anda, pedala ou dirige. Além de localização e rotas, você é um concierge completo: dicas do entorno, o que fazer, roteiros, história e cultura do lugar, comida, compras, eventos, horários, preços, transporte, clima, costumes locais e qualquer outra dúvida da viagem.
 
 Como trabalhar:
+- Use web_search para tudo que depende de informação atual ou específica: se um lugar existe e está aberto, horários, avaliações, eventos de hoje, exposições, ingressos, preços, recomendações. Combine com buscar_lugar ou buscar_proximos para localizar no mapa e dizer a distância.
+- Quando a pessoa pedir dicas, sugira opções concretas perto dela, dizendo por que vale a pena e a que distância fica; ofereça levar até lá.
 - Use as ferramentas para dados reais de localização, lugares e rotas. Nunca invente nomes, endereços, distâncias ou horários.
 - Quando houver uma imagem da câmera, ela mostra o que está à frente da pessoa. Use o que aparece (cor das fachadas, placas, lojas, árvores, faixas, esquinas) para orientar: "o restaurante fica depois daquela casa amarela à direita". Só cite o que de fato está visível.
 - Para levar a pessoa a algum lugar: encontre o destino (buscar_lugar ou buscar_proximos) e chame iniciar_rota. Se houver várias opções parecidas, escolha a mais próxima e diga qual escolheu, sem perguntar, a menos que a dúvida seja real.
 - A partir daí o app mostra as conversões na tela (e fala, se a pessoa ativou os avisos falados); você não precisa repetir a rota inteira. Diga só o primeiro passo e o tempo estimado.
 
-Estilo: português do Brasil, frases curtas e naturais, pensadas para serem ouvidas. Até 3 frases, salvo se pedirem detalhes. Sem markdown, listas ou emojis. Distâncias arredondadas ("uns 200 metros").
+Estilo: português do Brasil, frases naturais, pensadas para serem ouvidas. Perguntas simples: até 3 frases. Dicas, roteiros e explicações: até umas 10 frases, em texto corrido. Sem markdown, listas, links ou emojis. Distâncias arredondadas ("uns 200 metros").
 
 Diário de viagem: quando a pessoa contar o que está fazendo, onde comeu, com quem está, o que achou de um lugar, ou pedir para anotar, use anotar_no_diario (sem perguntar). Quando pedir um relatório ou resumo da viagem de um período, use gerar_relatorio com as datas (hoje é a data da "Hora local"); para ver os relatórios guardados, use abrir_historico.
 Memória: você lembra dos passeios anteriores pela ferramenta consultar_memoria. Quando a pessoa estiver num lugar já visitado ou perguntar sobre algo, consulte antes de explicar; não repita o que já foi contado, a menos que ela peça para explicar de novo; faça referência ("como te contei em 12 de setembro") e acrescente algo novo.
@@ -804,7 +812,7 @@ function explainError(e) {
 
 async function claudeCreate(params) {
   return client.beta.messages.create({
-    model: MODEL,
+    model: MODELS[S.guideModel] || MODELS.opus,
     betas: ["server-side-fallback-2026-07-01"],
     fallbacks: "default",
     ...params,
@@ -833,21 +841,28 @@ async function ask(text) {
   S.history.push({ role: "user", content });
 
   try {
-    for (let round = 0; round < 8; round++) {
+    const web = { type: "web_search_20260209", name: "web_search", max_uses: 5 };
+    const loc = { type: "approximate", timezone: Intl.DateTimeFormat().resolvedOptions().timeZone };
+    if (S.address?.cidade) loc.city = S.address.cidade;
+    web.user_location = loc;
+    for (let round = 0; round < 10; round++) {
       const resp = await claudeCreate({
-        max_tokens: 8000, system: SYSTEM, tools: TOOLS, messages: S.history,
+        model: MODELS[S.chatModel] || MODELS.sonnet,
+        max_tokens: 8000, system: SYSTEM, tools: [...TOOLS, web], messages: S.history,
         output_config: { effort: "low" }, cache_control: { type: "ephemeral" },
       });
       if (resp.stop_reason === "refusal") { S.history.length = snapshot; wait.remove(); say("Não posso ajudar com esse pedido."); return; }
       S.history.push({ role: "assistant", content: resp.content });
       const reply = resp.content.filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
       const calls = resp.content.filter((b) => b.type === "tool_use");
+      // Busca na web longa: a API pausa e continua do mesmo ponto na próxima chamada
+      if (resp.stop_reason === "pause_turn") { wait.textContent = "Pesquisando na internet…"; continue; }
       if (resp.stop_reason !== "tool_use" || !calls.length) {
         wait.remove(); say(reply || "Pronto.");
         journal("pergunta", { text, reply }, att ? null : img);
         return;
       }
-      wait.textContent = "Consultando mapa…";
+      wait.textContent = resp.content.some((b) => b.type === "server_tool_use") ? "Pesquisando na internet…" : "Consultando mapa…";
       const results = await Promise.all(calls.map(async (c) => {
         try { return { type: "tool_result", tool_use_id: c.id, content: JSON.stringify(await runTool(c.name, c.input)) }; }
         catch (e) { return { type: "tool_result", tool_use_id: c.id, content: e.message || "Falhou", is_error: true }; }
@@ -1173,7 +1188,7 @@ function listen() {
 
 // ---------- Ajustes ----------
 function openSettings() {
-  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("liveDirections").value = S.liveDirections ? "on" : "off"; $("diaryOn").value = S.diaryOn ? "on" : "off"; $("clipEvery").value = S.clipEvery; $("navVoice").value = S.navVoice ? "on" : "off"; $("livePace").value = S.livePace;
+  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("liveDirections").value = S.liveDirections ? "on" : "off"; $("chatModel").value = S.chatModel; $("guideModel").value = S.guideModel; $("diaryOn").value = S.diaryOn ? "on" : "off"; $("clipEvery").value = S.clipEvery; $("navVoice").value = S.navVoice ? "on" : "off"; $("livePace").value = S.livePace;
   fillVoiceSelect();
   $("openaiKey").value = S.openaiKey; $("openaiVoice").value = S.openaiVoice;
   $("settings").showModal();
@@ -1185,8 +1200,8 @@ $("settings").addEventListener("close", () => {
   if (newKey !== S.openaiKey) { cloudFailed = false; audioUnlocked = false; }
   S.openaiKey = newKey; S.openaiVoice = $("openaiVoice").value;
   store.set("openaiKey", S.openaiKey); store.set("openaiVoice", S.openaiVoice);
-  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.liveDirections = $("liveDirections").value === "on"; S.diaryOn = $("diaryOn").value === "on"; S.clipEvery = $("clipEvery").value; S.navVoice = $("navVoice").value === "on"; S.livePace = $("livePace").value;
-  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("diaryOn", S.diaryOn); store.set("clipEvery", S.clipEvery); store.set("navVoice", S.navVoice); store.set("livePace", S.livePace);
+  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.liveDirections = $("liveDirections").value === "on"; if ($("chatModel").value !== S.chatModel) S.history = []; S.chatModel = $("chatModel").value; S.guideModel = $("guideModel").value; S.diaryOn = $("diaryOn").value === "on"; S.clipEvery = $("clipEvery").value; S.navVoice = $("navVoice").value === "on"; S.livePace = $("livePace").value;
+  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("chatModel", S.chatModel); store.set("guideModel", S.guideModel); store.set("diaryOn", S.diaryOn); store.set("clipEvery", S.clipEvery); store.set("navVoice", S.navVoice); store.set("livePace", S.livePace);
   client = S.key ? new Anthropic({ apiKey: S.key, dangerouslyAllowBrowser: true }) : null;
   if (S.route) startRoute(S.route.dest).catch((e) => addMsg(e.message, "err"));
 });

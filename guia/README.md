@@ -5,6 +5,7 @@ Assistente de localização e viagem para o celular. Ele usa o GPS, o mapa e, qu
 ## O que ele faz
 
 - **Onde estou:** endereço, bairro e cidade a partir do GPS. O botão de mira no canto do mapa volta o mapa para a sua posição e faz ele acompanhar você de novo.
+- **Assistente de viagem no chat:** pergunte qualquer coisa da viagem: dicas do entorno, o que fazer agora, roteiros, livrarias, restaurantes, eventos, horários, ingressos, história do lugar. O chat pesquisa na internet quando precisa e localiza os lugares no mapa, e pode levar você até lá. Usa o Sonnet 5.5 por padrão (mais barato); dá para trocar para o Opus 5.5 em **Ajustes → Inteligência do chat**. O guia ao vivo, a câmera e os relatórios têm a sua própria escolha (Opus por padrão).
 - **O que tem por perto:** restaurantes, cafés, farmácias, mercados, caixas eletrônicos, postos, transporte, pontos turísticos e outros, com distância e direção.
 - **Me leve até…:** procura o lugar, traça a rota (a pé, de carro ou de bicicleta) e guia passo a passo. Se você sair da rota, ele recalcula. Por padrão os avisos de conversão aparecem só na tela, sem falar; para ouvi-los, ligue "Avisos de navegação" em Ajustes ou peça no chat ("fala as conversões").
 - **Câmera:** com a câmera ligada, o Claude olha a cena perto de cada conversão e na chegada para dar referências visuais. O botão **Olhar** pede uma descrição na hora.
@@ -66,6 +67,7 @@ A chave da API, os ajustes e o diário ficam salvos no navegador onde o app foi 
 - Mapa, endereços, lugares e rotas vêm do OpenStreetMap (Nominatim, Overpass e roteamento FOSSGIS), que são gratuitos. Esses serviços públicos têm limite de uso justo e servem bem para uso pessoal.
 - As respostas do Claude são cobradas na sua conta da Anthropic. Cada pergunta com imagem custa poucos centavos de dólar. Durante uma rota com câmera, ele consulta o Claude perto de cada conversão. Defina um limite de gastos no console.
 - A chave da API fica salva apenas no navegador deste celular e é enviada direto para a Anthropic. Não use esse modo em um site aberto a outras pessoas, porque qualquer pessoa com acesso ao aparelho pode ver a chave.
+- O chat com Sonnet custa cerca de metade do Opus. Cada pesquisa na internet custa por volta de US$ 0,01, mais o texto lido.
 - Com os avisos de navegação silenciados, a rota não consulta o Claude pela câmera nas conversões, o que economiza.
 - O **Guia ao vivo** consulta o Claude a cada fala: no modo contínuo são 6 consultas por minuto, o que dá uns 4 a 6 dólares por hora de passeio. Nos modos normal e calmo sai bem mais barato.
 - A chave da OpenAI, se usada, também fica só neste navegador e vai direto para a OpenAI, junto com o texto de cada fala.

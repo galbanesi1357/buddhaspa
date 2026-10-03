@@ -337,6 +337,17 @@ dialog input[type=password], dialog select {
       <option value="off">Só na tela, sem falar</option>
       <option value="on">Falar em voz alta</option>
     </select>
+    <label for="chatModel">Inteligência do chat</label>
+    <select id="chatModel">
+      <option value="sonnet">Sonnet 5.5 — rápido e mais barato</option>
+      <option value="opus">Opus 5.5 — o mais capaz, custa ~2x</option>
+    </select>
+    <label for="guideModel">Inteligência do guia ao vivo, câmera e relatórios</label>
+    <select id="guideModel">
+      <option value="opus">Opus 5.5 — o mais capaz</option>
+      <option value="sonnet">Sonnet 5.5 — mais barato</option>
+    </select>
+    <div class="note">O chat pesquisa na internet quando precisa (horários, eventos, avaliações). Cada pesquisa custa cerca de US$ 0,01.</div>
     <label for="liveDirections">Guia ao vivo: indicar para onde olhar</label>
     <select id="liveDirections">
       <option value="off">Não, só contar o que há em volta</option>
@@ -451,6 +462,6 @@ dialog input[type=password], dialog select {
   </form>
 </dialog>
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=22"></script>
+<script type="module" src="app.js?v=23"></script>
 </body>
 </html>
