@@ -141,6 +141,8 @@ function speak(text, { interrupt = false } = {}) {
   if (ptVoice) u.voice = ptVoice;
   u.rate = S.rate;
   u.onend = u.onerror = () => { S.lastSpeechEnd = Date.now(); };
+  const words = u.text.split(" ").length;
+  S.speechUntil = Math.max(S.speechUntil || 0, Date.now()) + (words / (2.6 * S.rate)) * 1000 + 3000;
   speechSynthesis.speak(u);
 }
 
@@ -220,7 +222,7 @@ async function nearby(categoria, raio) {
   const r = Math.min(Math.max(raio || 600, 100), 3000);
   const parts = filters.map((f) => `nwr${f}["name"](around:${r},${S.pos.lat},${S.pos.lon});`).join("");
   const q = `[out:json][timeout:20];(${parts});out center tags 80;`;
-  const res = await fetch(OVERPASS, { method: "POST", body: "data=" + encodeURIComponent(q), headers: { "Content-Type": "application/x-www-form-urlencoded" } });
+  const res = await fetch(OVERPASS, { method: "POST", body: "data=" + encodeURIComponent(q), headers: { "Content-Type": "application/x-www-form-urlencoded" }, signal: AbortSignal.timeout(15000) });
   if (!res.ok) throw new Error("Serviço de lugares indisponível (" + res.status + ")");
   const j = await res.json();
   const items = j.elements.map((e) => {
@@ -621,7 +623,7 @@ Regras:
 - Fatos: use os dados do mapa e conhecimento que você tem com segurança. Se não tiver certeza (estrela Michelin, data, "o prédio mais alto", quem projetou), não afirme; diga "parece" ou deixe de fora. Nunca invente nomes.
 - Siga a preferência de direções indicada no início da mensagem.
 - Se a imagem estiver escura, tremida ou sem nada útil, fale do entorno pelos dados do mapa.
-- Só se realmente não houver nada novo para dizer, responda exatamente [SILENCIO].`;
+- Siga a regra de ritmo indicada na mensagem.`;
 
 const LIVE_FILTERS = [
   '["tourism"~"^(attraction|museum|viewpoint|artwork|gallery|theme_park|zoo)$"]',
@@ -640,7 +642,7 @@ async function refreshLivePois() {
   if (S.livePoisAt && dist(S.livePoisAt, S.pos) < 120 && Date.now() - S.livePoisAt.t < 5 * 60000) return;
   const parts = LIVE_FILTERS.map((f) => `nwr${f}["name"](around:350,${S.pos.lat},${S.pos.lon});`).join("");
   const q = `[out:json][timeout:20];(${parts});out center tags 200;`;
-  const res = await fetch(OVERPASS, { method: "POST", body: "data=" + encodeURIComponent(q), headers: { "Content-Type": "application/x-www-form-urlencoded" } });
+  const res = await fetch(OVERPASS, { method: "POST", body: "data=" + encodeURIComponent(q), headers: { "Content-Type": "application/x-www-form-urlencoded" }, signal: AbortSignal.timeout(15000) });
   if (!res.ok) throw new Error("overpass " + res.status);
   const j = await res.json();
   S.livePois = j.elements.map((e) => {
@@ -681,7 +683,11 @@ function livePoiLines() {
 async function liveNarrate() {
   S.liveBusy = true;
   try {
-    await refreshLivePois().catch(() => {});
+    if (!S.livePoisLoading) {
+      S.livePoisLoading = refreshLivePois().catch(() => {}).finally(() => { S.livePoisLoading = null; });
+    }
+    if (S.livePoisLoading && !S.livePois.length) await Promise.race([S.livePoisLoading, new Promise((r) => setTimeout(r, 4000))]);
+    liveStatus("olhando…");
     const img = grabFrame();
     const f = facing();
     const lines = [
@@ -696,6 +702,9 @@ async function liveNarrate() {
     if (S.route && S.liveDirections) { const n = S.route.steps[S.stepIdx + 1]; lines.push(`Rota ativa até ${S.route.dest.nome}; próxima manobra: ${n ? instruction(n) + " em " + fmtDist(dist(S.pos, n.at)) : "chegada"}.`); }
     if (S.pos && S.livePois.length) lines.push(`\nLugares do mapa por perto (até 350 m):\n${livePoiLines()}`);
     lines.push(S.liveSaid.length ? `\nO que você já contou (não repita):\n${S.liveSaid.map((t) => "- " + t).join("\n")}` : "\nVocê ainda não falou nada; comece se apresentando em poucas palavras e contando onde a pessoa está.");
+    lines.push(S.livePace === "continuo"
+      ? "Ritmo contínuo: fale sempre alguma coisa nova, mesmo que a cena não tenha mudado."
+      : "Se realmente não houver nada novo para dizer, responda exatamente [SILENCIO].");
     lines.push(img ? "\nA imagem anexada é o que a pessoa vê agora." : "\nSem imagem da câmera neste momento.");
 
     const content = [];
@@ -706,6 +715,7 @@ async function liveNarrate() {
     S.liveErrors = 0;
     const text = resp.stop_reason === "refusal" ? "" : resp.content.filter((b) => b.type === "text").map((b) => b.text).join(" ").trim();
     if (!text || text.includes("[SILENCIO]")) { S.liveReadyAt = Date.now() + LIVE_GAP[S.livePace] + 5000; return; }
+    liveStatus("falando");
     S.liveSaid.push(text);
     if (S.liveSaid.length > 12) S.liveSaid.shift();
     addMsg(text, "bot");
@@ -714,11 +724,14 @@ async function liveNarrate() {
     const readMs = S.voice ? 0 : (text.split(/\s+/).length / 3) * 1000;
     S.liveReadyAt = Date.now() + readMs + LIVE_GAP[S.livePace];
   } catch (e) {
+    console.warn("guia ao vivo", e);
     S.liveErrors++;
     if (e instanceof Anthropic.AuthenticationError || S.liveErrors >= 3) {
       addMsg(explainError(e) + " Guia ao vivo desligado.", "err");
       setLive(false);
     } else {
+      addMsg(explainError(e) + " Tentando de novo em 15 segundos.", "err");
+      liveStatus("erro, tentando de novo");
       S.liveReadyAt = Date.now() + 15000;
     }
   } finally {
@@ -728,10 +741,13 @@ async function liveNarrate() {
 
 function liveTick() {
   if (!S.live) return;
-  const speaking = "speechSynthesis" in window && (speechSynthesis.speaking || speechSynthesis.pending);
+  let speaking = "speechSynthesis" in window && (speechSynthesis.speaking || speechSynthesis.pending);
+  if (speaking && Date.now() > (S.speechUntil || 0)) { speechSynthesis.cancel(); speaking = false; }
+  if (!speaking && !S.liveBusy && S.liveStatusText === "falando") liveStatus("");
   const idle = !speaking && !S.liveBusy && !S.busy && !S.guideBusy && !rec && document.visibilityState === "visible";
   const sinceSpeech = Date.now() - (S.lastSpeechEnd || 0);
-  if (idle && Date.now() >= S.liveReadyAt && (!S.voice || sinceSpeech >= LIVE_GAP[S.livePace])) liveNarrate();
+  const gapOk = !S.voice || sinceSpeech >= LIVE_GAP[S.livePace] || Date.now() > (S.speechUntil || 0) + LIVE_GAP[S.livePace];
+  if (idle && Date.now() >= S.liveReadyAt && gapOk) liveNarrate();
   S.liveTimer = setTimeout(liveTick, 1000);
 }
 
@@ -756,13 +772,18 @@ async function enableCompass() {
   } catch {}
 }
 
+function liveStatus(t) {
+  S.liveStatusText = t;
+  $("liveBtn").querySelector("span").textContent = S.live ? `Guia ao vivo · ${t || "tocar para parar"}` : "Guia ao vivo";
+}
+
 async function setLive(on) {
   if (on) {
     if (!client) { openSettings(); return; }
     enableCompass();
     if (!S.camOn && !(await setCamera(true))) return;
     if (!S.voice) setVoice(true);
-    S.live = true; S.liveSaid = []; S.liveErrors = 0; S.liveReadyAt = 0; S.lastSpeechEnd = 0;
+    S.live = true; S.liveSaid = []; S.liveErrors = 0; S.liveReadyAt = 0; S.lastSpeechEnd = 0; S.speechUntil = 0;
     keepAwake(true);
     addMsg("Guia ao vivo ligado. Aponte a câmera para a rua e eu vou contando o que há por aqui.", "sys");
     clearTimeout(S.liveTimer);
@@ -775,7 +796,7 @@ async function setLive(on) {
     addMsg("Guia ao vivo desligado.", "sys");
   }
   $("liveBtn").setAttribute("aria-pressed", String(S.live));
-  $("liveBtn").querySelector("span").textContent = S.live ? "Guia ao vivo · tocar para parar" : "Guia ao vivo";
+  liveStatus("");
 }
 
 // ---------- Voz (entrada) ----------
@@ -841,7 +862,13 @@ $("voiceBtn").addEventListener("click", () => {
   else if ("speechSynthesis" in window) speechSynthesis.cancel();
 });
 $("camBtn").addEventListener("click", () => setCamera(!S.camOn));
-$("liveBtn").addEventListener("click", () => setLive(!S.live));
+$("liveBtn").addEventListener("click", () => {
+  if (!S.live && client) {
+    if (!S.voice) setVoice(true);
+    speak("Ligando o guia ao vivo.", { interrupt: true });
+  }
+  setLive(!S.live);
+});
 $("cam").addEventListener("click", () => $("stage").classList.toggle("cam-big"));
 $("micBtn").addEventListener("click", listen);
 $("settingsBtn").addEventListener("click", openSettings);
