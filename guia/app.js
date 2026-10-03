@@ -24,6 +24,7 @@ const S = {
   lookEvery: store.get("lookEvery", "turns"),
   rate: store.get("rate", 1.5),
   livePace: store.get("livePace", "continuo"),
+  liveDirections: store.get("liveDirections", false),
   live: false,
   liveBusy: false,
   liveReadyAt: 0,
@@ -434,6 +435,9 @@ Como trabalhar:
 
 Estilo: português do Brasil, frases curtas e naturais, pensadas para serem ouvidas. Até 3 frases, salvo se pedirem detalhes. Sem markdown, listas ou emojis. Distâncias arredondadas ("uns 200 metros").
 
+Não leia coordenadas numéricas (latitude e longitude) a menos que a pessoa peça.
+Se a pessoa pedir para falar mais rápido ou devagar, ou para o guia ao vivo indicar (ou parar de indicar) para onde olhar, use ajustar_preferencias e confirme em poucas palavras.
+
 Segurança: se a pessoa estiver de carro, seja ainda mais breve e nunca peça para ela olhar a tela.`;
 
 const TOOLS = [
@@ -454,6 +458,11 @@ const TOOLS = [
     input_schema: { type: "object", properties: { lat: { type: "number" }, lon: { type: "number" }, nome: { type: "string" } }, required: ["lat", "lon", "nome"] },
   },
   { name: "status_rota", description: "Situação da navegação em andamento: próxima manobra, distância até ela, quanto falta e próximos passos.", input_schema: { type: "object", properties: {} } },
+  {
+    name: "ajustar_preferencias",
+    description: "Muda preferências do app: velocidade da fala (1, 1.5 ou 2) e se o guia ao vivo deve indicar para onde olhar e virar.",
+    input_schema: { type: "object", properties: { velocidade_fala: { type: "number", enum: [1, 1.5, 2] }, direcoes_no_guia_ao_vivo: { type: "boolean" } } },
+  },
   { name: "parar_rota", description: "Encerra a navegação em andamento.", input_schema: { type: "object", properties: {} } },
 ];
 
@@ -471,6 +480,11 @@ async function runTool(name, input) {
       if (!S.route) return { resultado: "Nenhuma navegação em andamento." };
       const n = S.route.steps[S.stepIdx + 1];
       return { destino: S.route.dest.nome, proxima_manobra: n ? instruction(n) : "chegada", distancia_ate_manobra: n ? fmtDist(dist(S.pos, n.at)) : null, falta: fmtDist(remaining()), proximos: S.route.steps.slice(S.stepIdx + 2, S.stepIdx + 6).map(instruction) };
+    }
+    case "ajustar_preferencias": {
+      if (SPEEDS.includes(input.velocidade_fala)) setRate(input.velocidade_fala);
+      if (typeof input.direcoes_no_guia_ao_vivo === "boolean") { S.liveDirections = input.direcoes_no_guia_ao_vivo; store.set("liveDirections", S.liveDirections); }
+      return { velocidade_fala: speedLabel(S.rate), direcoes_no_guia_ao_vivo: S.liveDirections ? "ligadas" : "desligadas" };
     }
     case "parar_rota": stopRoute(); return { resultado: "Navegação encerrada." };
     default: return { erro: "Ferramenta desconhecida." };
@@ -589,15 +603,14 @@ Sua fala: de 1 a 3 frases, até umas 45 palavras, em português do Brasil, em to
 
 O que contar, variando a cada vez:
 - O que aparece na imagem: prédios, igrejas, monumentos, praças, arte de rua, estilo arquitetônico, detalhes curiosos.
-- Lugares por perto que valem um olhar, dizendo para onde virar: "olhe à sua esquerda", "atrás de você", "logo à frente".
+- Lugares por perto que valem a pena, com a distância.
 - História do lugar, do bairro e da cidade; quem morou ou trabalhou ali; o que funciona naquele prédio hoje.
 - Comida e vida local: restaurantes e cafés conhecidos, áreas de compras, mercados, vida noturna.
-- Se houver rota ativa, você pode lembrar a direção a seguir quando ajudar.
 
 Regras:
 - Não repita o que já contou. Se a cena não mudou, fale de outra coisa do entorno, do bairro ou da cidade.
 - Fatos: use os dados do mapa e conhecimento que você tem com segurança. Se não tiver certeza (estrela Michelin, data, "o prédio mais alto", quem projetou), não afirme; diga "parece" ou deixe de fora. Nunca invente nomes.
-- As direções relativas dos lugares vêm prontas nos dados; use-as. Se a direção for desconhecida, descreva pela imagem ou diga a distância.
+- Siga a preferência de direções indicada no início da mensagem.
 - Se a imagem estiver escura, tremida ou sem nada útil, fale do entorno pelos dados do mapa.
 - Só se realmente não houver nada novo para dizer, responda exatamente [SILENCIO].`;
 
@@ -651,7 +664,8 @@ function livePoiLines() {
     .sort((a, b) => a.d - b.d)
     .map((p) => {
       const b = bearing(S.pos, p);
-      return `- ${p.nome} (${p.info}) — ${Math.round(p.d)} m, ${relative(b) || "direção desconhecida"}, a ${cardinal(b)}`;
+      const dir = S.liveDirections ? `, ${relative(b) || "direção desconhecida"}, a ${cardinal(b)}` : "";
+      return `- ${p.nome} (${p.info}) — ${Math.round(p.d)} m${dir}`;
     }).join("\n");
 }
 
@@ -662,12 +676,15 @@ async function liveNarrate() {
     const img = grabFrame();
     const f = facing();
     const lines = [
+      S.liveDirections
+        ? 'Preferência de direções: LIGADA. Diga para onde olhar ou virar ("olhe à sua esquerda", "atrás de você", "logo à frente") usando as direções relativas dos dados; se a direção for desconhecida, descreva pela imagem.'
+        : 'Preferência de direções: DESLIGADA. Não diga para onde olhar, virar ou andar (nada de "à esquerda", "à direita", "atrás de você", "vire", "siga"). Só conte o que há e o que se vê; pode dizer a distância.',
       `Hora local: ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}. Modo: ${MODE_LABEL[S.mode]}.`,
       S.address ? `Local: ${S.address.completo}` : "Local: endereço ainda desconhecido",
       S.pos ? `Coordenadas: ${S.pos.lat.toFixed(5)}, ${S.pos.lon.toFixed(5)} (±${Math.round(S.pos.acc)} m)` : "Sem GPS no momento.",
-      `Câmera apontando para: ${f != null ? cardinal(f) : "direção desconhecida"}${S.pos?.speed > 0.5 ? `; andando a ${Math.round(S.pos.speed * 3.6)} km/h` : ""}.`,
+      `Câmera apontando para: ${S.liveDirections && f != null ? cardinal(f) : "não informado"}${S.pos?.speed > 0.5 ? `; andando a ${Math.round(S.pos.speed * 3.6)} km/h` : ""}.`,
     ];
-    if (S.route) { const n = S.route.steps[S.stepIdx + 1]; lines.push(`Rota ativa até ${S.route.dest.nome}; próxima manobra: ${n ? instruction(n) + " em " + fmtDist(dist(S.pos, n.at)) : "chegada"}.`); }
+    if (S.route && S.liveDirections) { const n = S.route.steps[S.stepIdx + 1]; lines.push(`Rota ativa até ${S.route.dest.nome}; próxima manobra: ${n ? instruction(n) + " em " + fmtDist(dist(S.pos, n.at)) : "chegada"}.`); }
     if (S.pos && S.livePois.length) lines.push(`\nLugares do mapa por perto (até 350 m):\n${livePoiLines()}`);
     lines.push(S.liveSaid.length ? `\nO que você já contou (não repita):\n${S.liveSaid.map((t) => "- " + t).join("\n")}` : "\nVocê ainda não falou nada; comece se apresentando em poucas palavras e contando onde a pessoa está.");
     lines.push(img ? "\nA imagem anexada é o que a pessoa vê agora." : "\nSem imagem da câmera neste momento.");
@@ -779,18 +796,31 @@ function listen() {
 
 // ---------- Ajustes ----------
 function openSettings() {
-  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("rate").value = String(S.rate); $("livePace").value = S.livePace;
+  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("liveDirections").value = S.liveDirections ? "on" : "off"; $("livePace").value = S.livePace;
   $("settings").showModal();
 }
 $("settings").addEventListener("close", () => {
   if ($("settings").returnValue !== "save") return;
-  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.rate = +$("rate").value; S.livePace = $("livePace").value;
-  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("rate", S.rate); store.set("livePace", S.livePace);
+  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.liveDirections = $("liveDirections").value === "on"; S.livePace = $("livePace").value;
+  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("livePace", S.livePace);
   client = S.key ? new Anthropic({ apiKey: S.key, dangerouslyAllowBrowser: true }) : null;
   if (S.route) startRoute(S.route.dest).catch((e) => addMsg(e.message, "err"));
 });
 
 // ---------- Eventos ----------
+const SPEEDS = [1, 1.5, 2];
+const speedLabel = (r) => `${String(r).replace(".", ",")}x`;
+function setRate(r) {
+  S.rate = r; store.set("rate", r);
+  $("speedBtn").textContent = speedLabel(r);
+  $("speedBtn").setAttribute("aria-label", `Velocidade da fala: ${speedLabel(r)}. Tocar para mudar`);
+}
+$("speedBtn").addEventListener("click", () => {
+  const next = SPEEDS.find((x) => x > S.rate + 0.01) ?? SPEEDS[0];
+  setRate(next);
+  speak(`Velocidade ${speedLabel(next)}`, { interrupt: !S.live });
+});
+
 function setVoice(on) {
   S.voice = on; store.set("voice", on);
   $("voiceBtn").setAttribute("aria-pressed", String(on));
@@ -828,5 +858,6 @@ $("chips").addEventListener("click", async (e) => {
 });
 
 setVoice(S.voice);
+setRate(S.rate);
 startGeo();
 if (!S.key) openSettings();

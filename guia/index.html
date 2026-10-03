@@ -103,7 +103,7 @@ header h1 { font: 600 1.15rem var(--font-display); margin: 0; letter-spacing: .0
 .chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 12px; font-size: .9rem; }
 
 #controls {
-  display: grid; grid-template-columns: auto auto 1fr auto auto; gap: 8px; align-items: center;
+  display: grid; grid-template-columns: auto auto auto 1fr auto auto; gap: 8px; align-items: center;
   padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
   background: var(--surface); border-top: 1px solid var(--line);
 }
@@ -116,6 +116,7 @@ header h1 { font: 600 1.15rem var(--font-display); margin: 0; letter-spacing: .0
 .ctl.listening { background: var(--danger); color: #fff; border-color: var(--danger); }
 #send { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .ctl svg { width: 22px; height: 22px; display: block; }
+#speedBtn { font-weight: 700; font-size: .9rem; min-width: 3.4em; font-variant-numeric: tabular-nums; }
 
 dialog {
   border: 0; border-radius: 16px; padding: 20px; width: min(92vw, 460px);
@@ -176,10 +177,11 @@ dialog input[type=password], dialog select {
   <button type="button" class="ctl" id="voiceBtn" aria-pressed="false" aria-label="Ligar fala em voz alta">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
   </button>
+  <button type="button" class="ctl" id="speedBtn" aria-label="Velocidade da fala: 1,5x. Tocar para mudar">1,5x</button>
   <button type="button" class="ctl" id="camBtn" aria-pressed="false" aria-label="Ligar câmera">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
   </button>
-  <input id="q" placeholder="Pergunte ou diga para onde ir" aria-label="Mensagem">
+  <input id="q" placeholder="Pergunte…" aria-label="Mensagem">
   <button type="button" class="ctl" id="micBtn" aria-label="Falar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/></svg>
   </button>
@@ -201,14 +203,12 @@ dialog input[type=password], dialog select {
       <option value="car">De carro</option>
       <option value="bike">De bicicleta</option>
     </select>
-    <label for="rate">Velocidade da fala</label>
-    <select id="rate">
-      <option value="1">1x (normal)</option>
-      <option value="1.25">1,25x</option>
-      <option value="1.5">1,5x</option>
-      <option value="1.75">1,75x</option>
-      <option value="2">2x</option>
+    <label for="liveDirections">Guia ao vivo: indicar para onde olhar</label>
+    <select id="liveDirections">
+      <option value="off">Não, só contar o que há em volta</option>
+      <option value="on">Sim, dizer "olhe à esquerda", "atrás de você"…</option>
     </select>
+    <div class="note">A velocidade da fala fica no botão 1x / 1,5x / 2x da barra de baixo. Você também pode pedir no chat: "fala mais rápido", "quero as direções".</div>
     <label for="livePace">Ritmo do guia ao vivo</label>
     <select id="livePace">
       <option value="continuo">Contínuo (fala sem parar)</option>
