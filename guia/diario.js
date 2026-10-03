@@ -42,6 +42,77 @@ async function getReport(id) { return done((await store("reports")).get(id)); }
 async function putReport(r) { return done((await store("reports", "readwrite")).put(r)); }
 async function deleteReport(id) { return done((await store("reports", "readwrite")).delete(id)); }
 
+// ---------- Memória (o que já foi contado em passeios anteriores) ----------
+const MEMORY_TYPES = new Set(["narracao", "olhar", "pergunta", "nota"]);
+export async function loadMemory(before = Date.now()) {
+  const out = [];
+  const idx = (await store("events")).index("t");
+  await new Promise((resolve, reject) => {
+    const req = idx.openCursor(IDBKeyRange.upperBound(before, true));
+    req.onsuccess = () => {
+      const c = req.result;
+      if (!c) return resolve();
+      const e = c.value;
+      if (MEMORY_TYPES.has(e.type) && e.text) out.push({ t: e.t, type: e.type, text: e.text, reply: e.reply, lat: e.lat, lon: e.lon, addr: e.addr });
+      c.continue();
+    };
+    req.onerror = () => reject(req.error);
+  });
+  return out;
+}
+// Lembranças perto de um ponto, das mais próximas para as mais distantes
+export function memoryNear(mem, pos, radius = 300, limit = 10) {
+  if (!pos) return [];
+  return mem.filter((m) => m.lat != null)
+    .map((m) => ({ ...m, d: dist(pos, m) }))
+    .filter((m) => m.d <= radius)
+    .sort((a, b) => a.d - b.d)
+    .slice(0, limit);
+}
+export function memorySearch(mem, text, limit = 12) {
+  const words = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(/\W+/).filter((w) => w.length > 3);
+  if (!words.length) return [];
+  const norm = (t) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return mem.map((m) => ({ m, score: words.filter((w) => norm(`${m.text} ${m.reply || ""} ${m.addr || ""}`).includes(w)).length }))
+    .filter((x) => x.score > 0).sort((a, b) => b.score - a.score || b.m.t - a.m.t).slice(0, limit).map((x) => x.m);
+}
+export function describeMemory(m, d) {
+  const when = new Date(m.t).toLocaleDateString("pt-BR", { day: "numeric", month: "short", year: "numeric" });
+  const kind = { narracao: "você contou", olhar: "você descreveu", pergunta: "a pessoa perguntou", nota: "nota da pessoa" }[m.type];
+  const body = m.type === "pergunta" ? `${m.text} → ${(m.reply || "").slice(0, 200)}` : m.text.slice(0, 260);
+  return `${when}${d != null ? `, a ${Math.round(d)} m daqui` : ""}${m.addr ? ` (${m.addr})` : ""} — ${kind}: ${body}`;
+}
+
+// ---------- Sessões de gravação (guardar ou descartar) ----------
+async function eventsBetweenRaw(from, to) { return eventsBetween(from, to); }
+export async function sessionSummary(from, to) {
+  const ev = await eventsBetweenRaw(from, to);
+  let bytes = 0;
+  for (const e of ev) if (e.mediaId != null) { const m = await getMedia(e.mediaId); bytes += m?.blob?.size || 0; }
+  return {
+    count: ev.length,
+    narrations: ev.filter((e) => e.type === "narracao").length,
+    photos: ev.filter((e) => e.mediaId != null && e.type !== "clipe").length,
+    clips: ev.filter((e) => e.type === "clipe").length,
+    notes: ev.filter((e) => e.type === "nota").length,
+    mb: bytes / 1048576,
+  };
+}
+// Apaga o que foi gravado no período, mas mantém as notas escritas pela pessoa
+export async function discardBetween(from, to) {
+  const ev = (await eventsBetweenRaw(from, to)).filter((e) => e.type !== "nota");
+  const d = await db();
+  await new Promise((resolve, reject) => {
+    const tx = d.transaction(["events", "media"], "readwrite");
+    for (const e of ev) {
+      tx.objectStore("events").delete(e.id);
+      if (e.mediaId != null) tx.objectStore("media").delete(e.mediaId);
+    }
+    tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
+  });
+  return ev.length;
+}
+
 // ---------- Utilidades ----------
 const rad = (d) => (d * Math.PI) / 180;
 function dist(a, b) {
@@ -150,7 +221,7 @@ export async function generateReport(fromStr, toStr, onStatus = () => {}) {
       chegada: `chegou a ${e.text}`,
       olhar: `descrição da câmera: ${e.text}`,
       clipe: "clipe de vídeo gravado",
-      foto: "foto",
+      foto: "FOTO ESCOLHIDA PELA PESSOA (momento que ela quis guardar)",
     }[e.type] || e.text || e.type;
     lines.push(`${hhmm(e.t)}${where} ${txt}${media}`);
   }

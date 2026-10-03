@@ -183,6 +183,8 @@ dialog input[type=password], dialog select {
 #clipBtn { position: absolute; right: 16px; top: 10px; z-index: 600; border: 0; border-radius: 999px; padding: 7px 12px;
   background: rgb(0 0 0 / .55); color: #fff; font-weight: 700; font-size: .85rem; }
 #clipBtn.recording { background: var(--danger); }
+#photoBtn { position: absolute; right: 16px; top: 50px; z-index: 600; border: 0; border-radius: 999px; padding: 7px 12px;
+  background: rgb(0 0 0 / .55); color: #fff; font-weight: 700; font-size: .85rem; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } #liveBtn[aria-pressed="true"] i { animation: none; } }
 </style>
 </head>
@@ -198,6 +200,7 @@ dialog input[type=password], dialog select {
   <div id="map"></div>
   <video id="cam" playsinline muted hidden></video>
   <button id="liveBtn" aria-pressed="false" title="Narração contínua do que a câmera vê e do que há por perto"><i></i><span>Guia ao vivo</span></button>
+  <button id="photoBtn" hidden title="Guardar uma foto no diário">◉ Foto</button>
   <button id="clipBtn" hidden title="Gravar um clipe de 10 segundos para o diário">● Gravar 10 s</button>
   <button id="locateBtn" aria-label="Mostrar minha localização" aria-pressed="true" title="Minha localização">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
@@ -358,6 +361,19 @@ dialog input[type=password], dialog select {
   <div class="ov-scroll" id="reportBody"></div>
 </section>
 
+<dialog id="keepDlg">
+  <form method="dialog">
+    <h2>Guardar esta gravação?</h2>
+    <p id="keepText"></p>
+    <p class="note" id="keepNote"></p>
+    <div class="row">
+      <button class="btn" value="later">Decidir depois</button>
+      <button class="btn danger" value="discard">Descartar</button>
+      <button class="btn primary" value="keep">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog id="confirmDlg">
   <form method="dialog">
     <h2>Confirmar</h2>
@@ -369,6 +385,6 @@ dialog input[type=password], dialog select {
   </form>
 </dialog>
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=13"></script>
+<script type="module" src="app.js?v=14"></script>
 </body>
 </html>

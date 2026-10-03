@@ -1,5 +1,5 @@
 import Anthropic from "./vendor/anthropic-sdk.js";
-import { initDiary, addEvent, addNote, b64ToBlob, generateReport, openDiary, openReport } from "./diario.js?v=1";
+import { initDiary, addEvent, addNote, b64ToBlob, generateReport, openDiary, openReport, loadMemory, memoryNear, memorySearch, describeMemory, sessionSummary, discardBetween } from "./diario.js?v=2";
 
 // ---------- Configuração ----------
 const MODEL = "claude-opus-5-5";
@@ -34,6 +34,8 @@ const S = {
   lastLogPos: null,
   lastClip: 0,
   recording: false,
+  memory: [],
+  liveSessionStart: 0,
   openaiVoice: store.get("openaiVoice", "coral"),
   live: false,
   liveBusy: false,
@@ -638,7 +640,7 @@ async function setCamera(on) {
     $("cam").hidden = true; $("stage").classList.remove("cam-big"); S.camOn = false;
   }
   $("camBtn").setAttribute("aria-pressed", String(S.camOn));
-  $("clipBtn").hidden = !(S.camOn && S.diaryOn);
+  $("clipBtn").hidden = $("photoBtn").hidden = !(S.camOn && S.diaryOn);
   $("camBtn").setAttribute("aria-label", S.camOn ? "Desligar câmera" : "Ligar câmera");
   return S.camOn;
 }
@@ -664,6 +666,7 @@ Como trabalhar:
 Estilo: português do Brasil, frases curtas e naturais, pensadas para serem ouvidas. Até 3 frases, salvo se pedirem detalhes. Sem markdown, listas ou emojis. Distâncias arredondadas ("uns 200 metros").
 
 Diário de viagem: quando a pessoa contar o que está fazendo, onde comeu, com quem está, o que achou de um lugar, ou pedir para anotar, use anotar_no_diario (sem perguntar). Quando pedir um relatório ou resumo da viagem de um período, use gerar_relatorio com as datas (hoje é a data da "Hora local"); para ver os relatórios guardados, use abrir_historico.
+Memória: você lembra dos passeios anteriores pela ferramenta consultar_memoria. Quando a pessoa estiver num lugar já visitado ou perguntar sobre algo, consulte antes de explicar; não repita o que já foi contado, a menos que ela peça para explicar de novo; faça referência ("como te contei em 12 de setembro") e acrescente algo novo.
 Não leia coordenadas numéricas (latitude e longitude) a menos que a pessoa peça.
 Se a pessoa pedir para falar mais rápido ou devagar, ou para o guia ao vivo indicar (ou parar de indicar) para onde olhar, ou para falar ou silenciar os avisos de navegação, use ajustar_preferencias e confirme em poucas palavras.
 
@@ -702,6 +705,11 @@ const TOOLS = [
     description: "Gera e guarda um relatório de viagem (texto, mapa do trajeto, fotos e clipes) de um período, e o abre na tela. Datas no formato AAAA-MM-DD.",
     input_schema: { type: "object", properties: { de: { type: "string" }, ate: { type: "string" } }, required: ["de", "ate"] },
   },
+  {
+    name: "consultar_memoria",
+    description: "Busca o que já foi contado, perguntado ou anotado em passeios anteriores. Sem 'busca', traz o que há perto da posição atual; com 'busca', procura por palavras (nome de lugar, assunto, pessoa).",
+    input_schema: { type: "object", properties: { busca: { type: "string" } } },
+  },
   { name: "abrir_historico", description: "Abre a tela com os relatórios de viagem guardados.", input_schema: { type: "object", properties: {} } },
   { name: "parar_rota", description: "Encerra a navegação em andamento.", input_schema: { type: "object", properties: {} } },
 ];
@@ -728,6 +736,11 @@ async function runTool(name, input) {
       const r = await generateReport(input.de, input.ate, (st) => { if (st) addMsg(st, "sys"); });
       openDiary("list"); openReport(r.id);
       return { resultado: "Relatório gerado e aberto na tela.", titulo: r.title, periodo: `${input.de} a ${input.ate}` };
+    }
+    case "consultar_memoria": {
+      const found = input.busca ? memorySearch(S.memory, input.busca).map((m) => describeMemory(m, S.pos && m.lat != null ? dist(S.pos, m) : null))
+        : memoryNear(S.memory, S.pos, 400, 12).map((m) => describeMemory(m, m.d));
+      return found.length ? { lembrancas: found } : { resultado: "Nada na memória sobre isso." };
     }
     case "abrir_historico": openDiary("list"); return { resultado: "Histórico aberto." };
     case "status_rota": {
@@ -872,6 +885,7 @@ Regras:
 - Fatos: use os dados do mapa e conhecimento que você tem com segurança. Se não tiver certeza (estrela Michelin, data, "o prédio mais alto", quem projetou), não afirme; diga "parece" ou deixe de fora. Nunca invente nomes.
 - Siga a preferência de direções indicada no início da mensagem.
 - Se a imagem estiver escura, tremida ou sem nada útil, fale do entorno pelos dados do mapa.
+- Se houver memória de passeios anteriores, trate como conversa que vocês já tiveram: não repita aquelas explicações; quando ajudar, faça uma referência curta ("como te contei no dia 12", "da outra vez que você passou por aqui") e traga um ângulo novo.
 - Siga a regra de ritmo indicada na mensagem.`;
 
 const LIVE_FILTERS = [
@@ -957,6 +971,8 @@ async function liveNarrate() {
       lines.push(moved > 15 ? `A pessoa andou ${Math.round(moved)} m desde a última fala: traga o que é novo neste trecho e o que vem pela frente.` : "A pessoa está praticamente parada: aprofunde sobre o entorno, o bairro e a cidade.");
     }
     if (S.pos && S.livePois.length) lines.push(`\nLugares do mapa por perto (até 350 m; os marcados [à frente] estão no caminho em que a pessoa anda):\n${livePoiLines()}`);
+    const near = memoryNear(S.memory, S.pos, 300, 10);
+    if (near.length) lines.push(`\nMemória de passeios anteriores perto daqui (já foi contado antes):\n${near.map((m) => "- " + describeMemory(m, m.d)).join("\n")}`);
     lines.push(S.liveSaid.length ? `\nO que você já contou (não repita):\n${S.liveSaid.map((t) => "- " + t).join("\n")}` : "\nVocê ainda não falou nada; comece se apresentando em poucas palavras e contando onde a pessoa está.");
     lines.push(S.livePace === "continuo"
       ? "Ritmo contínuo: fale sempre alguma coisa nova, mesmo que a cena não tenha mudado."
@@ -1051,6 +1067,9 @@ async function setLive(on) {
     S.live = true; S.liveSaid = []; S.liveErrors = 0; S.liveReadyAt = 0; S.lastSpeechEnd = 0;
     S.liveNext = null; S.liveLastReq = 0; S.liveLastPos = null;
     S.lastClip = Date.now() - (+S.clipEvery || 0) * 60000 + 20000; // primeiro clipe uns 20 s depois de ligar
+    S.liveSessionStart = Date.now();
+    if (S.diaryOn) store.set("pendingSession", { start: S.liveSessionStart });
+    loadMemory(S.liveSessionStart).then((m) => { S.memory = m; }).catch(() => {});
     keepAwake(true);
     addMsg("Guia ao vivo ligado. Aponte a câmera para a rua e eu vou contando o que há por aqui.", "sys");
     clearTimeout(S.liveTimer);
@@ -1061,9 +1080,37 @@ async function setLive(on) {
     stopSpeech();
     if (!S.route) keepAwake(false);
     addMsg("Guia ao vivo desligado.", "sys");
+    if (S.diaryOn && S.liveSessionStart) {
+      const ses = { start: S.liveSessionStart, end: Date.now() };
+      store.set("pendingSession", ses);
+      S.liveSessionStart = 0;
+      setTimeout(() => askKeepSession(ses), 1500); // espera clipes em gravação terminarem
+    }
   }
   $("liveBtn").setAttribute("aria-pressed", String(S.live));
   liveStatus("");
+}
+
+// Ao fim de cada gravação: guardar no diário ou descartar
+async function askKeepSession({ start, end }) {
+  const sum = await sessionSummary(start, end).catch(() => null);
+  if (!sum || !sum.count) { store.set("pendingSession", null); return; }
+  const mins = Math.max(1, Math.round((end - start) / 60000));
+  const when = new Date(start).toLocaleString("pt-BR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  $("keepText").textContent = `Gravação de ${mins} min (${when}): ${sum.narrations} falas do guia, ${sum.photos} fotos e ${sum.clips} clipes, ${sum.mb.toFixed(1).replace(".", ",")} MB. Guardar no diário para a memória e os relatórios?`;
+  $("keepNote").textContent = sum.notes ? `As ${sum.notes} notas que você fez ficam guardadas de qualquer jeito.` : "";
+  const d = $("keepDlg");
+  d.returnValue = "";
+  d.showModal();
+  await new Promise((r) => { d.onclose = r; });
+  if (d.returnValue === "discard") {
+    const n = await discardBetween(start, end);
+    addMsg(`Gravação descartada (${n} itens apagados).${sum.notes ? " As notas foram mantidas." : ""}`, "sys");
+  } else if (d.returnValue === "keep") {
+    addMsg("Gravação guardada no diário.", "sys");
+  } else return; // decide depois: pergunta de novo na próxima vez que abrir o app
+  store.set("pendingSession", null);
+  S.memory = await loadMemory().catch(() => S.memory);
 }
 
 // ---------- Voz (entrada) ----------
@@ -1171,6 +1218,17 @@ $("cam").addEventListener("click", () => $("stage").classList.toggle("cam-big"))
 $("micBtn").addEventListener("click", listen);
 $("settingsBtn").addEventListener("click", openSettings);
 $("clipBtn").addEventListener("click", () => recordClip(10, true));
+$("photoBtn").addEventListener("click", () => {
+  const img = grabFrame();
+  if (!img) return;
+  journal("foto", { text: "foto escolhida pela pessoa" }, img);
+  addMsg("Foto guardada no diário.", "sys");
+});
+loadMemory().then((m) => { S.memory = m; }).catch(() => {});
+{
+  const pending = store.get("pendingSession", null);
+  if (pending?.start) setTimeout(() => askKeepSession({ start: pending.start, end: pending.end || Date.now() }), 2500);
+}
 initDiary({ claude: (p) => claudeCreate(p), explain: (e) => explainError(e), getContext: here });
 $("stopBtn").addEventListener("click", () => { stopRoute(); say("Navegação encerrada."); });
 $("describeBtn").addEventListener("click", async () => {
