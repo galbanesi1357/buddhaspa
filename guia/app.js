@@ -26,6 +26,7 @@ const S = {
   livePace: store.get("livePace", "continuo"),
   liveDirections: store.get("liveDirections", false),
   navVoice: store.get("navVoice", false),
+  voiceURI: store.get("voiceURI", ""),
   live: false,
   liveBusy: false,
   liveReadyAt: 0,
@@ -127,10 +128,38 @@ $("locateBtn").addEventListener("click", () => {
 });
 
 // ---------- Fala ----------
+// As vozes são as do próprio celular. Preferimos as naturais/neurais em português do Brasil
+// e evitamos as compactas, que soam robóticas.
 let ptVoice = null;
+const NATURAL = /natural|neural|premium|enhanced|aprimorad|online|network|wavenet|studio|siri/i;
+function voiceScore(v) {
+  const lang = (v.lang || "").toLowerCase().replace("_", "-");
+  if (!lang.startsWith("pt")) return -1;
+  let sc = lang === "pt-br" ? 20 : 2;
+  if (NATURAL.test(v.name)) sc += 10;
+  if (/google/i.test(v.name)) sc += 5;
+  if (v.localService === false) sc += 3;
+  if (/compact|eloquence|espeak|robot/i.test(v.name)) sc -= 8;
+  return sc;
+}
+function ptVoices() {
+  return speechSynthesis.getVoices().filter((v) => voiceScore(v) >= 0).sort((a, b) => voiceScore(b) - voiceScore(a));
+}
 function pickVoice() {
-  const vs = speechSynthesis.getVoices();
-  ptVoice = vs.find((v) => v.lang === "pt-BR") || vs.find((v) => v.lang?.startsWith("pt")) || null;
+  const vs = ptVoices();
+  ptVoice = vs.find((v) => v.voiceURI === S.voiceURI) || vs[0] || null;
+  fillVoiceSelect();
+}
+function fillVoiceSelect() {
+  const sel = document.getElementById("voiceSel");
+  if (!sel) return;
+  const vs = ptVoices();
+  sel.replaceChildren(new Option(vs.length ? `Automática (${vs[0].name})` : "Nenhuma voz em português encontrada", ""));
+  vs.forEach((v) => {
+    const tags = [v.lang, NATURAL.test(v.name) || v.localService === false ? "natural" : ""].filter(Boolean).join(", ");
+    sel.add(new Option(`${v.name} (${tags})`, v.voiceURI));
+  });
+  sel.value = vs.some((v) => v.voiceURI === S.voiceURI) ? S.voiceURI : "";
 }
 if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
 // Fila própria de fala: frases curtas, para poder mudar a velocidade e continuar de onde parou
@@ -883,14 +912,25 @@ function listen() {
 // ---------- Ajustes ----------
 function openSettings() {
   $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("liveDirections").value = S.liveDirections ? "on" : "off"; $("navVoice").value = S.navVoice ? "on" : "off"; $("livePace").value = S.livePace;
+  fillVoiceSelect();
   $("settings").showModal();
 }
 $("settings").addEventListener("close", () => {
-  if ($("settings").returnValue !== "save") return;
+  if ($("settings").returnValue !== "save") { pickVoice(); return; }
+  S.voiceURI = $("voiceSel").value; store.set("voiceURI", S.voiceURI); pickVoice();
   S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.liveDirections = $("liveDirections").value === "on"; S.navVoice = $("navVoice").value === "on"; S.livePace = $("livePace").value;
   store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("navVoice", S.navVoice); store.set("livePace", S.livePace);
   client = S.key ? new Anthropic({ apiKey: S.key, dangerouslyAllowBrowser: true }) : null;
   if (S.route) startRoute(S.route.dest).catch((e) => addMsg(e.message, "err"));
+});
+
+$("voiceTest").addEventListener("click", () => {
+  const v = ptVoices().find((x) => x.voiceURI === $("voiceSel").value) || ptVoices()[0];
+  if (!v) return;
+  stopSpeech();
+  const u = new SpeechSynthesisUtterance("Olá! Esta é a minha voz. Vamos passear pela cidade?");
+  u.lang = v.lang; u.voice = v; u.rate = S.rate;
+  speechSynthesis.speak(u);
 });
 
 // ---------- Eventos ----------
@@ -914,7 +954,7 @@ function setVoice(on) {
 }
 $("voiceBtn").addEventListener("click", () => {
   setVoice(!S.voice);
-  if (S.voice) speak("Voz ligada. Vou falando as respostas e as conversões.", { interrupt: true });
+  if (S.voice) speak("Voz ligada.", { interrupt: true });
   else stopSpeech();
 });
 $("camBtn").addEventListener("click", () => setCamera(!S.camOn));

@@ -11,6 +11,13 @@ Assistente de localização e viagem para o celular. Ele usa o GPS, o mapa e, qu
 - **Guia ao vivo:** o botão no alto do mapa liga uma narração contínua. O Claude olha pela câmera, cruza a imagem com os pontos de interesse do mapa num raio de 350 m (monumentos, igrejas, museus, prédios históricos, parques, restaurantes, shoppings) e vai contando o que há em volta: "aquele prédio suspenso é o MASP…". Por padrão ele não diz para onde olhar ou virar; se quiser, ligue "indicar para onde olhar" em Ajustes ou peça no chat ("quero as direções"). Ele não repete o que já contou e só para quando você toca no botão de novo. Usa a bússola do celular para saber para onde você está olhando. No ritmo contínuo ele faz uma nova leitura da câmera a cada 10 segundos, já preparando a próxima fala enquanto ainda está falando, e dá destaque ao que vem pela frente no caminho. O ritmo (contínuo, normal ou calmo) muda em Ajustes.
 - **Voz:** o botão do alto-falante liga a fala, e todas as respostas e avisos de rota passam a ser lidos em voz alta, em 1,5x por padrão. O botão **1x / 1,25x / 1,5x / 2x** na barra de baixo troca a velocidade a qualquer momento, continuando a leitura do ponto onde estava, e você também pode pedir no chat ("fala mais devagar"). O botão do microfone deixa você perguntar falando.
 
+## Voz mais natural
+
+O app usa as vozes instaladas no celular e escolhe sozinho a mais natural em português do Brasil. Em **Ajustes → Voz** dá para escolher outra e tocar em **Testar**. Para ter vozes bem melhores:
+
+- **iPhone:** Ajustes → Acessibilidade → Conteúdo Falado → Vozes → Português (Brasil). Baixe uma voz "Aprimorada" ou "Premium" (Luciana ou Felipe).
+- **Android:** instale ou atualize "Serviços de fala do Google" e, em Configurações → Conversão de texto em voz, baixe o português (Brasil).
+
 ## Como usar
 
 1. Abra o endereço publicado no navegador do celular (Chrome no Android ou Safari no iPhone). É preciso usar **https**, porque sem ele o celular bloqueia o GPS e a câmera.
@@ -26,7 +33,7 @@ No repositório, abra **Settings → Pages**, escolha "Deploy from a branch", se
 
 ## Atualizações
 
-O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=11`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
+O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=12`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
 
 ## Custos e privacidade
 

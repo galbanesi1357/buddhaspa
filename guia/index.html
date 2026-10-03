@@ -134,6 +134,8 @@ dialog input[type=password], dialog select {
 .btn { border-radius: 10px; padding: 10px 16px; border: 1px solid var(--line); background: var(--bg); }
 .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .note { font-size: .8rem; color: var(--muted); margin-top: 8px; }
+.voice-row { display: flex; gap: 8px; }
+.voice-row select { flex: 1; min-width: 0; }
 
 .leaflet-container { font: inherit; }
 .me-dot { width: 18px; height: 18px; border-radius: 50%; background: #2f7cf6; border: 3px solid #fff; box-shadow: 0 0 0 6px rgb(47 124 246 / .25); }
@@ -203,6 +205,12 @@ dialog input[type=password], dialog select {
       <option value="car">De carro</option>
       <option value="bike">De bicicleta</option>
     </select>
+    <label for="voiceSel">Voz</label>
+    <div class="voice-row">
+      <select id="voiceSel"></select>
+      <button type="button" class="btn" id="voiceTest">Testar</button>
+    </div>
+    <div class="note">As vozes vêm do próprio celular. Para vozes bem mais naturais: no iPhone, Ajustes → Acessibilidade → Conteúdo Falado → Vozes → Português (Brasil) e baixe uma voz "Aprimorada" ou "Premium" (ex.: Luciana ou Felipe). No Android, instale "Serviços de fala do Google" e, em Configurações → Conversão de texto em voz, baixe o português (Brasil). Depois volte aqui e escolha a voz.</div>
     <label for="navVoice">Avisos de navegação ("em 90 metros, vire à esquerda")</label>
     <select id="navVoice">
       <option value="off">Só na tela, sem falar</option>
@@ -235,6 +243,6 @@ dialog input[type=password], dialog select {
 </dialog>
 
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=10"></script>
+<script type="module" src="app.js?v=11"></script>
 </body>
 </html>
