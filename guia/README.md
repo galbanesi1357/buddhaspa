@@ -9,7 +9,7 @@ Assistente de localização e viagem para o celular. Ele usa o GPS, o mapa e, qu
 - **Me leve até…:** procura o lugar, traça a rota (a pé, de carro ou de bicicleta) e guia passo a passo. Se você sair da rota, ele recalcula. Por padrão os avisos de conversão aparecem só na tela, sem falar; para ouvi-los, ligue "Avisos de navegação" em Ajustes ou peça no chat ("fala as conversões").
 - **Câmera:** com a câmera ligada, o Claude olha a cena perto de cada conversão e na chegada para dar referências visuais. O botão **Olhar** pede uma descrição na hora.
 - **Guia ao vivo:** o botão no alto do mapa liga uma narração contínua. O Claude olha pela câmera, cruza a imagem com os pontos de interesse do mapa num raio de 350 m (monumentos, igrejas, museus, prédios históricos, parques, restaurantes, shoppings) e vai contando o que há em volta: "aquele prédio suspenso é o MASP…". Por padrão ele não diz para onde olhar ou virar; se quiser, ligue "indicar para onde olhar" em Ajustes ou peça no chat ("quero as direções"). Ele não repete o que já contou e só para quando você toca no botão de novo. Usa a bússola do celular para saber para onde você está olhando. No ritmo contínuo ele faz uma nova leitura da câmera a cada 10 segundos, já preparando a próxima fala enquanto ainda está falando, e dá destaque ao que vem pela frente no caminho. O ritmo (contínuo, normal ou calmo) muda em Ajustes.
-- **Voz:** o botão do alto-falante liga a fala, e todas as respostas e avisos de rota passam a ser lidos em voz alta, em 1,5x por padrão. O botão **1x / 1,25x / 1,5x / 2x** na barra de baixo troca a velocidade a qualquer momento, continuando a leitura do ponto onde estava, e você também pode pedir no chat ("fala mais devagar"). O botão do microfone deixa você perguntar falando.
+- **Voz:** o botão do alto-falante liga a fala, e todas as respostas e avisos de rota passam a ser lidos em voz alta, em 1,5x por padrão. O botão **1x / 1,25x / 1,5x / 2x** no canto do mapa troca a velocidade a qualquer momento, continuando a leitura do ponto onde estava, e você também pode pedir no chat ("fala mais devagar"). O botão do microfone deixa você perguntar falando.
 
 ## Diário de viagem
 
@@ -21,7 +21,7 @@ Enquanto você usa o app, ele guarda **só no celular** o trajeto do GPS, o que 
 - **Exportar:** gera um arquivo `.html` único com texto, fotos, clipes e o desenho do trajeto, para salvar em Arquivos, mandar para alguém ou trazer para o Claude montar uma apresentação.
 - **Guardar ou descartar:** ao desligar o Guia ao vivo, o app pergunta se aquela gravação fica no diário (Guardar), se é apagada (Descartar; as notas escritas são mantidas) ou se você decide depois. Se fechar o app sem responder, ele pergunta na próxima vez.
 - **Memória:** o guia lembra o que já contou em passeios guardados. Ao passar de novo por um lugar, ele não repete e faz referência ("como te contei no dia 12…"), trazendo algo novo. No chat, peça "explica de novo" quando quiser a explicação completa, ou "o que você me contou sobre o MASP?".
-- **Fotos da galeria:** em **Diário → Novo relatório**, escreva a nota e toque em **📷 Adicionar fotos da galeria** para anexar fotos tiradas com a câmera normal do celular.
+- **Fotos do rolo da câmera:** toque no **＋** dentro da caixa de mensagem, escolha a foto, escreva um comentário ("almoço com a Vanderlar no Coal Office") e envie. O Claude vê a foto e responde, e ela fica no diário com o comentário. Fotos antigas ficam com a data em que foram tiradas. Também dá para anexar várias de uma vez em **Diário → Novo relatório → 📷 Adicionar fotos da galeria**.
 - **Foto:** com a câmera ligada, o botão **◉ Foto** guarda o momento no diário; essas fotos têm prioridade no relatório.
 - Desligue em **Ajustes → Diário de viagem** se não quiser guardar nada.
 
@@ -51,7 +51,7 @@ No repositório, abra **Settings → Pages**, escolha "Deploy from a branch", se
 
 ## Atualizações
 
-O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=16`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
+O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=17`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
 
 ## Custos e privacidade
 

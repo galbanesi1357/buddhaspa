@@ -1,5 +1,5 @@
 import Anthropic from "./vendor/anthropic-sdk.js";
-import { initDiary, addEvent, addNote, b64ToBlob, generateReport, openDiary, openReport, loadMemory, memoryNear, memorySearch, describeMemory, sessionSummary, discardBetween } from "./diario.js?v=3";
+import { initDiary, addEvent, addNote, b64ToBlob, generateReport, openDiary, openReport, loadMemory, memoryNear, memorySearch, describeMemory, sessionSummary, discardBetween, shrinkImage } from "./diario.js?v=4";
 
 // ---------- Configuração ----------
 const MODEL = "claude-opus-5-5";
@@ -797,9 +797,15 @@ async function ask(text) {
   if (S.history.length > 24) S.history = [];
   const snapshot = S.history.length;
   const content = [];
-  const img = grabFrame();
+  const att = S.attach; clearAttach();
+  const img = att ? att.b64 : grabFrame();
   if (img) content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: img } });
-  content.push({ type: "text", text: `${contextLine()}\n\n${text}` });
+  const attNote = att ? `\n[A imagem é uma foto do rolo da câmera escolhida pela pessoa${att.old ? `, tirada em ${new Date(att.t).toLocaleString("pt-BR")}` : ", tirada agora"}, e não a câmera ao vivo. ${S.diaryOn ? "Ela já foi guardada no diário com o comentário da pessoa; confirme em poucas palavras e, se fizer sentido, comente algo sobre a foto." : "O diário está desligado, então ela não foi guardada."}]` : "";
+  content.push({ type: "text", text: `${contextLine()}${attNote}\n\n${text}` });
+  if (att && S.diaryOn) {
+    addEvent("foto", { ...(att.old ? { t: att.t } : here()), text: `foto do rolo da câmera: ${text}` }, att.blob);
+    loadMemory().then((m) => { S.memory = m; }).catch(() => {});
+  }
   S.history.push({ role: "user", content });
 
   try {
@@ -814,7 +820,7 @@ async function ask(text) {
       const calls = resp.content.filter((b) => b.type === "tool_use");
       if (resp.stop_reason !== "tool_use" || !calls.length) {
         wait.remove(); say(reply || "Pronto.");
-        journal("pergunta", { text, reply }, img);
+        journal("pergunta", { text, reply }, att ? null : img);
         return;
       }
       wait.textContent = "Consultando mapa…";
@@ -1218,6 +1224,36 @@ $("cam").addEventListener("click", () => $("stage").classList.toggle("cam-big"))
 $("micBtn").addEventListener("click", listen);
 $("settingsBtn").addEventListener("click", openSettings);
 $("clipBtn").addEventListener("click", () => recordClip(10, true));
+// Foto do rolo da câmera, com comentário, para o chat e o diário
+function clearAttach() {
+  S.attach = null;
+  $("attachBar").hidden = true;
+  if ($("attachThumb").src.startsWith("blob:")) URL.revokeObjectURL($("attachThumb").src);
+  $("attachThumb").removeAttribute("src");
+  $("attachFile").value = "";
+}
+$("attachBtn").addEventListener("click", () => $("attachFile").click());
+$("attachRemove").addEventListener("click", clearAttach);
+$("attachFile").addEventListener("change", async () => {
+  const f = $("attachFile").files[0];
+  if (!f) return;
+  try {
+    const blob = await shrinkImage(f, 1600);
+    const small = await shrinkImage(f, 1024);
+    const b64 = (await new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(small); })).split(",")[1];
+    const age = Date.now() - (f.lastModified || Date.now());
+    const old = age > 30 * 60000 && age < 30 * 86400000;
+    S.attach = { blob, b64, old, t: old ? f.lastModified : Date.now() };
+    $("attachThumb").src = URL.createObjectURL(blob);
+    $("attachInfo").textContent = S.diaryOn ? "Escreva um comentário e envie. A foto vai para o diário." : "Escreva e envie. (O diário está desligado em Ajustes.)";
+    $("attachBar").hidden = false;
+    $("q").placeholder = "Comente a foto…";
+    $("q").focus();
+  } catch {
+    addMsg("Não consegui abrir essa foto.", "err");
+  }
+});
+
 $("photoBtn").addEventListener("click", () => {
   const img = grabFrame();
   if (!img) return;
@@ -1241,9 +1277,10 @@ $("describeBtn").addEventListener("click", async () => {
 });
 $("controls").addEventListener("submit", (e) => {
   e.preventDefault();
-  const t = $("q").value.trim();
+  let t = $("q").value.trim();
+  if (!t && S.attach) t = "Guarda esta foto no diário.";
   if (!t) return;
-  $("q").value = "";
+  $("q").value = ""; $("q").placeholder = "Pergunte…";
   ask(t);
 });
 $("chips").addEventListener("click", async (e) => {

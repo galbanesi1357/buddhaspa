@@ -103,10 +103,18 @@ header h1 { font: 600 1.15rem var(--font-display); margin: 0; letter-spacing: .0
 .chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 12px; font-size: .9rem; }
 
 #controls {
-  display: grid; grid-template-columns: auto auto auto 1fr auto auto; gap: 8px; align-items: center;
+  display: grid; grid-template-columns: auto auto 1fr auto auto; gap: 8px; align-items: center;
   padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
   background: var(--surface); border-top: 1px solid var(--line);
 }
+.qwrap { position: relative; min-width: 0; }
+#attachBtn { position: absolute; left: 4px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; border-radius: 50%;
+  background: var(--accent); color: var(--accent-ink); font-size: 1.2rem; line-height: 1; display: grid; place-items: center; }
+#controls .qwrap input { padding-left: 42px; }
+#attachBar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--surface); border-top: 1px solid var(--line); }
+#attachBar img { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; }
+#attachBar span { flex: 1; min-width: 0; font-size: .88rem; color: var(--muted); }
+#attachBar button { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 6px 10px; }
 #controls input {
   min-width: 0; width: 100%; padding: 11px 12px; border-radius: 12px;
   border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit;
@@ -116,7 +124,10 @@ header h1 { font: 600 1.15rem var(--font-display); margin: 0; letter-spacing: .0
 .ctl.listening { background: var(--danger); color: #fff; border-color: var(--danger); }
 #send { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .ctl svg { width: 22px; height: 22px; display: block; }
-#speedBtn { font-weight: 700; font-size: .9rem; min-width: 3.4em; font-variant-numeric: tabular-nums; }
+#speedBtn { position: absolute; left: 10px; bottom: 66px; z-index: 600; height: 40px; min-width: 48px; padding: 0 8px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 700; font-size: .9rem; font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 10px rgb(0 0 0 / .25); }
+#stage.cam-big #speedBtn { display: none; }
 
 dialog {
   border: 0; border-radius: 16px; padding: 20px; width: min(92vw, 460px);
@@ -202,6 +213,7 @@ dialog input[type=password], dialog select {
   <button id="liveBtn" aria-pressed="false" title="Narração contínua do que a câmera vê e do que há por perto"><i></i><span>Guia ao vivo</span></button>
   <button id="photoBtn" hidden title="Guardar uma foto no diário">◉ Foto</button>
   <button id="clipBtn" hidden title="Gravar um clipe de 10 segundos para o diário">● Gravar 10 s</button>
+  <button type="button" id="speedBtn" aria-label="Velocidade da fala: 1,5x. Tocar para mudar">1,5x</button>
   <button id="locateBtn" aria-label="Mostrar minha localização" aria-pressed="true" title="Minha localização">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
   </button>
@@ -224,15 +236,23 @@ dialog input[type=password], dialog select {
   </div>
 </main>
 
+<div id="attachBar" hidden>
+  <img id="attachThumb" alt="Foto escolhida">
+  <span id="attachInfo">Escreva um comentário e envie. A foto vai para o diário.</span>
+  <button type="button" id="attachRemove" aria-label="Remover foto">Remover</button>
+</div>
 <form id="controls" autocomplete="off">
   <button type="button" class="ctl" id="voiceBtn" aria-pressed="false" aria-label="Ligar fala em voz alta">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
   </button>
-  <button type="button" class="ctl" id="speedBtn" aria-label="Velocidade da fala: 1,5x. Tocar para mudar">1,5x</button>
   <button type="button" class="ctl" id="camBtn" aria-pressed="false" aria-label="Ligar câmera">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
   </button>
-  <input id="q" placeholder="Pergunte…" aria-label="Mensagem">
+  <div class="qwrap">
+    <button type="button" id="attachBtn" aria-label="Adicionar foto do rolo da câmera" title="Adicionar foto do rolo da câmera">＋</button>
+    <input id="q" placeholder="Pergunte…" aria-label="Mensagem">
+  </div>
+  <input type="file" id="attachFile" accept="image/*" hidden>
   <button type="button" class="ctl" id="micBtn" aria-label="Falar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/></svg>
   </button>
@@ -388,6 +408,6 @@ dialog input[type=password], dialog select {
   </form>
 </dialog>
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=15"></script>
+<script type="module" src="app.js?v=17"></script>
 </body>
 </html>
