@@ -139,6 +139,50 @@ dialog input[type=password], dialog select {
 
 .leaflet-container { font: inherit; }
 .me-dot { width: 18px; height: 18px; border-radius: 50%; background: #2f7cf6; border: 3px solid #fff; box-shadow: 0 0 0 6px rgb(47 124 246 / .25); }
+
+/* Diário de viagem */
+.overlay { position: fixed; inset: 0; z-index: 2000; background: var(--bg); color: var(--ink); display: flex; flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.ov-bar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.ov-bar h2 { font: 600 1.15rem var(--font-display); margin: 0; flex: 1; }
+.tabs { display: flex; gap: 6px; padding: 10px 16px 0; }
+.tabs button { flex: 1; padding: 10px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; font-weight: 700; }
+.tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.ov-scroll { flex: 1; overflow-y: auto; padding: 14px 16px 24px; min-height: 0; }
+.ov-scroll label { display: block; font-weight: 700; margin: 12px 0 6px; }
+.dates { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dates input, #noteText { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; }
+#noteText { min-height: 70px; resize: vertical; }
+.status { color: var(--muted); font-size: .9rem; margin-top: 8px; min-height: 1.2em; }
+.empty { color: var(--muted); text-align: center; padding: 30px 10px; }
+.rcard { display: flex; gap: 12px; width: 100%; text-align: left; padding: 10px; margin-bottom: 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.rthumb { width: 84px; height: 84px; flex: none; border-radius: 10px; overflow: hidden; background: var(--line); }
+.rthumb img { width: 100%; height: 100%; object-fit: cover; }
+.rbody { min-width: 0; }
+.rtitle { font: 600 1.05rem var(--font-display); }
+.rmeta { font-size: .82rem; color: var(--muted); margin: 2px 0 4px; font-variant-numeric: tabular-nums; }
+.rsum { font-size: .9rem; overflow-wrap: anywhere; }
+.pin { color: var(--signal); }
+#reportBody h2 { font: 600 1.6rem/1.2 var(--font-display); margin: 12px 0 4px; text-wrap: balance; }
+#reportBody h3 { font: 600 1.2rem var(--font-display); margin: 22px 0 6px; }
+#reportBody h3 small { display: block; font: 400 .85rem var(--font-body); color: var(--muted); }
+.rsub { color: var(--muted); margin: 0 0 10px; }
+.rcover { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 14px; }
+.rstats { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--muted); font-size: .9rem; margin-bottom: 12px; }
+.rstats b { color: var(--ink); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.rmap { height: 240px; border-radius: 14px; margin: 10px 0 14px; }
+.rhl { border-top: 1px solid var(--line); padding: 10px 0; }
+.rhl img, .rhl video { width: 100%; max-height: 60vh; object-fit: cover; border-radius: 12px; margin-top: 6px; background: #000; }
+.rtime { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+.ov-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+.ov-actions .btn, #reportBack { padding: 7px 9px; font-size: .85rem; white-space: nowrap; }
+#reportView .ov-bar { flex-wrap: nowrap; gap: 6px; padding-inline: 12px; }
+#reportView .ov-actions { flex-wrap: nowrap; }
+.btn.danger { color: var(--danger); border-color: var(--danger); }
+#pinBtn[aria-pressed="true"] { color: var(--signal); border-color: var(--signal); }
+#clipBtn { position: absolute; right: 16px; top: 10px; z-index: 600; border: 0; border-radius: 999px; padding: 7px 12px;
+  background: rgb(0 0 0 / .55); color: #fff; font-weight: 700; font-size: .85rem; }
+#clipBtn.recording { background: var(--danger); }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } #liveBtn[aria-pressed="true"] i { animation: none; } }
 </style>
 </head>
@@ -146,6 +190,7 @@ dialog input[type=password], dialog select {
 <header>
   <h1>Guia de Rua</h1>
   <div id="where">Aguardando localização…</div>
+  <button class="icon-btn" id="diaryBtn" aria-label="Diário de viagem">Diário</button>
   <button class="icon-btn" id="settingsBtn" aria-label="Configurações">Ajustes</button>
 </header>
 
@@ -153,6 +198,7 @@ dialog input[type=password], dialog select {
   <div id="map"></div>
   <video id="cam" playsinline muted hidden></video>
   <button id="liveBtn" aria-pressed="false" title="Narração contínua do que a câmera vê e do que há por perto"><i></i><span>Guia ao vivo</span></button>
+  <button id="clipBtn" hidden title="Gravar um clipe de 10 segundos para o diário">● Gravar 10 s</button>
   <button id="locateBtn" aria-label="Mostrar minha localização" aria-pressed="true" title="Minha localização">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
   </button>
@@ -228,6 +274,18 @@ dialog input[type=password], dialog select {
       <button type="button" class="btn" id="cloudTest">Testar</button>
     </div>
     <div class="note" id="cloudStatus">Com uma chave da OpenAI, as falas usam uma voz neural com sotaque brasileiro (cerca de US$ 1 por hora de fala, cobrado pela OpenAI). Crie em platform.openai.com → API keys.</div>
+    <label for="diaryOn">Diário de viagem</label>
+    <select id="diaryOn">
+      <option value="on">Guardar trajeto, falas, fotos e notas</option>
+      <option value="off">Não guardar nada</option>
+    </select>
+    <label for="clipEvery">Clipes de vídeo automáticos no guia ao vivo</label>
+    <select id="clipEvery">
+      <option value="2">Um clipe de 6 s a cada 2 min</option>
+      <option value="5">Um clipe de 6 s a cada 5 min</option>
+      <option value="off">Só quando eu tocar em Gravar</option>
+    </select>
+    <div class="note">Tudo fica guardado só neste celular. Cada clipe ocupa cerca de 0,6 MB.</div>
     <label for="navVoice">Avisos de navegação ("em 90 metros, vire à esquerda")</label>
     <select id="navVoice">
       <option value="off">Só na tela, sem falar</option>
@@ -259,7 +317,58 @@ dialog input[type=password], dialog select {
   </form>
 </dialog>
 
+
+<section id="diary" class="overlay" hidden aria-label="Diário de viagem">
+  <div class="ov-bar">
+    <h2>Diário de viagem</h2>
+    <button class="btn" id="diaryClose">Fechar</button>
+  </div>
+  <div class="tabs" role="tablist">
+    <button id="tab-list" role="tab" aria-selected="true">Relatórios</button>
+    <button id="tab-new" role="tab" aria-selected="false">Novo relatório</button>
+  </div>
+  <div class="ov-scroll" id="panel-list">
+    <div id="reportList"></div>
+    <div class="status" id="storageInfo"></div>
+  </div>
+  <div class="ov-scroll" id="panel-new" hidden>
+    <div class="dates">
+      <div><label for="dFrom">De</label><input type="date" id="dFrom"></div>
+      <div><label for="dTo">Até</label><input type="date" id="dTo"></div>
+    </div>
+    <div class="status" id="dPreview"></div>
+    <div class="row" style="justify-content:flex-start"><button class="btn primary" id="genBtn">Gerar relatório</button></div>
+    <div class="status" id="dStatus"></div>
+    <label for="noteText">Anotar algo no diário</label>
+    <textarea id="noteText" placeholder="Ex.: Almoçamos no mercado municipal, o sanduíche de mortadela é enorme."></textarea>
+    <div class="row" style="justify-content:flex-start"><button class="btn" id="noteBtn">Guardar nota</button></div>
+    <p class="note">Também dá para anotar pelo chat ("anota que jantamos no Bar X") e pedir o relatório falando ("faz o relatório de ontem").</p>
+  </div>
+</section>
+
+<section id="reportView" class="overlay" hidden aria-label="Relatório de viagem">
+  <div class="ov-bar">
+    <button class="btn" id="reportBack">‹ Voltar</button>
+    <div class="ov-actions">
+      <button class="btn" id="pinBtn" aria-pressed="false">☆ Permanente</button>
+      <button class="btn" id="exportBtn">Exportar</button>
+      <button class="btn danger" id="deleteBtn">Excluir</button>
+    </div>
+  </div>
+  <div class="ov-scroll" id="reportBody"></div>
+</section>
+
+<dialog id="confirmDlg">
+  <form method="dialog">
+    <h2>Confirmar</h2>
+    <p id="confirmText"></p>
+    <div class="row">
+      <button class="btn" value="cancel">Cancelar</button>
+      <button class="btn primary" value="ok" id="confirmOk">OK</button>
+    </div>
+  </form>
+</dialog>
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=12"></script>
+<script type="module" src="app.js?v=13"></script>
 </body>
 </html>

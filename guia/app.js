@@ -1,4 +1,5 @@
 import Anthropic from "./vendor/anthropic-sdk.js";
+import { initDiary, addEvent, addNote, b64ToBlob, generateReport, openDiary, openReport } from "./diario.js?v=1";
 
 // ---------- Configuração ----------
 const MODEL = "claude-opus-5-5";
@@ -28,6 +29,11 @@ const S = {
   navVoice: store.get("navVoice", false),
   voiceURI: store.get("voiceURI", ""),
   openaiKey: store.get("openaiKey", ""),
+  diaryOn: store.get("diaryOn", true),
+  clipEvery: store.get("clipEvery", "2"),
+  lastLogPos: null,
+  lastClip: 0,
+  recording: false,
   openaiVoice: store.get("openaiVoice", "coral"),
   live: false,
   liveBusy: false,
@@ -321,6 +327,51 @@ function addMsg(text, cls) {
 }
 
 // ---------- Localização ----------
+// ---------- Diário: o que vai sendo guardado ----------
+function here() {
+  return S.pos ? { lat: +S.pos.lat.toFixed(6), lon: +S.pos.lon.toFixed(6), addr: S.address?.curto || null } : { addr: S.address?.curto || null };
+}
+function journal(type, data = {}, b64 = null) {
+  if (!S.diaryOn) return;
+  addEvent(type, { ...here(), ...data }, b64 ? b64ToBlob(b64) : null);
+}
+function logTrack() {
+  if (!S.diaryOn || !S.pos || S.pos.acc > 80) return;
+  const last = S.lastLogPos;
+  if (last && dist(last, S.pos) < 25 && Date.now() - last.t < 120000) return;
+  S.lastLogPos = { lat: S.pos.lat, lon: S.pos.lon, t: Date.now() };
+  addEvent("pos", { lat: +S.pos.lat.toFixed(6), lon: +S.pos.lon.toFixed(6), acc: Math.round(S.pos.acc), addr: S.address?.curto || null });
+}
+
+// Clipe curto da câmera para o diário
+async function recordClip(sec = 10, manual = false) {
+  if (!stream || S.recording || typeof MediaRecorder === "undefined" || !S.diaryOn) return;
+  const type = ["video/mp4", "video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"].find((t) => MediaRecorder.isTypeSupported(t));
+  if (!type) { if (manual) addMsg("Este navegador não grava vídeo.", "err"); return; }
+  S.recording = true; S.lastClip = Date.now();
+  $("clipBtn").classList.add("recording"); $("clipBtn").textContent = "● Gravando…";
+  try {
+    const chunks = [];
+    const mr = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 800000 });
+    mr.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    const stopped = new Promise((r) => { mr.onstop = r; });
+    mr.start();
+    await new Promise((r) => setTimeout(r, sec * 1000));
+    if (mr.state !== "inactive") mr.stop();
+    await stopped;
+    const blob = new Blob(chunks, { type: type.split(";")[0] });
+    if (blob.size) {
+      await addEvent("clipe", { ...here(), manual }, blob);
+      if (manual) addMsg("Clipe guardado no diário.", "sys");
+    }
+  } catch (e) {
+    if (manual) addMsg("Não consegui gravar o clipe.", "err");
+  } finally {
+    S.recording = false;
+    $("clipBtn").classList.remove("recording"); $("clipBtn").textContent = "● Gravar 10 s";
+  }
+}
+
 function onPosition(p) {
   const c = p.coords;
   const prev = S.pos;
@@ -340,6 +391,7 @@ function onPosition(p) {
     S.lastGeocode = { ...now, at: Date.now() };
     reverseGeocode(now).then((a) => { S.address = a; $("where").textContent = a?.curto || "Endereço não encontrado"; }).catch(() => {});
   }
+  logTrack();
   if (S.route) updateNav();
 }
 function startGeo() {
@@ -501,6 +553,7 @@ function updateNav() {
   const dDest = dist(S.pos, r.dest);
   if (dDest < cfg.arrive + Math.min(S.pos.acc, 30) && !S.arrived) {
     S.arrived = true;
+    journal("chegada", { text: r.dest.nome || "destino" });
     const fala = `Você chegou${r.dest.nome ? " a " + r.dest.nome : ""}.`;
     if (S.camOn && S.navVoice && !S.ann.near) lookAndGuide("arrive").then((t) => navSay(t || fala, true));
     else navSay(fala, true);
@@ -585,6 +638,7 @@ async function setCamera(on) {
     $("cam").hidden = true; $("stage").classList.remove("cam-big"); S.camOn = false;
   }
   $("camBtn").setAttribute("aria-pressed", String(S.camOn));
+  $("clipBtn").hidden = !(S.camOn && S.diaryOn);
   $("camBtn").setAttribute("aria-label", S.camOn ? "Desligar câmera" : "Ligar câmera");
   return S.camOn;
 }
@@ -609,6 +663,7 @@ Como trabalhar:
 
 Estilo: português do Brasil, frases curtas e naturais, pensadas para serem ouvidas. Até 3 frases, salvo se pedirem detalhes. Sem markdown, listas ou emojis. Distâncias arredondadas ("uns 200 metros").
 
+Diário de viagem: quando a pessoa contar o que está fazendo, onde comeu, com quem está, o que achou de um lugar, ou pedir para anotar, use anotar_no_diario (sem perguntar). Quando pedir um relatório ou resumo da viagem de um período, use gerar_relatorio com as datas (hoje é a data da "Hora local"); para ver os relatórios guardados, use abrir_historico.
 Não leia coordenadas numéricas (latitude e longitude) a menos que a pessoa peça.
 Se a pessoa pedir para falar mais rápido ou devagar, ou para o guia ao vivo indicar (ou parar de indicar) para onde olhar, ou para falar ou silenciar os avisos de navegação, use ajustar_preferencias e confirme em poucas palavras.
 
@@ -637,6 +692,17 @@ const TOOLS = [
     description: "Muda preferências do app: velocidade da fala (1, 1.25, 1.5 ou 2), se o guia ao vivo deve indicar para onde olhar e virar, e se os avisos de navegação (conversões da rota) devem ser falados em voz alta.",
     input_schema: { type: "object", properties: { velocidade_fala: { type: "number", enum: [1, 1.25, 1.5, 2] }, direcoes_no_guia_ao_vivo: { type: "boolean" }, avisos_de_navegacao_falados: { type: "boolean" } } },
   },
+  {
+    name: "anotar_no_diario",
+    description: "Guarda uma nota no diário de viagem (o que a pessoa fez, comeu, sentiu, com quem estava), com hora e local atuais. Usada depois nos relatórios.",
+    input_schema: { type: "object", properties: { texto: { type: "string" } }, required: ["texto"] },
+  },
+  {
+    name: "gerar_relatorio",
+    description: "Gera e guarda um relatório de viagem (texto, mapa do trajeto, fotos e clipes) de um período, e o abre na tela. Datas no formato AAAA-MM-DD.",
+    input_schema: { type: "object", properties: { de: { type: "string" }, ate: { type: "string" } }, required: ["de", "ate"] },
+  },
+  { name: "abrir_historico", description: "Abre a tela com os relatórios de viagem guardados.", input_schema: { type: "object", properties: {} } },
   { name: "parar_rota", description: "Encerra a navegação em andamento.", input_schema: { type: "object", properties: {} } },
 ];
 
@@ -649,7 +715,21 @@ async function runTool(name, input) {
     }
     case "buscar_proximos": { const r = await nearby(input.categoria, input.raio_m); return r.length ? r : { resultado: "Nada encontrado nesse raio. Tente um raio maior." }; }
     case "buscar_lugar": { const r = await searchPlace(input.consulta); return r.length ? r : { resultado: "Nada encontrado." }; }
-    case "iniciar_rota": return await startRoute({ lat: input.lat, lon: input.lon, nome: input.nome });
+    case "iniciar_rota": {
+      const r = await startRoute({ lat: input.lat, lon: input.lon, nome: input.nome });
+      journal("rota", { text: input.nome });
+      return r;
+    }
+    case "anotar_no_diario":
+      if (!S.diaryOn) return { erro: "O diário está desligado em Ajustes." };
+      await addNote(input.texto);
+      return { resultado: "Nota guardada." };
+    case "gerar_relatorio": {
+      const r = await generateReport(input.de, input.ate, (st) => { if (st) addMsg(st, "sys"); });
+      openDiary("list"); openReport(r.id);
+      return { resultado: "Relatório gerado e aberto na tela.", titulo: r.title, periodo: `${input.de} a ${input.ate}` };
+    }
+    case "abrir_historico": openDiary("list"); return { resultado: "Histórico aberto." };
     case "status_rota": {
       if (!S.route) return { resultado: "Nenhuma navegação em andamento." };
       const n = S.route.steps[S.stepIdx + 1];
@@ -719,7 +799,11 @@ async function ask(text) {
       S.history.push({ role: "assistant", content: resp.content });
       const reply = resp.content.filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
       const calls = resp.content.filter((b) => b.type === "tool_use");
-      if (resp.stop_reason !== "tool_use" || !calls.length) { wait.remove(); say(reply || "Pronto."); return; }
+      if (resp.stop_reason !== "tool_use" || !calls.length) {
+        wait.remove(); say(reply || "Pronto.");
+        journal("pergunta", { text, reply }, img);
+        return;
+      }
       wait.textContent = "Consultando mapa…";
       const results = await Promise.all(calls.map(async (c) => {
         try { return { type: "tool_result", tool_use_id: c.id, content: JSON.stringify(await runTool(c.name, c.input)) }; }
@@ -745,7 +829,7 @@ async function lookAndGuide(kind, ctx = {}) {
   if (!client || !S.camOn || S.guideBusy) return null;
   const img = grabFrame();
   if (!img) return null;
-  S.guideBusy = true; S.lastLook = Date.now();
+  S.guideBusy = true; S.lastLook = Date.now(); S.lastLookImg = img;
   let task;
   if (kind === "arrive") task = `A pessoa está chegando ao destino: ${S.route?.dest.nome || "destino"}. Ajude a identificar o local ou a entrada na imagem, se aparecer.`;
   else if (kind === "describe") task = ctx.instr ? `Próxima instrução: ${ctx.instr}, em ${spokenDist(ctx.d)}. Descreva por onde seguir usando o que aparece na imagem.` : "Não há rota ativa. Descreva brevemente o que está à frente que ajude a se orientar.";
@@ -890,6 +974,7 @@ async function liveNarrate() {
     S.liveSaid.push(text);
     if (S.liveSaid.length > 12) S.liveSaid.shift();
     S.liveNext = text; // fica na vez; é falada assim que a fala atual terminar
+    journal("narracao", { text }, img);
     if (S.pos) S.liveLastPos = { lat: S.pos.lat, lon: S.pos.lon };
   } catch (e) {
     console.warn("guia ao vivo", e);
@@ -926,6 +1011,8 @@ function liveTick() {
     ? Date.now() - (S.liveLastReq || 0) >= LIVE_REFRESH_MS && !S.liveNext
     : !speaking && !S.liveNext && (!S.voice || sinceSpeech >= LIVE_GAP[S.livePace]);
   if (due && free && !S.liveBusy && Date.now() >= S.liveReadyAt) liveNarrate();
+  // 3) Clipe automático para o diário
+  if (S.clipEvery !== "off" && S.camOn && S.diaryOn && !S.recording && Date.now() - S.lastClip > +S.clipEvery * 60000) recordClip(6);
   S.liveTimer = setTimeout(liveTick, 500);
 }
 
@@ -963,6 +1050,7 @@ async function setLive(on) {
     if (!S.voice) setVoice(true);
     S.live = true; S.liveSaid = []; S.liveErrors = 0; S.liveReadyAt = 0; S.lastSpeechEnd = 0;
     S.liveNext = null; S.liveLastReq = 0; S.liveLastPos = null;
+    S.lastClip = Date.now() - (+S.clipEvery || 0) * 60000 + 20000; // primeiro clipe uns 20 s depois de ligar
     keepAwake(true);
     addMsg("Guia ao vivo ligado. Aponte a câmera para a rua e eu vou contando o que há por aqui.", "sys");
     clearTimeout(S.liveTimer);
@@ -1005,7 +1093,7 @@ function listen() {
 
 // ---------- Ajustes ----------
 function openSettings() {
-  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("liveDirections").value = S.liveDirections ? "on" : "off"; $("navVoice").value = S.navVoice ? "on" : "off"; $("livePace").value = S.livePace;
+  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("liveDirections").value = S.liveDirections ? "on" : "off"; $("diaryOn").value = S.diaryOn ? "on" : "off"; $("clipEvery").value = S.clipEvery; $("navVoice").value = S.navVoice ? "on" : "off"; $("livePace").value = S.livePace;
   fillVoiceSelect();
   $("openaiKey").value = S.openaiKey; $("openaiVoice").value = S.openaiVoice;
   $("settings").showModal();
@@ -1017,8 +1105,8 @@ $("settings").addEventListener("close", () => {
   if (newKey !== S.openaiKey) { cloudFailed = false; audioUnlocked = false; }
   S.openaiKey = newKey; S.openaiVoice = $("openaiVoice").value;
   store.set("openaiKey", S.openaiKey); store.set("openaiVoice", S.openaiVoice);
-  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.liveDirections = $("liveDirections").value === "on"; S.navVoice = $("navVoice").value === "on"; S.livePace = $("livePace").value;
-  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("navVoice", S.navVoice); store.set("livePace", S.livePace);
+  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.liveDirections = $("liveDirections").value === "on"; S.diaryOn = $("diaryOn").value === "on"; S.clipEvery = $("clipEvery").value; S.navVoice = $("navVoice").value === "on"; S.livePace = $("livePace").value;
+  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("diaryOn", S.diaryOn); store.set("clipEvery", S.clipEvery); store.set("navVoice", S.navVoice); store.set("livePace", S.livePace);
   client = S.key ? new Anthropic({ apiKey: S.key, dangerouslyAllowBrowser: true }) : null;
   if (S.route) startRoute(S.route.dest).catch((e) => addMsg(e.message, "err"));
 });
@@ -1082,6 +1170,8 @@ $("liveBtn").addEventListener("click", () => {
 $("cam").addEventListener("click", () => $("stage").classList.toggle("cam-big"));
 $("micBtn").addEventListener("click", listen);
 $("settingsBtn").addEventListener("click", openSettings);
+$("clipBtn").addEventListener("click", () => recordClip(10, true));
+initDiary({ claude: (p) => claudeCreate(p), explain: (e) => explainError(e), getContext: here });
 $("stopBtn").addEventListener("click", () => { stopRoute(); say("Navegação encerrada."); });
 $("describeBtn").addEventListener("click", async () => {
   if (!S.camOn && !(await setCamera(true))) return;
@@ -1089,6 +1179,7 @@ $("describeBtn").addEventListener("click", async () => {
   const n = S.route?.steps[S.stepIdx + 1];
   const t = await lookAndGuide("describe", n ? { instr: instruction(n), d: dist(S.pos, n.at) } : {});
   say(t || "Não consegui analisar a imagem agora.", true);
+  if (t) journal("olhar", { text: t }, S.lastLookImg);
 });
 $("controls").addEventListener("submit", (e) => {
   e.preventDefault();

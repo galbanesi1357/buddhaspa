@@ -11,6 +11,16 @@ Assistente de localização e viagem para o celular. Ele usa o GPS, o mapa e, qu
 - **Guia ao vivo:** o botão no alto do mapa liga uma narração contínua. O Claude olha pela câmera, cruza a imagem com os pontos de interesse do mapa num raio de 350 m (monumentos, igrejas, museus, prédios históricos, parques, restaurantes, shoppings) e vai contando o que há em volta: "aquele prédio suspenso é o MASP…". Por padrão ele não diz para onde olhar ou virar; se quiser, ligue "indicar para onde olhar" em Ajustes ou peça no chat ("quero as direções"). Ele não repete o que já contou e só para quando você toca no botão de novo. Usa a bússola do celular para saber para onde você está olhando. No ritmo contínuo ele faz uma nova leitura da câmera a cada 10 segundos, já preparando a próxima fala enquanto ainda está falando, e dá destaque ao que vem pela frente no caminho. O ritmo (contínuo, normal ou calmo) muda em Ajustes.
 - **Voz:** o botão do alto-falante liga a fala, e todas as respostas e avisos de rota passam a ser lidos em voz alta, em 1,5x por padrão. O botão **1x / 1,25x / 1,5x / 2x** na barra de baixo troca a velocidade a qualquer momento, continuando a leitura do ponto onde estava, e você também pode pedir no chat ("fala mais devagar"). O botão do microfone deixa você perguntar falando.
 
+## Diário de viagem
+
+Enquanto você usa o app, ele guarda **só no celular** o trajeto do GPS, o que o guia contou, as perguntas e respostas, as fotos que foram para o Claude, notas e clipes de vídeo curtos (automáticos no guia ao vivo, ou no botão **● Gravar 10 s** sobre a câmera).
+
+- **Anotar:** conte no chat o que está fazendo ("anota que almoçamos no mercado municipal") ou use o campo de nota no Diário. As notas são a parte mais importante do relatório.
+- **Gerar relatório:** em **Diário → Novo relatório**, escolha as datas e toque em **Gerar relatório**, ou peça no chat ("faz o relatório do dia 1 ao dia 4"). O Claude escreve o resumo da viagem, os destaques de cada dia com fotos e clipes, as curiosidades do caminho, e o app mostra o mapa do trajeto, os km e as paradas.
+- **Histórico:** em **Diário → Relatórios** ficam todos os relatórios, com capa e resumo. Cada um pode ser marcado como **Permanente** (não pode ser excluído sem desmarcar antes) ou **Excluído**, sempre com confirmação.
+- **Exportar:** gera um arquivo `.html` único com texto, fotos, clipes e o desenho do trajeto, para salvar em Arquivos, mandar para alguém ou trazer para o Claude montar uma apresentação.
+- Desligue em **Ajustes → Diário de viagem** se não quiser guardar nada.
+
 ## Voz mais natural
 
 O app usa as vozes instaladas no celular e escolhe sozinho a mais natural em português do Brasil. Em **Ajustes → Voz** dá para escolher outra e tocar em **Testar**. Para ter vozes bem melhores:
@@ -37,7 +47,7 @@ No repositório, abra **Settings → Pages**, escolha "Deploy from a branch", se
 
 ## Atualizações
 
-O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=13`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
+O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=14`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
 
 ## Custos e privacidade
 
@@ -47,7 +57,8 @@ O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma n
 - Com os avisos de navegação silenciados, a rota não consulta o Claude pela câmera nas conversões, o que economiza.
 - O **Guia ao vivo** consulta o Claude a cada fala: no modo contínuo são 6 consultas por minuto, o que dá uns 4 a 6 dólares por hora de passeio. Nos modos normal e calmo sai bem mais barato.
 - A chave da OpenAI, se usada, também fica só neste navegador e vai direto para a OpenAI, junto com o texto de cada fala.
-- As imagens da câmera vão para o Claude só no momento da pergunta e não ficam guardadas pelo app.
+- As imagens da câmera vão para o Claude no momento da pergunta. Com o diário ligado, uma cópia fica guardada só neste celular; gerar um relatório envia ao Claude o texto do período e até 16 fotos (cerca de US$ 0,10 a 0,40 por relatório).
+- O iPhone pode apagar dados de sites que ficam semanas sem uso. Adicione o app à Tela de Início e exporte os relatórios importantes.
 
 ## Limitações
 
