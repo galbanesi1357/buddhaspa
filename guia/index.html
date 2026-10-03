@@ -342,11 +342,12 @@ dialog input[type=password], dialog select {
       <option value="sonnet">Sonnet 5.5 — rápido e mais barato</option>
       <option value="opus">Opus 5.5 — o mais capaz, custa ~2x</option>
     </select>
-    <label for="guideModel">Inteligência do guia ao vivo, câmera e relatórios</label>
+    <label for="guideModel">Inteligência do guia ao vivo e da câmera</label>
     <select id="guideModel">
-      <option value="opus">Opus 5.5 — o mais capaz</option>
-      <option value="sonnet">Sonnet 5.5 — mais barato</option>
+      <option value="sonnet">Sonnet 5.5 — metade do custo</option>
+      <option value="opus">Opus 5.5 — o mais capaz, custa ~2x</option>
     </select>
+    <div class="note">Os relatórios de viagem usam sempre o Opus: são poucos e o texto fica melhor.</div>
     <div class="note">O chat pesquisa na internet quando precisa (horários, eventos, avaliações). Cada pesquisa custa cerca de US$ 0,01.</div>
     <label for="liveDirections">Guia ao vivo: indicar para onde olhar</label>
     <select id="liveDirections">
@@ -462,6 +463,6 @@ dialog input[type=password], dialog select {
   </form>
 </dialog>
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=23"></script>
+<script type="module" src="app.js?v=24"></script>
 </body>
 </html>

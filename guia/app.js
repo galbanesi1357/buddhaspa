@@ -2,7 +2,7 @@ import Anthropic from "./vendor/anthropic-sdk.js";
 import { initDiary, addEvent, addNote, b64ToBlob, generateReport, openDiary, openReport, loadMemory, memoryNear, memorySearch, describeMemory, sessionSummary, discardBetween, shrinkImage, offerCopy } from "./diario.js?v=5";
 
 // ---------- Configuração ----------
-// Modelos: o chat usa o Sonnet por padrão (mais barato); guia ao vivo, câmera e relatórios usam o Opus por padrão
+// Modelos: chat e guia ao vivo usam o Sonnet por padrão (mais barato); relatórios usam sempre o Opus
 const MODELS = { sonnet: "claude-sonnet-5-5", opus: "claude-opus-5-5" };
 const NOMINATIM = "https://nominatim.openstreetmap.org";
 const OVERPASS = "https://overpass-api.de/api/interpreter";
@@ -16,7 +16,7 @@ const NAV = {
 };
 
 // Versão deste código. Ao publicar, aumente aqui, em version.json e em app.js?v= no index.html.
-const APP_VERSION = 23;
+const APP_VERSION = 24;
 
 const store = {
   get(k, d) { try { const v = localStorage.getItem("guia." + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
@@ -40,7 +40,7 @@ const S = {
   recording: false,
   memory: [],
   chatModel: store.get("chatModel", "sonnet"),
-  guideModel: store.get("guideModel", "opus"),
+  guideModel: store.get("guideModel2", "sonnet"),
   facing: "environment", // "user" = câmera frontal (selfie)
   liveSessionStart: 0,
   openaiVoice: store.get("openaiVoice", "coral"),
@@ -1201,7 +1201,7 @@ $("settings").addEventListener("close", () => {
   S.openaiKey = newKey; S.openaiVoice = $("openaiVoice").value;
   store.set("openaiKey", S.openaiKey); store.set("openaiVoice", S.openaiVoice);
   S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.liveDirections = $("liveDirections").value === "on"; if ($("chatModel").value !== S.chatModel) S.history = []; S.chatModel = $("chatModel").value; S.guideModel = $("guideModel").value; S.diaryOn = $("diaryOn").value === "on"; S.clipEvery = $("clipEvery").value; S.navVoice = $("navVoice").value === "on"; S.livePace = $("livePace").value;
-  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("chatModel", S.chatModel); store.set("guideModel", S.guideModel); store.set("diaryOn", S.diaryOn); store.set("clipEvery", S.clipEvery); store.set("navVoice", S.navVoice); store.set("livePace", S.livePace);
+  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("liveDirections", S.liveDirections); store.set("chatModel", S.chatModel); store.set("guideModel2", S.guideModel); store.set("diaryOn", S.diaryOn); store.set("clipEvery", S.clipEvery); store.set("navVoice", S.navVoice); store.set("livePace", S.livePace);
   client = S.key ? new Anthropic({ apiKey: S.key, dangerouslyAllowBrowser: true }) : null;
   if (S.route) startRoute(S.route.dest).catch((e) => addMsg(e.message, "err"));
 });
@@ -1333,7 +1333,7 @@ loadMemory().then((m) => { S.memory = m; }).catch(() => {});
   const pending = store.get("pendingSession", null);
   if (pending?.start) setTimeout(() => askKeepSession({ start: pending.start, end: pending.end || Date.now() }), 2500);
 }
-initDiary({ claude: (p) => claudeCreate(p), explain: (e) => explainError(e), getContext: here });
+initDiary({ claude: (p) => claudeCreate({ model: MODELS.opus, ...p }), explain: (e) => explainError(e), getContext: here });
 
 // ---------- Atualização e cópia dos ajustes ----------
 // Garante que cada abertura do app use a versão mais nova publicada
