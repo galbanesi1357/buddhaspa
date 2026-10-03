@@ -196,6 +196,10 @@ dialog input[type=password], dialog select {
 #clipBtn.recording { background: var(--danger); }
 #photoBtn { position: absolute; right: 16px; top: 50px; z-index: 600; border: 0; border-radius: 999px; padding: 7px 12px;
   background: rgb(0 0 0 / .55); color: #fff; font-weight: 700; font-size: .85rem; }
+#flipBtn { position: absolute; right: 16px; top: 90px; z-index: 600; border: 0; border-radius: 999px; padding: 7px 12px;
+  background: rgb(0 0 0 / .55); color: #fff; font-weight: 700; font-size: .85rem; }
+#cam.selfie { transform: scaleX(-1); }
+#stage.cam-big #flipBtn, #stage.cam-big #photoBtn, #stage.cam-big #clipBtn { background: rgb(0 0 0 / .65); }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } #liveBtn[aria-pressed="true"] i { animation: none; } }
 </style>
 </head>
@@ -211,6 +215,7 @@ dialog input[type=password], dialog select {
   <div id="map"></div>
   <video id="cam" playsinline muted hidden></video>
   <button id="liveBtn" aria-pressed="false" title="Narração contínua do que a câmera vê e do que há por perto"><i></i><span>Guia ao vivo</span></button>
+  <button id="flipBtn" hidden aria-label="Virar para a câmera frontal (selfie)" title="Inverter câmera (selfie)">⇄ Selfie</button>
   <button id="photoBtn" hidden title="Guardar uma foto no diário">◉ Foto</button>
   <button id="clipBtn" hidden title="Gravar um clipe de 10 segundos para o diário">● Gravar 10 s</button>
   <button type="button" id="speedBtn" aria-label="Velocidade da fala: 1,5x. Tocar para mudar">1,5x</button>
@@ -408,6 +413,6 @@ dialog input[type=password], dialog select {
   </form>
 </dialog>
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=17"></script>
+<script type="module" src="app.js?v=18"></script>
 </body>
 </html>

@@ -35,6 +35,7 @@ const S = {
   lastClip: 0,
   recording: false,
   memory: [],
+  facing: "environment", // "user" = câmera frontal (selfie)
   liveSessionStart: 0,
   openaiVoice: store.get("openaiVoice", "coral"),
   live: false,
@@ -627,8 +628,9 @@ let stream = null;
 async function setCamera(on) {
   if (on) {
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 } }, audio: false });
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: S.facing }, width: { ideal: 1280 } }, audio: false });
       $("cam").srcObject = stream; $("cam").hidden = false; await $("cam").play();
+      $("cam").classList.toggle("selfie", S.facing === "user");
       S.camOn = true;
     } catch (e) {
       addMsg("Não consegui abrir a câmera. Verifique a permissão do navegador.", "err");
@@ -641,9 +643,28 @@ async function setCamera(on) {
   }
   $("camBtn").setAttribute("aria-pressed", String(S.camOn));
   $("clipBtn").hidden = $("photoBtn").hidden = !(S.camOn && S.diaryOn);
+  $("flipBtn").hidden = !S.camOn;
   $("camBtn").setAttribute("aria-label", S.camOn ? "Desligar câmera" : "Ligar câmera");
   return S.camOn;
 }
+// Alterna entre a câmera traseira e a frontal (selfie) sem desligar o guia
+async function flipCamera() {
+  if (!S.camOn || S.recording) return;
+  S.facing = S.facing === "user" ? "environment" : "user";
+  stream?.getTracks().forEach((t) => t.stop());
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: S.facing }, width: { ideal: 1280 } }, audio: false });
+  } catch {
+    try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: S.facing }, width: { ideal: 1280 } }, audio: false }); }
+    catch { addMsg("Não consegui trocar de câmera.", "err"); return; }
+  }
+  $("cam").srcObject = stream;
+  await $("cam").play().catch(() => {});
+  $("cam").classList.toggle("selfie", S.facing === "user");
+  $("flipBtn").setAttribute("aria-label", S.facing === "user" ? "Voltar para a câmera traseira" : "Virar para a câmera frontal (selfie)");
+  $("flipBtn").textContent = S.facing === "user" ? "⇄ Traseira" : "⇄ Selfie";
+}
+
 function grabFrame() {
   const v = $("cam");
   if (!S.camOn || !v.videoWidth) return null;
@@ -765,7 +786,7 @@ function contextLine() {
   else parts.push("Posição: ainda sem GPS");
   if (S.address?.curto) parts.push(`Endereço aproximado: ${S.address.curto}`);
   if (S.route) { const n = S.route.steps[S.stepIdx + 1]; parts.push(`Navegando até ${S.route.dest.nome}; próxima manobra: ${n ? instruction(n) + " em " + fmtDist(dist(S.pos, n.at)) : "chegada"}`); }
-  parts.push(S.camOn ? "Câmera: imagem anexada (o que está à frente da pessoa)" : "Câmera: desligada");
+  parts.push(!S.camOn ? "Câmera: desligada" : S.facing === "user" ? "Câmera: frontal (selfie) — a imagem mostra a pessoa e o que está atrás dela" : "Câmera: imagem anexada (o que está à frente da pessoa)");
   return `[${parts.join(" | ")}]`;
 }
 
@@ -845,7 +866,7 @@ Exemplos: "Daqui a uns 30 metros, vire à direita logo depois do prédio azul." 
 Se a imagem estiver escura, borrada ou sem nada útil, apenas reformule a instrução de modo natural. Nunca cite algo que não está na imagem. Sem markdown.`;
 
 async function lookAndGuide(kind, ctx = {}) {
-  if (!client || !S.camOn || S.guideBusy) return null;
+  if (!client || !S.camOn || S.guideBusy || S.facing === "user") return null;
   const img = grabFrame();
   if (!img) return null;
   S.guideBusy = true; S.lastLook = Date.now(); S.lastLookImg = img;
@@ -983,7 +1004,9 @@ async function liveNarrate() {
     lines.push(S.livePace === "continuo"
       ? "Ritmo contínuo: fale sempre alguma coisa nova, mesmo que a cena não tenha mudado."
       : "Se realmente não houver nada novo para dizer, responda exatamente [SILENCIO].");
-    lines.push(img ? "\nA imagem anexada é o que a pessoa vê agora." : "\nSem imagem da câmera neste momento.");
+    lines.push(!img ? "\nSem imagem da câmera neste momento." : S.facing === "user"
+      ? "\nA imagem é da câmera frontal (selfie): mostra a pessoa e o que está ATRÁS dela. Fale do cenário ao fundo (\"atrás de você aparece…\"); não descreva a aparência da pessoa."
+      : "\nA imagem anexada é o que a pessoa vê agora.");
 
     const content = [];
     if (img) content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: img } });
@@ -1224,6 +1247,7 @@ $("cam").addEventListener("click", () => $("stage").classList.toggle("cam-big"))
 $("micBtn").addEventListener("click", listen);
 $("settingsBtn").addEventListener("click", openSettings);
 $("clipBtn").addEventListener("click", () => recordClip(10, true));
+$("flipBtn").addEventListener("click", flipCamera);
 // Foto do rolo da câmera, com comentário, para o chat e o diário
 function clearAttach() {
   S.attach = null;

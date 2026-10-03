@@ -22,6 +22,7 @@ Enquanto você usa o app, ele guarda **só no celular** o trajeto do GPS, o que 
 - **Guardar ou descartar:** ao desligar o Guia ao vivo, o app pergunta se aquela gravação fica no diário (Guardar), se é apagada (Descartar; as notas escritas são mantidas) ou se você decide depois. Se fechar o app sem responder, ele pergunta na próxima vez.
 - **Memória:** o guia lembra o que já contou em passeios guardados. Ao passar de novo por um lugar, ele não repete e faz referência ("como te contei no dia 12…"), trazendo algo novo. No chat, peça "explica de novo" quando quiser a explicação completa, ou "o que você me contou sobre o MASP?".
 - **Fotos do rolo da câmera:** toque no **＋** dentro da caixa de mensagem, escolha a foto, escreva um comentário ("almoço com a Vanderlar no Coal Office") e envie. O Claude vê a foto e responde, e ela fica no diário com o comentário. Fotos antigas ficam com a data em que foram tiradas. Também dá para anexar várias de uma vez em **Diário → Novo relatório → 📷 Adicionar fotos da galeria**.
+- **Selfie:** com a câmera ligada, o botão **⇄ Selfie** sobre o mapa vira para a câmera frontal (e **⇄ Traseira** volta). Fotos e clipes do diário saem com você no quadro; o guia ao vivo passa a comentar o cenário atrás de você.
 - **Foto:** com a câmera ligada, o botão **◉ Foto** guarda o momento no diário; essas fotos têm prioridade no relatório.
 - Desligue em **Ajustes → Diário de viagem** se não quiser guardar nada.
 
@@ -51,7 +52,7 @@ No repositório, abra **Settings → Pages**, escolha "Deploy from a branch", se
 
 ## Atualizações
 
-O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=17`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
+O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=18`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
 
 ## Custos e privacidade
 
