@@ -15,7 +15,7 @@ const NAV = {
 };
 
 // Versão deste código. Ao publicar, aumente aqui, em version.json e em app.js?v= no index.html.
-const APP_VERSION = 20;
+const APP_VERSION = 21;
 
 const store = {
   get(k, d) { try { const v = localStorage.getItem("guia." + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
@@ -1159,12 +1159,13 @@ function listen() {
     let t = "";
     for (const r of ev.results) { t += r[0].transcript; if (r.isFinal) finalText = t; }
     $("q").value = t;
+    fitInput();
   };
   rec.onerror = (ev) => { if (ev.error === "not-allowed") addMsg("Microfone negado. Libere a permissão no navegador.", "err"); };
   rec.onend = () => {
     $("micBtn").classList.remove("listening"); rec = null;
     const t = (finalText || $("q").value).trim();
-    if (t) { $("q").value = ""; ask(t); }
+    if (t) { $("q").value = ""; fitInput(); ask(t); }
   };
   $("micBtn").classList.add("listening");
   rec.start();
@@ -1251,6 +1252,31 @@ $("micBtn").addEventListener("click", listen);
 $("settingsBtn").addEventListener("click", openSettings);
 $("clipBtn").addEventListener("click", () => recordClip(10, true));
 $("flipBtn").addEventListener("click", flipCamera);
+// Caixa de mensagem que cresce com o texto (até ~6 linhas) e depois rola
+function fitInput() {
+  const q = $("q");
+  const form = $("controls");
+  // Passa de uma linha: caixa em largura total (volta ao normal quando fica vazia)
+  if (!q.value) form.classList.remove("expanded");
+  else if (!form.classList.contains("expanded")) {
+    q.style.height = "auto";
+    if (q.scrollHeight > 50 || q.value.includes("\n")) form.classList.add("expanded");
+  }
+  q.style.height = "auto";
+  const max = parseFloat(getComputedStyle(q).maxHeight) || 200;
+  q.style.height = Math.min(q.scrollHeight + 2, max) + "px";
+  q.classList.toggle("scroll", q.scrollHeight + 2 > max);
+  if (document.activeElement !== q) q.scrollTop = q.scrollHeight; // ditado: mostra o fim
+}
+$("q").addEventListener("input", fitInput);
+// No computador, Enter envia e Shift+Enter quebra a linha; no celular, Enter quebra a linha e envia-se pelo botão
+$("q").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing && !matchMedia("(pointer: coarse)").matches) {
+    e.preventDefault();
+    $("controls").requestSubmit();
+  }
+});
+
 // Foto do rolo da câmera, com comentário, para o chat e o diário
 function clearAttach() {
   S.attach = null;
@@ -1353,7 +1379,7 @@ $("controls").addEventListener("submit", (e) => {
   let t = $("q").value.trim();
   if (!t && S.attach) t = "Guarda esta foto no diário.";
   if (!t) return;
-  $("q").value = ""; $("q").placeholder = "Pergunte…";
+  $("q").value = ""; $("q").placeholder = "Pergunte…"; fitInput();
   ask(t);
 });
 $("chips").addEventListener("click", async (e) => {
