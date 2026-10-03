@@ -58,6 +58,7 @@ A chave da API, os ajustes e o diário ficam salvos no navegador onde o app foi 
 
 - Quando houver versão nova, aparece uma faixa amarela **"Há uma versão nova do Guia"** com o botão **Atualizar**. Não é preciso abrir links novos.
 - Para levar a chave e os ajustes para outro lugar: **Ajustes → Copiar meus ajustes** e, no outro lugar, **Ajustes → Aplicar código colado**. O código contém suas chaves: trate-o como uma senha.
+- O app tem um service worker (`sw.js`) que, a cada abertura, busca a versão mais nova na rede, ignorando o cache do navegador, e só usa a cópia guardada quando está sem internet. Assim as atualizações chegam sozinhas, inclusive no ícone da Tela de Início.
 - Para publicar uma versão: aumente `APP_VERSION` em `app.js`, o número em `version.json` e o `app.js?v=` no `index.html`.
 
 ## Custos e privacidade

@@ -15,7 +15,7 @@ const NAV = {
 };
 
 // Versão deste código. Ao publicar, aumente aqui, em version.json e em app.js?v= no index.html.
-const APP_VERSION = 21;
+const APP_VERSION = 22;
 
 const store = {
   get(k, d) { try { const v = localStorage.getItem("guia." + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
@@ -1321,6 +1321,9 @@ loadMemory().then((m) => { S.memory = m; }).catch(() => {});
 initDiary({ claude: (p) => claudeCreate(p), explain: (e) => explainError(e), getContext: here });
 
 // ---------- Atualização e cópia dos ajustes ----------
+// Garante que cada abertura do app use a versão mais nova publicada
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
 // Pede ao navegador para não apagar os dados do app (chave, ajustes e diário)
 navigator.storage?.persist?.().catch(() => {});
 
@@ -1332,8 +1335,17 @@ async function checkUpdate() {
   try {
     const r = await fetch(`version.json?t=${Date.now()}`, { cache: "no-store" });
     const { v } = await r.json();
-    if (v > APP_VERSION) $("updateBar").hidden = false;
-    $("updateBtn").onclick = () => location.replace(`${location.pathname}?v=${v}`);
+    if (v > APP_VERSION) {
+      // Com o service worker ativo, recarregar já traz a versão nova; tenta uma vez sozinho
+      let tried = false;
+      try { tried = sessionStorage.getItem("guia.reloadedFor") === String(v); sessionStorage.setItem("guia.reloadedFor", String(v)); } catch {}
+      if (navigator.serviceWorker?.controller && !tried) { location.reload(); return; }
+      $("updateBar").hidden = false;
+    }
+    $("updateBtn").onclick = async () => {
+      try { await (await navigator.serviceWorker?.getRegistration())?.update(); } catch {}
+      location.replace(`${location.pathname}?v=${v}&t=${Date.now()}`);
+    };
   } catch {}
 }
 checkUpdate();
