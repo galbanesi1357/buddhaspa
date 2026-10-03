@@ -1,5 +1,5 @@
 import Anthropic from "./vendor/anthropic-sdk.js";
-import { initDiary, addEvent, addNote, b64ToBlob, generateReport, openDiary, openReport, loadMemory, memoryNear, memorySearch, describeMemory, sessionSummary, discardBetween } from "./diario.js?v=2";
+import { initDiary, addEvent, addNote, b64ToBlob, generateReport, openDiary, openReport, loadMemory, memoryNear, memorySearch, describeMemory, sessionSummary, discardBetween } from "./diario.js?v=3";
 
 // ---------- Configuração ----------
 const MODEL = "claude-opus-5-5";

@@ -21,6 +21,7 @@ Enquanto você usa o app, ele guarda **só no celular** o trajeto do GPS, o que 
 - **Exportar:** gera um arquivo `.html` único com texto, fotos, clipes e o desenho do trajeto, para salvar em Arquivos, mandar para alguém ou trazer para o Claude montar uma apresentação.
 - **Guardar ou descartar:** ao desligar o Guia ao vivo, o app pergunta se aquela gravação fica no diário (Guardar), se é apagada (Descartar; as notas escritas são mantidas) ou se você decide depois. Se fechar o app sem responder, ele pergunta na próxima vez.
 - **Memória:** o guia lembra o que já contou em passeios guardados. Ao passar de novo por um lugar, ele não repete e faz referência ("como te contei no dia 12…"), trazendo algo novo. No chat, peça "explica de novo" quando quiser a explicação completa, ou "o que você me contou sobre o MASP?".
+- **Fotos da galeria:** em **Diário → Novo relatório**, escreva a nota e toque em **📷 Adicionar fotos da galeria** para anexar fotos tiradas com a câmera normal do celular.
 - **Foto:** com a câmera ligada, o botão **◉ Foto** guarda o momento no diário; essas fotos têm prioridade no relatório.
 - Desligue em **Ajustes → Diário de viagem** se não quiser guardar nada.
 
@@ -50,7 +51,7 @@ No repositório, abra **Settings → Pages**, escolha "Deploy from a branch", se
 
 ## Atualizações
 
-O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=15`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
+O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=16`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
 
 ## Custos e privacidade
 

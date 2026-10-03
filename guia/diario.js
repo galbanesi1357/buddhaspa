@@ -221,7 +221,7 @@ export async function generateReport(fromStr, toStr, onStatus = () => {}) {
       chegada: `chegou a ${e.text}`,
       olhar: `descrição da câmera: ${e.text}`,
       clipe: "clipe de vídeo gravado",
-      foto: "FOTO ESCOLHIDA PELA PESSOA (momento que ela quis guardar)",
+      foto: `FOTO ESCOLHIDA PELA PESSOA (momento que ela quis guardar)${e.text && !/^foto escolhida pela pessoa$/.test(e.text) ? ` — ${e.text}` : ""}`,
     }[e.type] || e.text || e.type;
     lines.push(`${hhmm(e.t)}${where} ${txt}${media}`);
   }
@@ -509,6 +509,17 @@ async function onGenerate() {
   }
 }
 
+// Reduz fotos da galeria para no máximo 1600 px (economiza espaço no celular)
+async function shrinkImage(file) {
+  const bmp = await createImageBitmap(file);
+  const k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+  c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+  bmp.close?.();
+  return new Promise((res) => c.toBlob(res, "image/jpeg", 0.85));
+}
+
 export async function addNote(text) {
   const ctx = deps.getContext();
   return addEvent("nota", { text, ...ctx });
@@ -524,13 +535,34 @@ export function initDiary(d) {
   $("dFrom").addEventListener("change", updatePreview);
   $("dTo").addEventListener("change", updatePreview);
   $("genBtn").addEventListener("click", onGenerate);
+  $("noteFiles").addEventListener("change", () => {
+    const n = $("noteFiles").files.length;
+    $("noteFilesInfo").textContent = n ? `${n} foto(s) escolhida(s).` : "";
+  });
   $("noteBtn").addEventListener("click", async () => {
     const t = $("noteText").value.trim();
-    if (!t) return;
-    await addNote(t);
-    $("noteText").value = "";
-    $("dStatus").textContent = "Nota guardada no diário.";
-    updatePreview();
+    const files = [...$("noteFiles").files];
+    if (!t && !files.length) return;
+    $("noteBtn").disabled = true;
+    try {
+      if (t) await addNote(t);
+      const ctx = deps.getContext();
+      let saved = 0;
+      for (const f of files) {
+        const blob = await shrinkImage(f).catch(() => null);
+        if (!blob) continue;
+        // Foto antiga da galeria: usa a data do arquivo e não a posição atual
+        const age = Date.now() - (f.lastModified || Date.now());
+        const old = age > 30 * 60000 && age < 30 * 86400000;
+        await addEvent("foto", { ...(old ? {} : ctx), ...(old ? { t: f.lastModified } : {}), text: `foto da galeria escolhida pela pessoa${t ? `: ${t}` : ""}` }, blob);
+        saved++;
+      }
+      $("noteText").value = ""; $("noteFiles").value = ""; $("noteFilesInfo").textContent = "";
+      $("dStatus").textContent = [t && "Nota guardada", saved && `${saved} foto(s) guardada(s)`].filter(Boolean).join(" e ") + " no diário.";
+      updatePreview();
+    } finally {
+      $("noteBtn").disabled = false;
+    }
   });
   $("reportBack").addEventListener("click", closeReport);
   $("deleteBtn").addEventListener("click", onDelete);

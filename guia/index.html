@@ -342,9 +342,12 @@ dialog input[type=password], dialog select {
     <div class="status" id="dPreview"></div>
     <div class="row" style="justify-content:flex-start"><button class="btn primary" id="genBtn">Gerar relatório</button></div>
     <div class="status" id="dStatus"></div>
-    <label for="noteText">Anotar algo no diário</label>
+    <label for="noteText">Anotar algo no diário (com fotos, se quiser)</label>
     <textarea id="noteText" placeholder="Ex.: Almoçamos no mercado municipal, o sanduíche de mortadela é enorme."></textarea>
-    <div class="row" style="justify-content:flex-start"><button class="btn" id="noteBtn">Guardar nota</button></div>
+    <label class="btn" for="noteFiles" style="display:inline-block;margin-top:8px;font-weight:400">📷 Adicionar fotos da galeria</label>
+    <input type="file" id="noteFiles" accept="image/*" multiple hidden>
+    <div class="status" id="noteFilesInfo"></div>
+    <div class="row" style="justify-content:flex-start"><button class="btn primary" id="noteBtn">Guardar no diário</button></div>
     <p class="note">Também dá para anotar pelo chat ("anota que jantamos no Bar X") e pedir o relatório falando ("faz o relatório de ontem").</p>
   </div>
 </section>
@@ -385,6 +388,6 @@ dialog input[type=password], dialog select {
   </form>
 </dialog>
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=14"></script>
+<script type="module" src="app.js?v=15"></script>
 </body>
 </html>
