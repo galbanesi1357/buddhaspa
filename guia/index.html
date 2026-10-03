@@ -200,10 +200,17 @@ dialog input[type=password], dialog select {
   background: rgb(0 0 0 / .55); color: #fff; font-weight: 700; font-size: .85rem; }
 #cam.selfie { transform: scaleX(-1); }
 #stage.cam-big #flipBtn, #stage.cam-big #photoBtn, #stage.cam-big #clipBtn { background: rgb(0 0 0 / .65); }
+#updateBar { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: var(--signal); color: #1d1600; font-size: .9rem; }
+#updateBar span { flex: 1; min-width: 0; }
+#updateBar button { border: 0; border-radius: 8px; padding: 7px 12px; background: #1d1600; color: #fff; font-weight: 700; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } #liveBtn[aria-pressed="true"] i { animation: none; } }
 </style>
 </head>
 <body>
+<div id="updateBar" hidden>
+  <span>Há uma versão nova do Guia. Seus ajustes e o diário continuam salvos.</span>
+  <button id="updateBtn">Atualizar</button>
+</div>
 <header>
   <h1>Guia de Rua</h1>
   <div id="where">Aguardando localização…</div>
@@ -338,6 +345,14 @@ dialog input[type=password], dialog select {
       <option value="30">Também a cada 30 s</option>
       <option value="60">Também a cada 60 s</option>
     </select>
+    <label for="settingsCode">Levar meus ajustes para outro navegador</label>
+    <div class="note">Gera um código com suas chaves e preferências para colar no app aberto em outro lugar (outro navegador ou o ícone da Tela de Início). Guarde-o como uma senha.</div>
+    <textarea id="settingsCode" rows="2" placeholder="Cole aqui um código GUIA1:…" style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:.8rem"></textarea>
+    <div class="voice-row" style="margin-top:6px">
+      <button type="button" class="btn" id="copySettings">Copiar meus ajustes</button>
+      <button type="button" class="btn" id="applySettings">Aplicar código colado</button>
+    </div>
+    <div class="note" id="settingsCodeStatus"></div>
     <div class="row">
       <button class="btn" value="cancel" formnovalidate>Cancelar</button>
       <button class="btn primary" value="save" id="saveSettings">Salvar</button>
@@ -413,6 +428,6 @@ dialog input[type=password], dialog select {
   </form>
 </dialog>
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=18"></script>
+<script type="module" src="app.js?v=19"></script>
 </body>
 </html>

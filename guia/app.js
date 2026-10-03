@@ -14,6 +14,9 @@ const NAV = {
   car: { far: 400, near: 120, pass: 30, off: 70, arrive: 40 },
 };
 
+// Versão deste código. Ao publicar, aumente aqui, em version.json e em app.js?v= no index.html.
+const APP_VERSION = 19;
+
 const store = {
   get(k, d) { try { const v = localStorage.getItem("guia." + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem("guia." + k, JSON.stringify(v)); } catch {} },
@@ -1290,6 +1293,52 @@ loadMemory().then((m) => { S.memory = m; }).catch(() => {});
   if (pending?.start) setTimeout(() => askKeepSession({ start: pending.start, end: pending.end || Date.now() }), 2500);
 }
 initDiary({ claude: (p) => claudeCreate(p), explain: (e) => explainError(e), getContext: here });
+
+// ---------- Atualização e cópia dos ajustes ----------
+// Pede ao navegador para não apagar os dados do app (chave, ajustes e diário)
+navigator.storage?.persist?.().catch(() => {});
+
+// Avisa quando há uma versão nova publicada, sem perder nada do que está salvo
+let lastUpdateCheck = 0;
+async function checkUpdate() {
+  if (Date.now() - lastUpdateCheck < 10 * 60000) return;
+  lastUpdateCheck = Date.now();
+  try {
+    const r = await fetch(`version.json?t=${Date.now()}`, { cache: "no-store" });
+    const { v } = await r.json();
+    if (v > APP_VERSION) $("updateBar").hidden = false;
+    $("updateBtn").onclick = () => location.replace(`${location.pathname}?v=${v}`);
+  } catch {}
+}
+checkUpdate();
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkUpdate(); });
+
+function exportSettings() {
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k.startsWith("guia.") && k !== "guia.pendingSession") data[k] = localStorage.getItem(k);
+  }
+  return "GUIA1:" + btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+}
+$("copySettings").addEventListener("click", async () => {
+  const code = exportSettings();
+  $("settingsCode").value = code;
+  try { await navigator.clipboard.writeText(code); $("settingsCodeStatus").textContent = "Copiado. Abra o app no outro lugar, vá em Ajustes e cole aqui."; }
+  catch { $("settingsCode").select(); $("settingsCodeStatus").textContent = "Selecionei o código: copie e cole no outro lugar."; }
+});
+$("applySettings").addEventListener("click", () => {
+  const code = $("settingsCode").value.trim();
+  try {
+    if (!code.startsWith("GUIA1:")) throw new Error();
+    const data = JSON.parse(decodeURIComponent(escape(atob(code.slice(6)))));
+    Object.entries(data).forEach(([k, v]) => { if (k.startsWith("guia.")) localStorage.setItem(k, v); });
+    $("settingsCodeStatus").textContent = "Ajustes aplicados. Recarregando…";
+    setTimeout(() => location.reload(), 600);
+  } catch {
+    $("settingsCodeStatus").textContent = "Esse código não é válido. Copie de novo no app de origem.";
+  }
+});
 $("stopBtn").addEventListener("click", () => { stopRoute(); say("Navegação encerrada."); });
 $("describeBtn").addEventListener("click", async () => {
   if (!S.camOn && !(await setCamera(true))) return;
