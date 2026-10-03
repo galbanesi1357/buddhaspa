@@ -97,7 +97,16 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 const meMarker = L.marker([0, 0], { icon: L.divIcon({ className: "", html: '<div class="me-dot"></div>', iconSize: [18, 18] }) });
 let accCircle = null, routeLine = null, destMarker = null, follow = true;
 const poiLayer = L.layerGroup().addTo(map);
-map.on("dragstart", () => { follow = false; });
+function setFollow(on) {
+  follow = on;
+  $("locateBtn").setAttribute("aria-pressed", String(on));
+}
+map.on("dragstart", () => setFollow(false));
+$("locateBtn").addEventListener("click", () => {
+  if (!S.pos) { addMsg("Ainda procurando sua localização. Verifique se o GPS e a permissão estão ligados.", "sys"); return; }
+  setFollow(true);
+  map.setView([S.pos.lat, S.pos.lon], Math.max(map.getZoom(), 17));
+});
 
 // ---------- Fala ----------
 let ptVoice = null;
@@ -263,7 +272,7 @@ async function startRoute(dest) {
   routeLine = L.polyline(S.route.coords.map((c) => [c.lat, c.lon]), { color: "#14675b", weight: 6, opacity: 0.85 }).addTo(map);
   destMarker = L.marker([dest.lat, dest.lon]).bindTooltip(dest.nome || "Destino").addTo(map);
   map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
-  follow = true;
+  setFollow(true);
   $("banner").hidden = false;
   keepAwake(true);
   renderBanner();
