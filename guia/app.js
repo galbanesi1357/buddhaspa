@@ -22,6 +22,7 @@ const S = {
   key: store.get("key", ""),
   mode: store.get("mode", "foot"),
   lookEvery: store.get("lookEvery", "turns"),
+  rate: store.get("rate", 1.5),
   voice: store.get("voice", false),
   pos: null,           // {lat, lon, acc, heading, speed, t}
   address: null,
@@ -111,7 +112,7 @@ function speak(text, { interrupt = false } = {}) {
   const u = new SpeechSynthesisUtterance(text.replace(/[*_#`>|]/g, "").replace(/\s+/g, " "));
   u.lang = "pt-BR";
   if (ptVoice) u.voice = ptVoice;
-  u.rate = 1.05;
+  u.rate = S.rate;
   speechSynthesis.speak(u);
 }
 
@@ -578,13 +579,13 @@ function listen() {
 
 // ---------- Ajustes ----------
 function openSettings() {
-  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery;
+  $("apiKey").value = S.key; $("mode").value = S.mode; $("lookEvery").value = S.lookEvery; $("rate").value = String(S.rate);
   $("settings").showModal();
 }
 $("settings").addEventListener("close", () => {
   if ($("settings").returnValue !== "save") return;
-  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value;
-  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery);
+  S.key = $("apiKey").value.trim(); S.mode = $("mode").value; S.lookEvery = $("lookEvery").value; S.rate = +$("rate").value;
+  store.set("key", S.key); store.set("mode", S.mode); store.set("lookEvery", S.lookEvery); store.set("rate", S.rate);
   client = S.key ? new Anthropic({ apiKey: S.key, dangerouslyAllowBrowser: true }) : null;
   if (S.route) startRoute(S.route.dest).catch((e) => addMsg(e.message, "err"));
 });

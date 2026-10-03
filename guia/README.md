@@ -8,7 +8,7 @@ Assistente de localização e viagem para o celular. Ele usa o GPS, o mapa e, qu
 - **O que tem por perto:** restaurantes, cafés, farmácias, mercados, caixas eletrônicos, postos, transporte, pontos turísticos e outros, com distância e direção.
 - **Me leve até…:** procura o lugar, traça a rota (a pé, de carro ou de bicicleta) e guia passo a passo. Se você sair da rota, ele recalcula.
 - **Câmera:** com a câmera ligada, o Claude olha a cena perto de cada conversão e na chegada para dar referências visuais. O botão **Olhar** pede uma descrição na hora.
-- **Voz:** o botão do alto-falante liga a fala, e todas as respostas e avisos de rota passam a ser lidos em voz alta. O botão do microfone deixa você perguntar falando.
+- **Voz:** o botão do alto-falante liga a fala, e todas as respostas e avisos de rota passam a ser lidos em voz alta, em 1,5x por padrão (a velocidade muda em Ajustes, de 1x a 2x). O botão do microfone deixa você perguntar falando.
 
 ## Como usar
 
