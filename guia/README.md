@@ -24,6 +24,10 @@ No repositório, abra **Settings → Pages**, escolha "Deploy from a branch", se
 
 `https://galbanesi1357.github.io/buddhaspa/guia/`
 
+## Atualizações
+
+O GitHub Pages deixa o navegador guardar a página por até 10 minutos. Se uma novidade não aparecer, abra o endereço com `?v=` e um número qualquer no fim (por exemplo `.../guia/?v=8`) ou feche e abra a aba de novo. Ao mudar `app.js`, aumente o número em `app.js?v=` no `index.html`.
+
 ## Custos e privacidade
 
 - Mapa, endereços, lugares e rotas vêm do OpenStreetMap (Nominatim, Overpass e roteamento FOSSGIS), que são gratuitos. Esses serviços públicos têm limite de uso justo e servem bem para uso pessoal.
