@@ -133,17 +133,58 @@ function pickVoice() {
   ptVoice = vs.find((v) => v.lang === "pt-BR") || vs.find((v) => v.lang?.startsWith("pt")) || null;
 }
 if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
-function speak(text, { interrupt = false } = {}) {
-  if (!S.voice || !("speechSynthesis" in window) || !text) return;
-  if (interrupt) speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text.replace(/[*_#`>|]/g, "").replace(/\s+/g, " "));
+// Fila própria de fala: frases curtas, para poder mudar a velocidade e continuar de onde parou
+const speechQ = [];
+function enqueueSpeech(text) {
+  const item = { text, idx: 0, queuedAt: Date.now(), startedAt: 0, dead: false };
+  const u = new SpeechSynthesisUtterance(text);
   u.lang = "pt-BR";
   if (ptVoice) u.voice = ptVoice;
   u.rate = S.rate;
-  u.onend = u.onerror = () => { S.lastSpeechEnd = Date.now(); };
-  const words = u.text.split(" ").length;
-  S.speechUntil = Math.max(S.speechUntil || 0, Date.now()) + (words / (2.6 * S.rate)) * 1000 + 3000;
+  u.onstart = () => { item.startedAt = Date.now(); };
+  u.onboundary = (e) => { if (e.charIndex != null) item.idx = e.charIndex; };
+  u.onend = u.onerror = () => {
+    if (item.dead) return;
+    const i = speechQ.indexOf(item);
+    if (i >= 0) speechQ.splice(i, 1);
+    S.lastSpeechEnd = Date.now();
+  };
+  item.u = u;
+  speechQ.push(item);
   speechSynthesis.speak(u);
+}
+function speak(text, { interrupt = false } = {}) {
+  if (!S.voice || !("speechSynthesis" in window) || !text) return;
+  if (interrupt) stopSpeech();
+  const clean = text.replace(/[*_#`>|]/g, "").replace(/\s+/g, " ").trim();
+  const parts = clean.match(/[^.!?…]+[.!?…]*/g) || [clean];
+  parts.map((p) => p.trim()).filter(Boolean).forEach(enqueueSpeech);
+}
+function stopSpeech() {
+  speechQ.splice(0).forEach((i) => { i.dead = true; });
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+}
+// Está falando? Ignora sinais presos (alguns celulares nunca avisam que terminaram)
+function isSpeaking() {
+  while (speechQ.length) {
+    const h = speechQ[0];
+    const est = (h.text.split(" ").length / (2.6 * S.rate)) * 1000 + 3000;
+    const t0 = h.startedAt || Math.max(h.queuedAt, S.lastSpeechEnd || 0);
+    const limit = h.startedAt ? est : est + 2000;
+    if (Date.now() - t0 <= limit) break;
+    h.dead = true; speechQ.shift(); S.lastSpeechEnd = Date.now();
+    if (!speechQ.length) speechSynthesis.cancel();
+  }
+  return speechQ.length > 0;
+}
+// Retoma o que falta na nova velocidade, a partir da última palavra falada
+function respeakAtCurrentRate() {
+  if (!speechQ.length) return;
+  const items = speechQ.splice(0);
+  items.forEach((i) => { i.dead = true; });
+  speechSynthesis.cancel();
+  const rest = items.map((it, k) => (k === 0 && it.startedAt ? it.text.slice(it.idx) : it.text).trim()).filter(Boolean);
+  setTimeout(() => rest.forEach(enqueueSpeech), 80);
 }
 
 // ---------- Interface de conversa ----------
@@ -470,8 +511,8 @@ const TOOLS = [
   { name: "status_rota", description: "Situação da navegação em andamento: próxima manobra, distância até ela, quanto falta e próximos passos.", input_schema: { type: "object", properties: {} } },
   {
     name: "ajustar_preferencias",
-    description: "Muda preferências do app: velocidade da fala (1, 1.5 ou 2), se o guia ao vivo deve indicar para onde olhar e virar, e se os avisos de navegação (conversões da rota) devem ser falados em voz alta.",
-    input_schema: { type: "object", properties: { velocidade_fala: { type: "number", enum: [1, 1.5, 2] }, direcoes_no_guia_ao_vivo: { type: "boolean" }, avisos_de_navegacao_falados: { type: "boolean" } } },
+    description: "Muda preferências do app: velocidade da fala (1, 1.25, 1.5 ou 2), se o guia ao vivo deve indicar para onde olhar e virar, e se os avisos de navegação (conversões da rota) devem ser falados em voz alta.",
+    input_schema: { type: "object", properties: { velocidade_fala: { type: "number", enum: [1, 1.25, 1.5, 2] }, direcoes_no_guia_ao_vivo: { type: "boolean" }, avisos_de_navegacao_falados: { type: "boolean" } } },
   },
   { name: "parar_rota", description: "Encerra a navegação em andamento.", input_schema: { type: "object", properties: {} } },
 ];
@@ -606,7 +647,8 @@ async function lookAndGuide(kind, ctx = {}) {
 
 // ---------- Guia ao vivo ----------
 // Narração contínua: olha a câmera, cruza com pontos de interesse do mapa e vai contando o que há em volta.
-const LIVE_GAP = { continuo: 2500, normal: 10000, calmo: 25000 };
+const LIVE_GAP = { continuo: 1000, normal: 10000, calmo: 25000 };
+const LIVE_REFRESH_MS = 10000; // modo contínuo: nova leitura da câmera a cada 10 s
 
 const LIVE_SYSTEM = `Você é um guia turístico ao vivo, caminhando ao lado da pessoa. A cada momento você recebe a imagem da câmera do celular (o que ela está vendo agora), a localização, para onde a câmera aponta, lugares do mapa ao redor com distância e direção relativa, e o que você já contou.
 
@@ -676,7 +718,9 @@ function livePoiLines() {
     .map((p) => {
       const b = bearing(S.pos, p);
       const dir = S.liveDirections ? `, ${relative(b) || "direção desconhecida"}, a ${cardinal(b)}` : "";
-      return `- ${p.nome} (${p.info}) — ${Math.round(p.d)} m${dir}`;
+      const h = S.pos.heading;
+      const ahead = h != null && Math.abs(((b - h + 540) % 360) - 180) < 50 ? " [à frente]" : "";
+      return `- ${p.nome} (${p.info}) — ${Math.round(p.d)} m${dir}${ahead}`;
     }).join("\n");
 }
 
@@ -687,20 +731,25 @@ async function liveNarrate() {
       S.livePoisLoading = refreshLivePois().catch(() => {}).finally(() => { S.livePoisLoading = null; });
     }
     if (S.livePoisLoading && !S.livePois.length) await Promise.race([S.livePoisLoading, new Promise((r) => setTimeout(r, 4000))]);
-    liveStatus("olhando…");
+    if (!isSpeaking()) liveStatus("olhando…");
+    S.liveLastReq = Date.now();
     const img = grabFrame();
     const f = facing();
     const lines = [
       S.liveDirections
         ? 'Preferência de direções: LIGADA. Diga para onde olhar ou virar ("olhe à sua esquerda", "atrás de você", "logo à frente") usando as direções relativas dos dados; se a direção for desconhecida, descreva pela imagem.'
-        : 'Preferência de direções: DESLIGADA. Não diga para onde olhar, virar ou andar (nada de "à esquerda", "à direita", "atrás de você", "vire", "siga"). Só conte o que há e o que se vê; pode dizer a distância.',
+        : 'Preferência de direções: DESLIGADA. Não dê instruções de olhar, virar ou andar (nada de "à esquerda", "à direita", "atrás de você", "vire", "siga"). Conte o que há e o que se vê; pode dizer a distância e que algo vem "mais adiante no caminho".',
       `Hora local: ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}. Modo: ${MODE_LABEL[S.mode]}.`,
       S.address ? `Local: ${S.address.completo}` : "Local: endereço ainda desconhecido",
       S.pos ? `Coordenadas: ${S.pos.lat.toFixed(5)}, ${S.pos.lon.toFixed(5)} (±${Math.round(S.pos.acc)} m)` : "Sem GPS no momento.",
       `Câmera apontando para: ${S.liveDirections && f != null ? cardinal(f) : "não informado"}${S.pos?.speed > 0.5 ? `; andando a ${Math.round(S.pos.speed * 3.6)} km/h` : ""}.`,
     ];
     if (S.route && S.liveDirections) { const n = S.route.steps[S.stepIdx + 1]; lines.push(`Rota ativa até ${S.route.dest.nome}; próxima manobra: ${n ? instruction(n) + " em " + fmtDist(dist(S.pos, n.at)) : "chegada"}.`); }
-    if (S.pos && S.livePois.length) lines.push(`\nLugares do mapa por perto (até 350 m):\n${livePoiLines()}`);
+    if (S.pos && S.liveLastPos) {
+      const moved = dist(S.liveLastPos, S.pos);
+      lines.push(moved > 15 ? `A pessoa andou ${Math.round(moved)} m desde a última fala: traga o que é novo neste trecho e o que vem pela frente.` : "A pessoa está praticamente parada: aprofunde sobre o entorno, o bairro e a cidade.");
+    }
+    if (S.pos && S.livePois.length) lines.push(`\nLugares do mapa por perto (até 350 m; os marcados [à frente] estão no caminho em que a pessoa anda):\n${livePoiLines()}`);
     lines.push(S.liveSaid.length ? `\nO que você já contou (não repita):\n${S.liveSaid.map((t) => "- " + t).join("\n")}` : "\nVocê ainda não falou nada; comece se apresentando em poucas palavras e contando onde a pessoa está.");
     lines.push(S.livePace === "continuo"
       ? "Ritmo contínuo: fale sempre alguma coisa nova, mesmo que a cena não tenha mudado."
@@ -715,14 +764,10 @@ async function liveNarrate() {
     S.liveErrors = 0;
     const text = resp.stop_reason === "refusal" ? "" : resp.content.filter((b) => b.type === "text").map((b) => b.text).join(" ").trim();
     if (!text || text.includes("[SILENCIO]")) { S.liveReadyAt = Date.now() + LIVE_GAP[S.livePace] + 5000; return; }
-    liveStatus("falando");
     S.liveSaid.push(text);
     if (S.liveSaid.length > 12) S.liveSaid.shift();
-    addMsg(text, "bot");
-    speak(text);
-    // Se a voz estiver desligada, dá tempo de ler antes da próxima
-    const readMs = S.voice ? 0 : (text.split(/\s+/).length / 3) * 1000;
-    S.liveReadyAt = Date.now() + readMs + LIVE_GAP[S.livePace];
+    S.liveNext = text; // fica na vez; é falada assim que a fala atual terminar
+    if (S.pos) S.liveLastPos = { lat: S.pos.lat, lon: S.pos.lon };
   } catch (e) {
     console.warn("guia ao vivo", e);
     S.liveErrors++;
@@ -741,14 +786,24 @@ async function liveNarrate() {
 
 function liveTick() {
   if (!S.live) return;
-  let speaking = "speechSynthesis" in window && (speechSynthesis.speaking || speechSynthesis.pending);
-  if (speaking && Date.now() > (S.speechUntil || 0)) { speechSynthesis.cancel(); speaking = false; }
-  if (!speaking && !S.liveBusy && S.liveStatusText === "falando") liveStatus("");
-  const idle = !speaking && !S.liveBusy && !S.busy && !S.guideBusy && !rec && document.visibilityState === "visible";
+  const speaking = isSpeaking();
+  const free = !S.busy && !S.guideBusy && !rec && document.visibilityState === "visible";
+  // 1) Fala a próxima narração assim que a anterior terminar
+  if (S.liveNext && !speaking && free) {
+    const t = S.liveNext; S.liveNext = null;
+    addMsg(t, "bot");
+    speak(t);
+    liveStatus(S.voice ? "falando" : "");
+    // Sem voz, dá tempo de ler na tela
+    if (!S.voice) S.liveReadyAt = Date.now() + (t.split(/\s+/).length / 3) * 1000;
+  } else if (!speaking && !S.liveBusy && S.liveStatusText === "falando") liveStatus("");
+  // 2) Pede uma nova leitura da câmera
   const sinceSpeech = Date.now() - (S.lastSpeechEnd || 0);
-  const gapOk = !S.voice || sinceSpeech >= LIVE_GAP[S.livePace] || Date.now() > (S.speechUntil || 0) + LIVE_GAP[S.livePace];
-  if (idle && Date.now() >= S.liveReadyAt && gapOk) liveNarrate();
-  S.liveTimer = setTimeout(liveTick, 1000);
+  const due = S.livePace === "continuo"
+    ? Date.now() - (S.liveLastReq || 0) >= LIVE_REFRESH_MS && !S.liveNext
+    : !speaking && !S.liveNext && (!S.voice || sinceSpeech >= LIVE_GAP[S.livePace]);
+  if (due && free && !S.liveBusy && Date.now() >= S.liveReadyAt) liveNarrate();
+  S.liveTimer = setTimeout(liveTick, 500);
 }
 
 function onOrient(e) {
@@ -783,15 +838,16 @@ async function setLive(on) {
     enableCompass();
     if (!S.camOn && !(await setCamera(true))) return;
     if (!S.voice) setVoice(true);
-    S.live = true; S.liveSaid = []; S.liveErrors = 0; S.liveReadyAt = 0; S.lastSpeechEnd = 0; S.speechUntil = 0;
+    S.live = true; S.liveSaid = []; S.liveErrors = 0; S.liveReadyAt = 0; S.lastSpeechEnd = 0;
+    S.liveNext = null; S.liveLastReq = 0; S.liveLastPos = null;
     keepAwake(true);
     addMsg("Guia ao vivo ligado. Aponte a câmera para a rua e eu vou contando o que há por aqui.", "sys");
     clearTimeout(S.liveTimer);
     S.liveTimer = setTimeout(liveTick, 800);
   } else {
-    S.live = false;
+    S.live = false; S.liveNext = null;
     clearTimeout(S.liveTimer);
-    if ("speechSynthesis" in window) speechSynthesis.cancel();
+    stopSpeech();
     if (!S.route) keepAwake(false);
     addMsg("Guia ao vivo desligado.", "sys");
   }
@@ -805,7 +861,7 @@ let rec = null;
 function listen() {
   if (!Rec) { addMsg("Este navegador não reconhece fala. Use o microfone do teclado do celular.", "sys"); $("q").focus(); return; }
   if (rec) { rec.stop(); return; }
-  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  stopSpeech();
   rec = new Rec();
   rec.lang = "pt-BR"; rec.interimResults = true; rec.maxAlternatives = 1;
   let finalText = "";
@@ -838,17 +894,17 @@ $("settings").addEventListener("close", () => {
 });
 
 // ---------- Eventos ----------
-const SPEEDS = [1, 1.5, 2];
+const SPEEDS = [1, 1.25, 1.5, 2];
 const speedLabel = (r) => `${String(r).replace(".", ",")}x`;
 function setRate(r) {
   S.rate = r; store.set("rate", r);
   $("speedBtn").textContent = speedLabel(r);
   $("speedBtn").setAttribute("aria-label", `Velocidade da fala: ${speedLabel(r)}. Tocar para mudar`);
+  respeakAtCurrentRate();
 }
 $("speedBtn").addEventListener("click", () => {
   const next = SPEEDS.find((x) => x > S.rate + 0.01) ?? SPEEDS[0];
   setRate(next);
-  speak(`Velocidade ${speedLabel(next)}`, { interrupt: !S.live });
 });
 
 function setVoice(on) {
@@ -859,7 +915,7 @@ function setVoice(on) {
 $("voiceBtn").addEventListener("click", () => {
   setVoice(!S.voice);
   if (S.voice) speak("Voz ligada. Vou falando as respostas e as conversões.", { interrupt: true });
-  else if ("speechSynthesis" in window) speechSynthesis.cancel();
+  else stopSpeech();
 });
 $("camBtn").addEventListener("click", () => setCamera(!S.camOn));
 $("liveBtn").addEventListener("click", () => {

@@ -213,14 +213,14 @@ dialog input[type=password], dialog select {
       <option value="off">Não, só contar o que há em volta</option>
       <option value="on">Sim, dizer "olhe à esquerda", "atrás de você"…</option>
     </select>
-    <div class="note">A velocidade da fala fica no botão 1x / 1,5x / 2x da barra de baixo. Você também pode pedir no chat: "fala mais rápido", "quero as direções".</div>
+    <div class="note">A velocidade da fala fica no botão 1x / 1,25x / 1,5x / 2x da barra de baixo. Você também pode pedir no chat: "fala mais rápido", "quero as direções".</div>
     <label for="livePace">Ritmo do guia ao vivo</label>
     <select id="livePace">
-      <option value="continuo">Contínuo (fala sem parar)</option>
+      <option value="continuo">Contínuo (nova leitura a cada 10 s)</option>
       <option value="normal">Normal (pausa de 10 s)</option>
       <option value="calmo">Calmo (pausa de 25 s)</option>
     </select>
-    <div class="note">No modo contínuo o Claude é consultado a cada fala, cerca de 3 a 5 vezes por minuto.</div>
+    <div class="note">No modo contínuo o Claude é consultado a cada 10 segundos (6 vezes por minuto).</div>
     <label for="lookEvery">Olhar pela câmera durante a rota</label>
     <select id="lookEvery">
       <option value="turns">Só perto das conversões</option>
@@ -235,6 +235,6 @@ dialog input[type=password], dialog select {
 </dialog>
 
 <script src="vendor/leaflet.js"></script>
-<script type="module" src="app.js?v=9"></script>
+<script type="module" src="app.js?v=10"></script>
 </body>
 </html>
