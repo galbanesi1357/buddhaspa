@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<title>Sistema de Eficiência Buddha Spa — Visão de Negócio e Escopo Funcional v1</title>
+<title>Sistema de Eficiência Buddha Spa — Visão de Negócio e Escopo Funcional v2</title>
 <style>
   :root{
     --terra:#392617; --cafe:#1c130c; --cafe2:#5d3c29; --bordo:#7e0000; --bordo2:#9d3f3f;
@@ -23,7 +23,8 @@
   li{margin-bottom:.9mm}
   strong{color:var(--cafe)}
   .section{break-before:page}
-  .tight .small,.tight table.compact td,.tight table.compact th{font-size:7.6pt}
+  .tight .small,.tight table.compact td,.tight table.compact th{font-size:7.5pt}
+  .xtight table.compact td,.xtight table.compact th{font-size:7.2pt;padding:.8mm 1.3mm}
   .tight li{margin-bottom:.6mm}
   .tight .box,.tight .callout{padding:2.4mm 3mm;margin-bottom:2.4mm}
   .cont{margin-top:2mm}
@@ -101,7 +102,7 @@
   .arrow{text-align:center;color:var(--gold);font-size:12pt;line-height:1;margin:-1mm 0 1.5mm 0}
 
   /* flow */
-  .flow{display:flex;gap:2mm;align-items:stretch;margin:2mm 0 3.5mm 0;break-inside:avoid}
+  .flow{display:flex;gap:2mm;align-items:stretch;margin:2mm 0 3.5mm 0;padding-top:3.5mm;break-inside:avoid}
   .step{flex:1;background:#fff;border:1px solid var(--line);border-radius:2mm;padding:2.5mm;font-size:8.4pt;position:relative;line-height:1.3}
   .step b{display:block;color:var(--terra);margin-bottom:1mm;font-size:8.8pt}
   .step .n{position:absolute;top:-3mm;left:2.5mm;background:var(--gold);color:#fff;border-radius:50%;width:6mm;height:6mm;display:flex;align-items:center;justify-content:center;font-size:7.5pt;font-weight:700}
@@ -137,13 +138,13 @@
   <div class="band"></div><div class="band2"></div>
   <div style="position:relative;z-index:1">
     <div class="logo"><img src="../../novo_logo_BUDDHA_SPA_fundo_branco.png" alt="Buddha Spa"></div>
-    <div style="margin-top:14mm"><span class="tag">Documento de Visão de Negócio · v1.0</span></div>
+    <div style="margin-top:14mm"><span class="tag">Documento de Visão de Negócio · v2.0</span></div>
     <h1>Sistema de Eficiência<br>Buddha Spa</h1>
     <div class="sub">Rede de agentes de IA para monitoramento, organização e ganho de eficiência da franqueadora</div>
   </div>
   <div style="position:relative;z-index:1" class="meta">
-    <div><strong style="color:#fff">Escopo de negócio, regras, KPIs e governança</strong> — etapa 1 de 2 (a etapa 2 é o documento técnico para o time de Tecnologia)</div>
-    <div>Preparado para Gustavo Albanesi, CEO · JG Participações / Buddha Spa · Novembro de 2026</div>
+    <div><strong style="color:#fff">Escopo de negócio, regras, KPIs e governança.</strong> Documento complementar: Requisitos Técnicos e Arquitetura (para o time de Tecnologia).</div>
+    <div>Buddha Wellness Group · Buddha Spa · Diretoria, Tecnologia e Gente &amp; Gestão · Novembro de 2026</div>
     <div>Confidencial. Uso interno da franqueadora.</div>
   </div>
 </section>
@@ -156,26 +157,25 @@
     <ol>
       <li><span>Sumário executivo: o problema, a solução e o que ela não é</span><span>pág. 3</span></li>
       <li><span>Contexto Buddha Spa: estrutura, ferramentas e o que já existe</span><span>pág. 4</span></li>
-      <li><span>Princípios de desenho do sistema</span><span>pág. 5</span></li>
-      <li><span>Arquitetura funcional: a rede de agentes e quem lidera quem</span><span>pág. 6</span></li>
-      <li><span>Fontes de dados e o que se extrai de cada uma</span><span>pág. 8</span></li>
-      <li><span>Agente 1 · Monitor de Atividades</span><span>pág. 9</span></li>
-      <li><span>Agente 2 · Organizador de Atividades (copiloto do colaborador)</span><span>pág. 11</span></li>
-      <li><span>Agente 3 · Termômetro de Comunicação e Humor</span><span>pág. 13</span></li>
-      <li><span>Agente 4 · Gestão de DP: jornada, assiduidade e aderência</span><span>pág. 14</span></li>
-      <li><span>Agente 5 · Reports e Alertas</span><span>pág. 16</span></li>
-      <li><span>Agente 6 · Governança, Auditoria e Parametrização</span><span>pág. 17</span></li>
-      <li><span>Modelo conceitual de dados e taxonomias</span><span>pág. 19</span></li>
-      <li><span>Catálogo consolidado de KPIs</span><span>pág. 20</span></li>
-      <li><span>Governança de acesso, privacidade e LGPD</span><span>pág. 21</span></li>
-      <li><span>Complementos propostos além do escopo original</span><span>pág. 22</span></li>
-      <li><span>Rastreabilidade: o que veio do seu material e o que foi ajustado</span><span>pág. 23</span></li>
-      <li><span>Roadmap de implantação em fases</span><span>pág. 25</span></li>
-      <li><span>Riscos, premissas e decisões pendentes para o CEO</span><span>pág. 26</span></li>
+      <li><span>Princípios de desenho do sistema</span><span>pág. 6</span></li>
+      <li><span>Arquitetura funcional: a rede de agentes e quem lidera quem</span><span>pág. 7</span></li>
+      <li><span>Fontes de dados e o que se extrai de cada uma</span><span>pág. 9</span></li>
+      <li><span>Agente 1 · Monitor de Atividades</span><span>pág. 11</span></li>
+      <li><span>Agente 2 · Organizador de Atividades (copiloto do colaborador)</span><span>pág. 14</span></li>
+      <li><span>Agente 3 · Termômetro de Comunicação e Humor</span><span>pág. 16</span></li>
+      <li><span>Agente 4 · Gestão de DP: jornada, assiduidade e aderência</span><span>pág. 17</span></li>
+      <li><span>Agente 5 · Reports e Alertas</span><span>pág. 19</span></li>
+      <li><span>Agente 6 · Governança, Auditoria e Parametrização</span><span>pág. 20</span></li>
+      <li><span>Modelo conceitual de dados e taxonomias</span><span>pág. 22</span></li>
+      <li><span>Catálogo consolidado de KPIs</span><span>pág. 23</span></li>
+      <li><span>Governança de acesso, privacidade e LGPD</span><span>pág. 24</span></li>
+      <li><span>Funcionalidades complementares incorporadas ao escopo</span><span>pág. 25</span></li>
+      <li><span>Roadmap de implantação em 6 meses</span><span>pág. 26</span></li>
+      <li><span>Riscos, premissas, decisões registradas e pendências</span><span>pág. 27</span></li>
     </ol>
   </div>
   <div class="callout" style="margin-top:6mm">
-    <strong>Como ler.</strong> Os capítulos 6 a 11 descrevem cada agente no mesmo formato: objetivo, o que consome, regras de negócio, KPIs, telas e saídas, quem acessa, alertas e o que o agente <em>não</em> faz. As numerações dos agentes seguem o seu material original (1 a 5); o Agente 6 foi destacado como peça própria por concentrar toda a governança, logs e parametrização que você descreveu no item 6 do anexo.
+    <strong>Como ler.</strong> Os capítulos 6 a 11 descrevem cada agente no mesmo formato: objetivo, o que consome, regras de negócio, KPIs, telas e saídas, quem acessa, alertas e o que o agente <em>não</em> faz. Os agentes 1 a 5 seguem a numeração das diretrizes originais da Diretoria; o Agente 6 concentra governança, logs e parametrização. As funcionalidades complementares (capítulo 15) já estão incorporadas às regras, KPIs e ao roadmap.
   </div>
 </section>
 
@@ -183,11 +183,11 @@
 <section class="section">
   <div class="kicker">Capítulo 1</div>
   <h2>Sumário executivo</h2>
-  <p class="lead">A franqueadora Buddha Spa tem cerca de 100 colaboradores, CLT e PJ, operando sobre Microsoft 365, Databricks, SULTS, Feedz, Asana, fSense e WhatsApp corporativo. A demanda chega por sete canais diferentes e quase nunca é consolidada em um só lugar. O resultado, confirmado pelo diagnóstico NR-1, é a sensação de sobrecarga sem visibilidade real de volume, origem e prioridade.</p>
+  <p class="lead">A franqueadora Buddha Spa tem cerca de 100 colaboradores, CLT e PJ, operando sobre Microsoft 365 (com o Planner como ferramenta oficial de tarefas), Databricks, SULTS, fSense em todas as estações e WhatsApp corporativo. A demanda chega por sete canais diferentes e quase nunca é consolidada em um só lugar. O resultado, confirmado pelo diagnóstico NR-1, é a sensação de sobrecarga sem visibilidade real de volume, origem e prioridade.</p>
 
   <h3>O problema que o sistema resolve</h3>
   <div class="grid3">
-    <div class="card"><h4>Demanda fragmentada</h4><p class="small">Pedidos chegam por WhatsApp, Teams, e-mail, chamado SULTS, reunião e corredor. O Planner e o Asana registram só uma parte. Ninguém enxerga o todo de uma pessoa ou de um time.</p></div>
+    <div class="card"><h4>Demanda fragmentada</h4><p class="small">Pedidos chegam por WhatsApp, Teams, e-mail, chamado SULTS, reunião e corredor. O Planner, recém-adotado e ainda pouco usado, registra só uma parte. Ninguém enxerga o todo de uma pessoa ou de um time.</p></div>
     <div class="card"><h4>Percepção sem medida</h4><p class="small">Colaboradores relatam excesso de trabalho; gestores não conseguem confirmar nem refutar, porque não há medida de carga versus capacidade (44h) nem de previsto versus entregue.</p></div>
     <div class="card"><h4>Controles manuais e tardios</h4><p class="small">O cruzamento ponto x catraca x facial é feito à mão pelo DP, meses depois (banco de horas de jul/ago só fechado em setembro). Alertas chegam quando o problema já aconteceu.</p></div>
   </div>
@@ -218,7 +218,7 @@
     </div>
   </div>
 
-  <h3>Resultados esperados em 12 meses</h3>
+  <h3>Resultados esperados ao final dos 6 meses de implantação</h3>
   <div class="grid4">
     <div class="stat"><div class="n">100%</div><div class="l">das demandas formais e informais visíveis em um só lugar por pessoa e time</div></div>
     <div class="stat"><div class="n">D+1</div><div class="l">de atraso máximo entre o fato e sua leitura nos dashboards; alertas críticos em tempo real</div></div>
@@ -234,10 +234,10 @@
   <p class="lead">A estrutura abaixo resume, de forma agregada, a relação de colaboradores e gestores mantida por G&amp;G e o organograma vigente. Ela define o perímetro inicial do sistema e o desenho de hierarquia que governa quem vê o quê. Nomes de colaboradores não são tratados neste documento.</p>
 
   <div class="grid4">
-    <div class="stat"><div class="n">~100</div><div class="l">colaboradores na franqueadora e holding</div></div>
+    <div class="stat"><div class="n">~100</div><div class="l">colaboradores na franqueadora e na holding Buddha Wellness Group</div></div>
     <div class="stat"><div class="n">CLT + PJ</div><div class="l">dois vínculos, regras contratuais de monitoramento semelhantes; PJ concentra diretoria e gerência</div></div>
     <div class="stat"><div class="n">3 a 4</div><div class="l">níveis hierárquicos: CEO, diretores, gerentes/coordenadores, supervisores e analistas</div></div>
-    <div class="stat"><div class="n">9</div><div class="l">diretorias e unidades: Operações, Financeiro, Marketing, TI, College, G&amp;G, Produtos/Lab, Instituto, Expansão</div></div>
+    <div class="stat"><div class="n">8</div><div class="l">diretorias e unidades: Operações (com Expansão e Comercial), Financeiro, Marketing, TI, College e Instituto, G&amp;G, Buddha Lab</div></div>
   </div>
 
   <h3>Áreas e subáreas cobertas pelo sistema</h3>
@@ -245,12 +245,12 @@
     <thead><tr><th style="width:44mm">Diretoria / unidade</th><th>Subáreas e frentes de trabalho</th><th style="width:40mm">Fontes de demanda predominantes</th></tr></thead>
     <tbody>
       <tr><td><strong>Operações</strong></td><td>Gestão de operações, SAF/SAC, Implantação, Onboarding de franqueados, Líderes Comerciais, Unidades Próprias e Híbridas, Expansão, Comercial e receita</td><td>Franqueados (SULTS, WhatsApp), clientes, CEO</td></tr>
-      <tr><td><strong>Financeiro</strong></td><td>Financeiro, Controladoria, Contabilidade, Fiscal, Contas a pagar e receber, Jurídico, Facilities, Logística e Supply (inclui Pomander)</td><td>Outras áreas, franqueados, fornecedores, prazos legais</td></tr>
+      <tr><td><strong>Financeiro</strong></td><td>Financeiro, Controladoria, Contabilidade, Fiscal, Contas a pagar e receber, Jurídico, Facilities</td><td>Outras áreas, franqueados, fornecedores, prazos legais</td></tr>
       <tr><td><strong>Marketing</strong></td><td>Criação e Design, Audiovisual, Copywriting, Marketing Digital, Mídia e Growth, Branding</td><td>Outras áreas, franqueados, campanhas planejadas</td></tr>
       <tr><td><strong>Tecnologia</strong></td><td>Engenharia e Arquitetura, Infraestrutura e Segurança da Informação, Data Analytics e BI, Martech, Suporte</td><td>Outras áreas (chamados), projetos, incidentes</td></tr>
       <tr><td><strong>Buddha Spa College</strong></td><td>Coordenação acadêmica e administrativa, equipe técnica, eventos, Instituto Buddha Spa</td><td>Alunos, franqueados, calendário de turmas</td></tr>
       <tr><td><strong>Gente &amp; Gestão</strong></td><td>Administração de Pessoas (DP), Treinamento e Desenvolvimento, DHO, Recrutamento e Seleção, Clima e Cultura</td><td>Colaboradores, gestores, obrigações legais</td></tr>
-      <tr><td><strong>Produtos / Buddha Spa Lab</strong></td><td>Pesquisa e Desenvolvimento, Laboratório, Direção Técnica, Direção Geral do Lab</td><td>Operações, franqueados, fornecedores</td></tr>
+      <tr><td><strong>Buddha Lab</strong> (Direção Geral)</td><td>Logística e Supply (inclui Pomander), Produtos, Pesquisa e Desenvolvimento e Laboratório, Direção Técnica</td><td>Operações, franqueados, fornecedores, PCP e compras</td></tr>
     </tbody>
   </table>
   <p class="tiny muted">A hierarquia nominal (quem é gestor de quem) fica exclusivamente no cadastro de pessoas do sistema, mantido por G&amp;G, e não é reproduzida em documentos. Divergências entre a relação de gestores e o organograma devem ser saneadas por G&amp;G antes do piloto, porque a hierarquia é a base de todo o controle de acesso.</p>
@@ -261,9 +261,10 @@
       <h4>Já integrado ou contratado</h4>
       <ul class="small">
         <li><strong>Microsoft 365</strong> para todos: Teams (chats, canais, reuniões com transcrição e resumo), Outlook, Calendário, Planner/To Do, OneDrive, SharePoint.</li>
-        <li><strong>Databricks</strong> (lakehouse em AWS, parceiro Cloud3) já recebendo SULTS, Control iD (catraca, ponto, reconhecimento facial), Feedz, intranet e portal jurídico.</li>
-        <li><strong>fSense</strong>: piloto com 14 colaboradores, 14 estações e cerca de 170 aplicações mapeadas; decisão de implantar em todas as máquinas, com base contratual validada por G&amp;G e Jurídico em outubro/2026.</li>
-        <li><strong>Asana</strong>: cerca de 95 usuários mapeados em set/2026 (TI e Marketing mais intensivos; CEO com 42 projetos). <strong>Trello</strong> em uso pontual.</li>
+        <li><strong>Databricks</strong> (lakehouse em AWS, parceiro Cloud3) já recebendo SULTS, Control iD (catraca, ponto, reconhecimento facial), intranet, portal jurídico e Feedz.</li>
+        <li><strong>fSense</strong>: já implantado em todas as estações da empresa, com base contratual validada por G&amp;G e Jurídico em outubro/2026. Captura screenshots por padrão, mas este sistema não os consome.</li>
+        <li><strong>Planner</strong>: ferramenta oficial de tarefas, em adoção recente e ainda com uso baixo porque as equipes estão aprendendo a ferramenta. O <strong>Asana</strong> foi cancelado para a empresa e permanece apenas para poucos usuários; <strong>Trello</strong> em uso pontual.</li>
+        <li><strong>Feedz</strong> (rede social corporativa): uso baixo e em avaliação de descontinuação; tratado como fonte secundária, sem KPIs relevantes apoiados nele.</li>
         <li><strong>WhatsApp corporativo</strong> em celulares da empresa, com WhatsApp Web nas estações.</li>
       </ul>
     </div>
@@ -286,7 +287,7 @@
   <p class="lead">Dez regras que valem para todos os agentes. Elas resolvem antecipadamente a maior parte das dúvidas de implementação e são o que o time de TI deve usar como critério de aceite.</p>
 
   <div class="grid2">
-    <div class="box gold"><h4>1 · Somente leitura nas fontes</h4><p class="small">Nenhum agente escreve em Teams, Outlook, WhatsApp, SULTS, Asana ou fSense em nome do colaborador. A única escrita autorizada é em sistemas do próprio Sistema de Eficiência (banco de dados, dashboards, notificações) e, mediante confirmação explícita do colaborador, a criação de tarefas no Planner/Asana a partir do Organizador.</p></div>
+    <div class="box gold"><h4>1 · Somente leitura nas fontes</h4><p class="small">Nenhum agente escreve em Teams, Outlook, WhatsApp, SULTS, Planner ou fSense em nome do colaborador. A única escrita autorizada é em sistemas do próprio Sistema de Eficiência (banco de dados, dashboards, notificações) e, mediante confirmação explícita do colaborador, a criação de tarefas no Planner ou de chamados no SULTS a partir do Organizador (formalização assistida).</p></div>
     <div class="box gold"><h4>2 · Dado observado é imutável; interpretação é corrigível</h4><p class="small">O fato bruto (ex.: "2h no YouTube segundo fSense", "catraca às 9h12") nunca é apagado. O que pode mudar, com aprovação, é a <em>classificação</em> ou a <em>justificativa</em> que acompanha o fato. O histórico De/Para fica para sempre.</p></div>
     <div class="box gold"><h4>3 · O colaborador vê o próprio espelho</h4><p class="small">Todo colaborador enxerga seus próprios dados de atividade e jornada, exatamente como o gestor os vê, exceto o Termômetro de Humor. Transparência reduz contestação e é exigência de boa prática LGPD.</p></div>
     <div class="box gold"><h4>4 · Hierarquia define visibilidade</h4><p class="small">Gestor vê liderados diretos; gestor de gestores vê toda a árvore abaixo; diretor vê a diretoria; CEO vê tudo. DP e Diretora de G&amp;G veem a dimensão de jornada de toda a empresa. A regra é derivada automaticamente do cadastro de hierarquia.</p></div>
@@ -310,10 +311,10 @@
       <div class="lab">Camada 0<span>Fontes</span></div>
       <div class="items">
         <div class="node src"><b>Microsoft 365</b>Teams, Outlook, Calendário, Planner/To Do, OneDrive, SharePoint, transcrições</div>
-        <div class="node src"><b>Databricks</b>SULTS, Control iD, Feedz, intranet, portal jurídico</div>
+        <div class="node src"><b>Databricks</b>SULTS, Control iD, intranet, portal jurídico, Feedz (secundário)</div>
         <div class="node src"><b>fSense</b>uso de apps, atividade, ociosidade, jornada</div>
-        <div class="node src"><b>Asana / Trello</b>tarefas, projetos, prazos</div>
-        <div class="node src"><b>WhatsApp Web</b>leitura no desktop, só com PC ligado</div>
+        <div class="node src"><b>Trello / Asana residual</b>tarefas de quem ainda usa</div>
+        <div class="node src"><b>WhatsApp Web</b>exportação completa das conversas e áudios, só com PC ligado</div>
         <div class="node src"><b>SO da estação</b>Screen Time (macOS) / Windows</div>
       </div>
     </div>
@@ -321,7 +322,7 @@
     <div class="layer">
       <div class="lab">Camada 1<span>Coleta e normalização</span></div>
       <div class="items">
-        <div class="node a6"><b>Coletor diário ("Sentinela")</b>Extrai de todas as fontes em janelas programadas (padrão: a cada hora para Teams/e-mail/calendário, diário para fSense/Databricks, contínuo para WhatsApp Web enquanto a estação estiver ligada). Guarda o bruto com data e origem.</div>
+        <div class="node a6"><b>Coletor diário ("Sentinela")</b>Extrai de todas as fontes em janelas programadas (padrão: a cada hora para Teams/e-mail/calendário/Planner, diário para fSense/Databricks, exportação incremental diária do WhatsApp Web enquanto a estação estiver ligada). Guarda o bruto com data e origem.</div>
         <div class="node a6"><b>Classificador</b>Transforma cada item em uma entidade padrão: <em>Demanda</em>, <em>Interação</em>, <em>Bloco de tempo</em>, <em>Evento de jornada</em>, <em>Sinal de humor</em>. Atribui origem, canal, tema, tipo, formal/informal, pessoa, SLA.</div>
         <div class="node a6"><b>Cadastro de pessoas e hierarquia</b>Quem é líder de quem, área, vínculo, jornada contratual, unidade. Fonte das permissões.</div>
       </div>
@@ -360,7 +361,7 @@
 
 <section class="cont">
   <h3>Quem lidera quem na rede de agentes</h3>
-  <p>Você pediu uma estrutura "não tão complexa, mas completa". A hierarquia abaixo é a mínima que garante ordem de execução, reaproveitamento e governança. No documento técnico ela vira a definição de cada agente, suas ferramentas e seus prompts.</p>
+  <p>A diretriz é uma estrutura "não tão complexa, mas completa". A hierarquia abaixo é a mínima que garante ordem de execução, reaproveitamento e governança. No documento técnico ela vira a definição de cada agente, suas ferramentas e seus prompts.</p>
   <table>
     <thead><tr><th style="width:30mm">Papel</th><th>Responsabilidade</th><th style="width:38mm">Depende de</th><th style="width:34mm">Entrega para</th></tr></thead>
     <tbody>
@@ -368,7 +369,7 @@
       <tr><td><strong>Coletor</strong></td><td>Conecta em cada fonte, extrai incrementalmente, guarda o bruto. Um conector por fonte, isolado: se o WhatsApp Web cair, o resto continua.</td><td>Credenciais e cadastro</td><td>Classificador</td></tr>
       <tr><td><strong>Classificador</strong></td><td>Lê o bruto e cria entidades padronizadas (cap. 12). É onde a IA faz o trabalho pesado: identificar demanda em conversa, inferir origem, tema, prazo, estimativa inicial, tom.</td><td>Coletor, taxonomias</td><td>Agentes 1, 2, 3, 4</td></tr>
       <tr><td><strong>Agente 1 · Monitor</strong></td><td>Consolida carga, origem e entrega por pessoa e time. Base de referência dos demais.</td><td>Classificador, cadastro</td><td>Agentes 2, 3, 5 e dashboards</td></tr>
-      <tr><td><strong>Agente 2 · Organizador</strong></td><td>Planeja a semana do colaborador e conversa com ele. Único agente com estado editável pelo usuário.</td><td>Agente 1, Planner/Asana, calendário</td><td>Colaborador, gestor, Agente 5</td></tr>
+      <tr><td><strong>Agente 2 · Organizador</strong></td><td>Planeja a semana do colaborador e conversa com ele. Único agente com estado editável pelo usuário.</td><td>Agente 1, Planner, calendário</td><td>Colaborador, gestor, Agente 5</td></tr>
       <tr><td><strong>Agente 3 · Termômetro</strong></td><td>Lê tom e padrões de comunicação; correlaciona com carga (Agente 1) e jornada (Agente 4).</td><td>Classificador, Agentes 1 e 4</td><td>Diretores, G&amp;G, CEO, Agente 5</td></tr>
       <tr><td><strong>Agente 4 · DP</strong></td><td>Cruza ponto, catraca, facial, fSense e calendário; calcula horas e inconsistências.</td><td>Databricks, fSense, calendário</td><td>DP, G&amp;G, gestores, colaborador, Agentes 3 e 5</td></tr>
       <tr><td><strong>Agente 5 · Reports</strong></td><td>Gera e envia resumos e alertas no canal certo, para o público certo, na hora certa.</td><td>Agentes 1 a 4</td><td>Pessoas, via Teams e e-mail</td></tr>
@@ -377,7 +378,7 @@
   </table>
 
   <div class="callout">
-    <strong>Por que não um agente só?</strong> Separar coleta, classificação e interpretação permite trocar uma fonte sem quebrar o resto, aplicar permissões em um ponto só e auditar onde um dado nasceu. Também permite começar o piloto com Agentes 1, 4 e 6 (que dependem apenas de dados já existentes) antes de ligar WhatsApp e humor.
+    <strong>Por que não um agente só?</strong> Separar coleta, classificação e interpretação permite trocar uma fonte sem quebrar o resto, aplicar permissões em um ponto só e auditar onde um dado nasceu. Também permite entrar em produção para toda a empresa com os Agentes 1, 4 e 6 (que dependem apenas de dados já existentes) antes de ligar WhatsApp e humor.
   </div>
 </section>
 
@@ -385,7 +386,7 @@
 <section class="section tight">
   <div class="kicker">Capítulo 5</div>
   <h2>Fontes de dados e o que se extrai de cada uma</h2>
-  <p class="lead">Para cada fonte: o que coletar, para qual agente serve, a frequência e as restrições. Itens marcados como "novo" não estavam na sua lista original e são sugestões.</p>
+  <p class="lead">Para cada fonte: o que coletar, para qual agente serve, a frequência e as restrições. Itens marcados como "novo" não constavam da lista original de origens e foram acrescentados.</p>
   <table class="compact">
     <thead><tr><th style="width:27mm">Fonte</th><th>O que se extrai</th><th style="width:22mm">Serve a</th><th style="width:20mm">Frequência</th><th style="width:40mm">Restrições e cuidados</th></tr></thead>
     <tbody>
@@ -393,21 +394,21 @@
       <tr><td><strong>Teams · reuniões</strong></td><td>Agenda, duração, participantes, transcrição e resumo automático, itens de ação e responsáveis.</td><td>1, 2, 5</td><td>Após cada reunião</td><td>Itens de ação só viram demanda para quem participou.</td></tr>
       <tr><td><strong>Outlook · e-mail</strong></td><td>Remetente, destinatários, assunto, horário, thread, anexos; pedidos e prazos no corpo; tempo de resposta.</td><td>1, 2, 3</td><td>Horária</td><td>Exclui webmail pessoal (previsto no Termo de Responsabilidade).</td></tr>
       <tr><td><strong>Calendário</strong></td><td>Eventos, categorias, local (externo/franqueado), aceite/recusa, sobreposições, blocos de foco.</td><td>1, 2, 4</td><td>Horária</td><td>Evento externo justifica ausência de catraca (Agente 4).</td></tr>
-      <tr><td><strong>Planner / To Do</strong></td><td>Tarefas, bucket, responsável, prazo, prioridade, % concluído, checklist, data de conclusão.</td><td>1, 2</td><td>Horária</td><td>É a referência de "demanda formal planejada".</td></tr>
+      <tr><td><strong>Planner / To Do</strong> <span class="pill p-info">principal</span></td><td>Tarefas, bucket, responsável, prazo, prioridade, % concluído, checklist, data de conclusão.</td><td>1, 2</td><td>Horária</td><td>Ferramenta oficial de tarefas; é a referência de "demanda formal planejada". Adoção ainda baixa: o Organizador ajuda a popular o Planner (formalização assistida) e mede a adoção por área.</td></tr>
       <tr><td><strong>OneDrive / SharePoint</strong></td><td>Arquivos criados e editados (nome, pasta, horário, autor), sem ler conteúdo salvo quando o colaborador anexa ao Organizador.</td><td>1, 2</td><td>Diária</td><td>Metadados apenas, por padrão.</td></tr>
       <tr><td><strong>SULTS (via Databricks)</strong></td><td>Chamados abertos por franqueados e entre áreas, responsável, SLA, status, tempo de primeira resposta e resolução, reaberturas, satisfação.</td><td>1, 2, 3, 5</td><td>Diária (ideal: horária)</td><td>SLA do SULTS é prazo oficial da demanda.</td></tr>
       <tr><td><strong>Control iD (via Databricks)</strong></td><td>Catraca (entrada/saída, sentido, terminal), ponto (marcação, origem app/REP/web, geolocalização), reconhecimento facial.</td><td>4, 5</td><td>Diária (ideal: horária)</td><td>Dado de RH: alteração só com aprovação do DP.</td></tr>
-      <tr><td><strong>Feedz (via Databricks)</strong></td><td>Posts, reconhecimentos, pesquisas de pulso, humor declarado, engajamento.</td><td>3, 5</td><td>Diária</td><td>Pesquisas anônimas continuam anônimas: usar só agregados.</td></tr>
+      <tr><td><strong>Feedz (via Databricks)</strong> <span class="pill p-info">secundário</span></td><td>Posts públicos e pesquisas de pulso em agregado, enquanto a ferramenta existir.</td><td>3</td><td>Semanal</td><td>Uso baixo e possível descontinuação: peso reduzido, nenhum KPI principal depende dele; pesquisas anônimas continuam anônimas.</td></tr>
       <tr><td><strong>Intranet, portal jurídico (via Databricks)</strong></td><td>Solicitações e aprovações (benefícios, férias, documentos), pedidos ao Jurídico com prazo.</td><td>1, 4</td><td>Diária</td><td>Fluxos internos viram demanda formal.</td></tr>
-      <tr><td><strong>fSense</strong></td><td>Tempo por aplicação e site, categoria (trabalho, pessoal, não aprovado), horas ativas, ociosidade, início e fim de atividade, jornada aderida, linha do tempo.</td><td>1, 4, 3</td><td>Diária (ideal: horária)</td><td>Screenshots e geolocalização ficam fora dos dashboards; uso restrito à investigação formal.</td></tr>
+      <tr><td><strong>fSense</strong> (toda a empresa)</td><td>Tempo por aplicação e site, categoria (trabalho, pessoal, não aprovado), horas ativas, ociosidade, início e fim de atividade, jornada aderida, linha do tempo.</td><td>1, 4, 3</td><td>Diária (ideal: horária)</td><td>O fSense captura screenshots e geolocalização por padrão; o sistema não os consome nem os exibe. Uso restrito à investigação formal, fora deste sistema.</td></tr>
       <tr><td><strong>SO da estação</strong> <span class="pill p-info">complementa</span></td><td>Tempo de tela por app (macOS Screen Time; Windows via telemetria local), ligado/desligado, bloqueio de tela.</td><td>1, 4</td><td>Diária</td><td>Redundância útil quando o fSense falha; precisa de agente local.</td></tr>
-      <tr><td><strong>Asana / Trello</strong></td><td>Tarefas, projetos, responsável, prazo, status, comentários, carga por pessoa.</td><td>1, 2</td><td>Horária</td><td>Trello só para quem usa; unificar nomenclatura com Planner.</td></tr>
-      <tr><td><strong>WhatsApp Web</strong></td><td>Conversas do número corporativo lidas no desktop: contatos, horário, texto, mídia (metadados), grupos; identificação de demanda, prazo, tom.</td><td>1, 2, 3</td><td>Contínua enquanto a estação estiver ligada e logada</td><td>Somente leitura; sem API oficial; sem automação de envio; coleta pausa se detectar risco de bloqueio; nunca o número pessoal.</td></tr>
+      <tr><td><strong>Trello / Asana residual</strong></td><td>Tarefas, responsável, prazo, status, comentários, apenas dos usuários que ainda usam.</td><td>1, 2</td><td>Horária</td><td>Asana cancelado para a empresa (poucos usuários remanescentes); Trello pontual. Unificar nomenclatura com o Planner e incentivar migração.</td></tr>
+      <tr><td><strong>WhatsApp Web</strong> (número corporativo)</td><td>Exportação completa e incremental das conversas da sessão do WhatsApp Web da estação: contatos, grupos, horário, texto, áudios transcritos automaticamente, metadados de mídia; identificação de demanda, prazo, tom.</td><td>1, 2, 3</td><td>Exportação incremental diária (ou a cada poucas horas) enquanto a estação estiver ligada e logada</td><td>Somente leitura, em lote, sem navegar conversa a conversa; sem envio, sem marcar como lido, sem alterar estado; sessão vinculada só à estação corporativa; nunca o número pessoal. Detalhamento técnico no documento de requisitos.</td></tr>
       <tr><td><strong>Cadastro de pessoas</strong> <span class="pill p-info">novo</span></td><td>Nome, cargo, gestor, área, vínculo CLT/PJ, jornada contratual, regime (presencial/híbrido/remoto), unidade, data de admissão, status.</td><td>Todos</td><td>Sob demanda, com histórico</td><td>Fonte das permissões. Hoje é planilha; precisa virar cadastro mantido por G&amp;G com versão.</td></tr>
     </tbody>
   </table>
   <div class="callout">
-    <strong>Confirmação pedida no seu material.</strong> O Teams é, sim, o melhor canal para aprovações e alertas: todos já o usam, suporta cards com botões "Aprovar / Recusar", registra quem clicou e quando, e permite abrir o dashboard pelo próprio card. E-mail fica como canal dos relatórios periódicos e como cópia de registro das aprovações.
+    <strong>Canal de aprovações e alertas.</strong> O Teams é o canal escolhido para aprovações e alertas: todos já o usam, suporta cards com botões "Aprovar / Recusar", registra quem clicou e quando, e permite abrir o dashboard pelo próprio card. E-mail fica como canal dos relatórios periódicos e como cópia de registro das aprovações.
   </div>
 </section>
 
@@ -425,7 +426,7 @@
       <ul class="small">
         <li>Capacidade semanal padrão: <strong>44h</strong> (parâmetro; migra para 40h quando a legislação mudar; PJ usa a jornada contratual informada no cadastro).</li>
         <li>Carga estimada = soma das estimativas das demandas abertas com prazo na semana + horas de reunião agendadas + tempo médio histórico de resposta a interações (e-mail, Teams, WhatsApp).</li>
-        <li>Termômetro de carga: <span class="pill p-ok">até 85%</span> saudável · <span class="pill p-warn">85 a 100%</span> atenção · <span class="pill p-bad">acima de 100%</span> sobrecarga · <span class="pill p-info">abaixo de 50%</span> possível ociosidade. Limiares parametrizáveis.</li>
+        <li>Termômetro de carga: <span class="pill p-info">até 65%</span> possível ociosidade · <span class="pill p-ok">65 a 90%</span> saudável · <span class="pill p-warn">90 a 100%</span> atenção · <span class="pill p-bad">acima de 100%</span> sobrecarga. Limiares parametrizáveis.</li>
         <li>Estimativa inicial de cada demanda vem do Classificador (histórico de demandas semelhantes do próprio colaborador e da área). Pode ser ajustada apenas no Organizador, e o ajuste fica registrado como "estimativa do colaborador".</li>
       </ul>
     </div>
@@ -433,8 +434,8 @@
       <h4>Origem, canal e planejamento</h4>
       <ul class="small">
         <li><strong>Origem</strong> (quem pediu): gestor direto, outra área, franqueado, CEO/diretoria, cliente final, fornecedor, o próprio colaborador, recorrente/rotina.</li>
-        <li><strong>Canal</strong> (por onde chegou): Planner/Asana/Trello, SULTS, Teams chat, Teams reunião, e-mail, WhatsApp, intranet/portal, presencial (registrado pelo colaborador no Organizador).</li>
-        <li><strong>Planejamento</strong>: <em>formal planejada</em> (estava em Planner/Asana/SULTS antes de iniciar), <em>formal reativa</em> (chamado/e-mail com prazo, não prevista), <em>informal</em> (chat, WhatsApp, corredor).</li>
+        <li><strong>Canal</strong> (por onde chegou): Planner (ou Trello/Asana residual), SULTS, Teams chat, Teams reunião, e-mail, WhatsApp, intranet/portal, presencial (registrado pelo colaborador no Organizador).</li>
+        <li><strong>Planejamento</strong>: <em>formal planejada</em> (estava em Planner ou SULTS antes de iniciar), <em>formal reativa</em> (chamado/e-mail com prazo, não prevista), <em>informal</em> (chat, WhatsApp, corredor).</li>
         <li>Uma demanda informal que depois ganha tarefa no Planner é "formalizada": o sistema liga as duas e mede o tempo até a formalização.</li>
       </ul>
     </div>
@@ -448,7 +449,7 @@
     <div class="box">
       <h4>Previsto x entregue</h4>
       <ul class="small">
-        <li>Demanda entregue = tarefa concluída no Planner/Asana, chamado resolvido no SULTS, ou confirmação do colaborador no Organizador para demandas informais.</li>
+        <li>Demanda entregue = tarefa concluída no Planner (ou Trello/Asana residual), chamado resolvido no SULTS, ou confirmação do colaborador no Organizador para demandas informais.</li>
         <li>Mede-se <strong>pontualidade</strong> (no prazo, atrasada, sem prazo), <strong>aderência de estimativa</strong> (estimado x realizado) e <strong>taxa de reabertura</strong> (SULTS).</li>
         <li>O colaborador <strong>não altera</strong> o Monitor. Se discorda de algo, abre solicitação no chat do Monitor, que segue o fluxo do Agente 6.</li>
       </ul>
@@ -463,7 +464,8 @@
       <tr><td>Demandas abertas / novas / concluídas</td><td>Contagem por status, com estimativa somada</td><td>Pessoa, time</td><td>Diária</td></tr>
       <tr><td>Mix de origem e canal</td><td>% de demandas e de horas por origem e por canal</td><td>Pessoa, time, área</td><td>Semanal</td></tr>
       <tr><td>Taxa de demanda informal</td><td>Demandas informais ÷ total; horas informais ÷ horas totais</td><td>Pessoa, time, área</td><td>Semanal</td></tr>
-      <tr><td>Tempo até formalização</td><td>Dias entre chegada informal e registro no Planner/Asana/SULTS</td><td>Time, área</td><td>Semanal</td></tr>
+      <tr><td>Tempo até formalização</td><td>Dias entre chegada informal e registro no Planner ou SULTS</td><td>Time, área</td><td>Semanal</td></tr>
+      <tr><td>Adoção do Planner</td><td>% das demandas formais registradas no Planner; % de pessoas da área com tarefas ativas no Planner</td><td>Pessoa, área</td><td>Semanal</td></tr>
       <tr><td>Pontualidade de entrega</td><td>% entregues no prazo; atraso médio em dias</td><td>Pessoa, time</td><td>Semanal</td></tr>
       <tr><td>Aderência de estimativa</td><td>Realizado ÷ estimado por demanda, mediana</td><td>Pessoa, área</td><td>Mensal</td></tr>
       <tr><td>Mix de tipo de atividade</td><td>% horas em reunião, alinhamento, execução, atendimento, externo</td><td>Pessoa, time, área</td><td>Semanal</td></tr>
@@ -471,7 +473,13 @@
       <tr><td>Top ferramentas</td><td>Horas por aplicação e categoria (fSense + SO)</td><td>Pessoa, time</td><td>Semanal</td></tr>
       <tr><td>Rede de interação</td><td>Pessoas e áreas com mais mensagens, reuniões e chamados trocados</td><td>Pessoa, área</td><td>Mensal</td></tr>
       <tr><td>Tempo de resposta</td><td>Mediana do tempo até a primeira resposta por canal (e-mail, Teams, WhatsApp, SULTS)</td><td>Pessoa, time</td><td>Semanal</td></tr>
-      <tr><td>Concentração de demanda</td><td>% da carga do time nas 20% pessoas mais carregadas; demandas que só uma pessoa atende</td><td>Time, área</td><td>Mensal</td></tr>
+      <tr><td>Concentração e ponto único de falha</td><td>% da carga do time nas 20% pessoas mais carregadas; tipos de demanda que só uma pessoa atende; pessoas sem backup</td><td>Time, área</td><td>Mensal</td></tr>
+      <tr><td>Eficiência de reuniões</td><td>Horas de reunião por pessoa e área; participantes por reunião; % sem pauta, sem ata ou sem item de ação; sobreposições; custo-hora estimado</td><td>Pessoa, time, área</td><td>Semanal</td></tr>
+      <tr><td>Demanda de franqueados por franquia</td><td>Volume, tema, canal (SULTS x WhatsApp x e-mail) e tempo de resposta por franqueado; franqueados que concentram demanda informal</td><td>Área, empresa</td><td>Semanal</td></tr>
+      <tr><td>Pedidos do CEO e da diretoria</td><td>Demandas originadas no CEO e nos diretores, com status, responsável e prazo</td><td>Empresa, área</td><td>Diária</td></tr>
+      <tr><td>Matriz de demanda entre áreas</td><td>Quem demanda quem, volume, canal e SLA médio, por par de áreas</td><td>Empresa</td><td>Mensal</td></tr>
+      <tr><td>Uso não aprovado (shadow IT)</td><td>Aplicações e sites categorizados como não aprovados com uso relevante, por área</td><td>Área, empresa</td><td>Semanal</td></tr>
+      <tr><td>Capacidade por área</td><td>Horas de demanda por tipo versus horas disponíveis por área, mês a mês (insumo de dimensionamento)</td><td>Área</td><td>Mensal</td></tr>
     </tbody>
   </table>
 </section>
@@ -493,10 +501,12 @@
       <h4>Visão do gestor, diretor e CEO</h4>
       <ul class="small">
         <li>Mapa de calor do time: pessoa x semana, cor pelo índice de carga.</li>
-        <li>Ranking de concentração: quem está acima de 100% e quem está abaixo de 50%; demandas que dependem de uma pessoa só.</li>
+        <li>Ranking de concentração: quem está acima de 100% e quem está abaixo de 65%; demandas que dependem de uma pessoa só.</li>
         <li>De onde vem a demanda do time (origem) e por onde chega (canal); tendência da taxa informal.</li>
         <li>Principais temas da semana (extraídos das demandas e conversas), com volume.</li>
         <li>Previsto x entregue, atrasos e SLAs SULTS em risco.</li>
+        <li>Eficiência de reuniões do time, demanda de franqueados por franquia e, para CEO e diretores, o rastreador de pedidos da diretoria e a matriz de demanda entre áreas.</li>
+        <li>Novos colaboradores (primeiros 90 dias): sinalização de subcarga ou isolamento (poucas interações) e plano de integração.</li>
         <li>Alertas ativos: sobrecarga, ociosidade, gargalo, demanda sem dono.</li>
         <li>Filtros: período, pessoa, time, área, origem, canal, tipo de atividade; exportação em PDF/Excel; drill-down até o fato de origem.</li>
       </ul>
@@ -508,7 +518,7 @@
     <thead><tr><th>Gatilho</th><th>Para quem</th><th style="width:22mm">Quando</th></tr></thead>
     <tbody>
       <tr><td>Índice de carga acima de 100% por 2 semanas seguidas, ou acima de 120% em uma semana</td><td>Gestor direto; diretor se persistir 4 semanas</td><td>Tempo real</td></tr>
-      <tr><td>Índice de carga abaixo de 50% por 2 semanas com ociosidade fSense acima do limiar</td><td>Gestor direto</td><td>Semanal</td></tr>
+      <tr><td>Índice de carga abaixo de 65% por 2 semanas com ociosidade fSense acima do limiar</td><td>Gestor direto</td><td>Semanal</td></tr>
       <tr><td>Demanda com SLA SULTS vencendo em 24h sem movimentação</td><td>Colaborador e gestor</td><td>Tempo real</td></tr>
       <tr><td>Demanda identificada em conversa há mais de 3 dias úteis sem tarefa formal e sem resposta</td><td>Colaborador (via Organizador); gestor após 5 dias</td><td>Diário</td></tr>
       <tr><td>Mais de 60% da carga do time em uma pessoa, ou uma pessoa única atendendo um tipo de demanda</td><td>Gestor e diretor</td><td>Semanal</td></tr>
@@ -531,7 +541,7 @@
     <div class="box">
       <h4>O que entra no plano</h4>
       <ul class="small">
-        <li>Tarefas do Planner, Asana e Trello do colaborador; chamados SULTS sob sua responsabilidade com SLA; itens de ação de reuniões em que participou; pedidos identificados em e-mail, Teams e WhatsApp dirigidos a ele.</li>
+        <li>Tarefas do Planner (e Trello/Asana residual) do colaborador; chamados SULTS sob sua responsabilidade com SLA; itens de ação de reuniões em que participou; pedidos identificados em e-mail, Teams e WhatsApp dirigidos a ele.</li>
         <li><strong>Só entra o que teve interação com o próprio colaborador.</strong> Conversa entre o gestor e terceiros sobre um tema que ainda não chegou a ele não gera item no plano. A regra é verificar se o colaborador é participante, destinatário ou mencionado.</li>
         <li>Cada item sugerido chega como "proposto pelo sistema" e precisa ser aceito, ajustado ou descartado pelo colaborador. Itens formais (Planner, SULTS) entram já aceitos.</li>
       </ul>
@@ -548,7 +558,7 @@
       <h4>Chat do colaborador</h4>
       <ul class="small">
         <li>Linguagem natural: "isso leva 10h, não 5", "joga para semana que vem", "essa foi cancelada", "saí de uma reunião com Fulano e precisamos entregar X até dia 20", "sobe este arquivo para o contexto".</li>
-        <li>Ao criar demanda nova, o chat pergunta o mínimo: o que, para quem, até quando, estimativa. Pode criar a tarefa correspondente no Planner ou Asana se o colaborador confirmar.</li>
+        <li>Ao criar demanda nova, o chat pergunta o mínimo: o que, para quem, até quando, estimativa. Pode criar a tarefa correspondente no Planner, ou abrir o chamado no SULTS, se o colaborador confirmar (formalização assistida).</li>
         <li>Aceita upload de arquivos (atas, briefings, planilhas) que viram contexto para estimar e detalhar.</li>
         <li>Toda interação fica em log, visível para o colaborador e para o gestor.</li>
       </ul>
@@ -558,7 +568,7 @@
       <ul class="small">
         <li>Enviado via Teams às 08h (horário parametrizável) para cada colaborador: três prioridades do dia, reuniões, prazos de hoje e de amanhã, o que venceu ontem, alertas de ruptura, carga da semana.</li>
         <li>O gestor recebe o seu próprio e um consolidado dos liderados: quem está acima da capacidade, prazos críticos do time, demandas sem dono, itens parados.</li>
-        <li>Versão semanal na segunda-feira com o plano da semana e versão mensal no primeiro dia útil.</li>
+        <li>Versão semanal na segunda-feira com o plano da semana e versão mensal no primeiro dia útil. Toda sexta-feira, o modo "semana que vem" propõe a semana seguinte ao colaborador e envia ao gestor a visão consolidada para redistribuir antes da segunda.</li>
       </ul>
     </div>
   </div>
@@ -574,6 +584,8 @@
       <tr><td>Risco de ruptura</td><td>Itens com prazo em até 3 dias e menos de 50% de progresso ou sem movimentação</td><td>Pessoa, time</td></tr>
       <tr><td>Previsibilidade</td><td>% de horas da semana já planejadas na segunda-feira versus adicionadas depois</td><td>Pessoa, time, área</td></tr>
       <tr><td>Uso do copiloto</td><td>Interações por semana, abertura do resumo das 8h, ajustes feitos</td><td>Pessoa, área</td></tr>
+      <tr><td>Sugestões do gestor</td><td>Sugestões enviadas pelo gestor, aceitas, recusadas e tempo de resposta do colaborador</td><td>Time</td></tr>
+      <tr><td>Formalização assistida</td><td>Demandas informais convertidas em tarefa do Planner ou chamado SULTS pelo Organizador</td><td>Pessoa, área</td></tr>
     </tbody>
   </table>
 </section>
@@ -586,14 +598,14 @@
     <div class="card"><h4>Por tema e por origem</h4><p class="small">Gráficos de horas estimadas por tema, por origem e por canal; o que é formal e informal; onde o tempo está indo além do esperado.</p></div>
     <div class="card"><h4>Alertas pessoais</h4><p class="small">Gargalos previstos, prazos em risco, dependências de outras pessoas paradas, itens aguardando resposta de franqueado.</p></div>
     <div class="card"><h4>Chat</h4><p class="small">Conversa com o copiloto, upload de arquivos, histórico completo. Atalhos: "replanejar semana", "o que venceu", "o que depende de mim".</p></div>
-    <div class="card"><h4>Visão do gestor</h4><p class="small">Mesmo kanban e agenda de cada liderado, mais o consolidado do time: carga por pessoa, excedentes, backlog envelhecido, demandas sem dono para redistribuir. Gestor comenta, não edita o plano do liderado (sugere via Teams).</p></div>
+    <div class="card"><h4>Visão do gestor</h4><p class="small">Mesmo kanban e agenda de cada liderado, mais o consolidado do time: carga por pessoa, excedentes, backlog envelhecido, demandas sem dono para redistribuir. O gestor pode propor mudança de prioridade, prazo ou estimativa em qualquer item; a proposta chega ao colaborador como sugestão.</p></div>
   </div>
 
   <div class="callout green">
-    <strong>Decisão de desenho.</strong> O gestor vê tudo do Organizador dos liderados, mas não edita. Se editasse, o plano deixaria de ser do colaborador e o engajamento cairia. O gestor sugere redistribuição ou mudança de prazo e o colaborador aceita no seu próprio Organizador, com log. Se você preferir que o gestor possa editar diretamente, isso é um parâmetro de área.
+    <strong>Regra de governança do Organizador.</strong> O Organizador é gestão do colaborador. O gestor pode alterar prioridades, prazos e estimativas, mas toda alteração é enviada ao colaborador como <strong>sugestão</strong>, via Teams e no próprio Organizador, e só passa a valer quando ele acata; se não acatar, o plano não muda automaticamente e o gestor é informado da recusa com a justificativa. Alterações diretas o gestor faz apenas nos sistemas de origem (Planner, SULTS e similares), e o Organizador reflete essas mudanças no próximo ciclo. Tudo com log.
   </div>
 
-  <div class="box bordo"><h4>O que o Organizador não faz</h4><p class="small">Não altera dados do Monitor nem de DP (apenas encaminha solicitações); não cria tarefas em Planner/Asana sem confirmação do colaborador; não envia mensagens a terceiros em nome do colaborador; não importa demandas de conversas em que o colaborador não participou.</p></div>
+  <div class="box bordo"><h4>O que o Organizador não faz</h4><p class="small">Não altera dados do Monitor nem de DP (apenas encaminha solicitações); não cria tarefas no Planner nem chamados no SULTS sem confirmação do colaborador; não aplica sugestões do gestor sem aceite do colaborador; não envia mensagens a terceiros em nome do colaborador; não importa demandas de conversas em que o colaborador não participou.</p></div>
 </section>
 
 <!-- ============================ 8. AGENTE 3 ============================ -->
@@ -608,10 +620,10 @@
     <div class="box">
       <h4>Sinais observados</h4>
       <ul class="small">
-        <li>Tom das mensagens (Teams, e-mail, WhatsApp corporativo, comentários SULTS e Feedz): neutro, positivo, tenso, urgente, frustrado. Sempre por classificação de IA sobre o texto, nunca leitura humana do conteúdo no dia a dia.</li>
+        <li>Tom das mensagens (Teams, e-mail, WhatsApp corporativo, comentários SULTS): neutro, positivo, tenso, urgente, frustrado. Sempre por classificação de IA sobre o texto, nunca leitura humana do conteúdo no dia a dia.</li>
         <li>Padrões: mensagens fora do horário (antes das 7h, depois das 20h, fins de semana), volume de "urgente" e "para ontem", tempo de resposta caindo, picos de mensagens curtas em sequência, aumento de escalonamentos ao gestor.</li>
-        <li>Sinais declarados: pesquisas de pulso e humor do Feedz, apenas em agregado por área.</li>
-        <li>Correlações: stress alto com índice de carga alto e horas extras (indica sobrecarga); stress alto com carga normal (indica atrito ou tema específico); queda de engajamento Feedz com aumento de informalidade de demanda.</li>
+        <li>Sinais declarados: pesquisas de pulso ou clima conduzidas por G&amp;G (e o Feedz, com peso reduzido, enquanto existir), apenas em agregado por área.</li>
+        <li>Correlações: stress alto com índice de carga alto e horas extras (indica sobrecarga); stress alto com carga normal (indica atrito ou tema específico); comunicação fora do horário recorrente com aumento de informalidade de demanda. Trabalho fora do horário é tratado como indicador de risco psicossocial da NR-1, por pessoa e área, com recomendação ao diretor.</li>
       </ul>
     </div>
     <div class="box">
@@ -634,7 +646,7 @@
       <tr><td>Comunicação fora do horário</td><td>% de mensagens e e-mails fora da janela de trabalho; pessoas recorrentes</td><td>Área, pessoa</td><td>Semanal</td></tr>
       <tr><td>Índice de atrito entre áreas</td><td>Threads com tom tenso entre duas áreas, reaberturas e escalonamentos no SULTS</td><td>Par de áreas</td><td>Mensal</td></tr>
       <tr><td>Correlação carga x humor</td><td>Pessoas em sobrecarga (Agente 1) e em faixa crítica simultaneamente</td><td>Área</td><td>Semanal</td></tr>
-      <tr><td>Engajamento Feedz</td><td>Posts, reconhecimentos e respostas a pulso por área</td><td>Área</td><td>Mensal</td></tr>
+      <tr><td>Participação em pesquisas de clima</td><td>Respostas a pulsos e pesquisas de G&amp;G por área (Feedz apenas enquanto existir, peso reduzido)</td><td>Área</td><td>Mensal</td></tr>
       <tr><td>Temas recorrentes de tensão</td><td>Assuntos mais frequentes nas mensagens tensas (ex.: prazo de franqueado, aprovação, sistema fora)</td><td>Área, empresa</td><td>Mensal</td></tr>
     </tbody>
   </table>
@@ -643,10 +655,10 @@
   <ul class="small">
     <li><strong>Dashboard</strong> para diretor, G&amp;G e CEO: termômetro por área e tendência, mapa de atrito entre áreas, temas de tensão, correlação com carga e horas, pessoas em atenção com os sinais que as levaram ali.</li>
     <li><strong>Resumo semanal</strong> da área para o diretor (Teams e e-mail) e <strong>resumo mensal</strong> consolidado para diretores, Diretora de G&amp;G e CEO, com destaques, KPIs e recomendações de cuidado (conversa 1:1, redistribuição, pausa).</li>
-    <li><strong>Alertas em tempo real</strong> ao diretor: conversa sensível, pessoa entrando em faixa crítica, área com salto de 20 pontos na semana.</li>
+    <li><strong>Alertas em tempo real</strong> ao diretor da área e à Diretora de G&amp;G: conversa sensível, pessoa entrando em faixa crítica, área com salto de 20 pontos na semana.</li>
   </ul>
 
-  <div class="box bordo"><h4>Salvaguardas obrigatórias</h4><p class="small">Nenhum colaborador acessa o próprio termômetro nem o de colegas. Gestores intermediários não acessam. O termômetro não entra em avaliação de desempenho, PDI, folha ou decisão disciplinar, e isso deve constar na política interna. O acesso a qualquer conteúdo de conversa a partir do Termômetro é registrado em log nominal e auditável pela Diretora de G&amp;G.</p></div>
+  <p class="small" style="border-left:3px solid var(--bordo);padding-left:3mm"><strong>Salvaguardas obrigatórias.</strong> Nenhum colaborador acessa o próprio termômetro nem o de colegas; gestores intermediários não acessam. O termômetro não entra em avaliação de desempenho, PDI, folha ou decisão disciplinar, e isso deve constar na política interna. Todo acesso a conteúdo de conversa a partir do Termômetro é registrado em log nominal, auditável pela Diretora de G&amp;G.</p>
 </section>
 
 <!-- ============================ 9. AGENTE 4 ============================ -->
@@ -681,7 +693,8 @@
     <div class="box">
       <h4>Janela de contestação e alçadas</h4>
       <ul class="small">
-        <li>O colaborador tem <strong>48 horas úteis</strong> após o dado ser computado para pedir ajuste ou justificar, pelo chat do Agente 4.</li>
+        <li>Toda inconsistência identificada gera, às <strong>08h do dia seguinte</strong>, uma notificação via Teams ao colaborador e ao seu gestor direto, com o dado, a regra violada e o botão para justificar.</li>
+        <li>O colaborador tem <strong>48 horas úteis</strong> a partir dessa notificação para pedir ajuste ou justificar, pelo chat do Agente 4.</li>
         <li>Dentro das 48h: o <strong>gestor direto</strong> aprova ou recusa via card no Teams (De/Para, justificativa, evidência anexa).</li>
         <li>Após 48h: a aprovação passa a exigir o <strong>DP</strong>. Gestor pode recomendar, mas não decide.</li>
         <li>Qualquer alteração de dado de RH (ponto, horas, banco) exige aprovação do DP, mesmo quando solicitada por gestor.</li>
@@ -702,8 +715,8 @@
 <section class="cont">
   <h3>Fluxo de contestação e aprovação (Agente 4 e Agente 6)</h3>
   <div class="flow">
-    <div class="step"><span class="n">1</span><b>Dado computado</b>D+1 o colaborador vê o dia no seu painel: horas, marcações, inconsistências marcadas.</div>
-    <div class="step"><span class="n">2</span><b>Colaborador contesta</b>No chat: "das 14h às 16h estava em reunião com franqueado X sem agenda". Anexa evidência se tiver. Relógio de 48h úteis conta a partir do passo 1.</div>
+    <div class="step"><span class="n">1</span><b>Dado computado e notificado</b>D+1, às 08h, colaborador e gestor recebem no Teams a inconsistência do dia anterior, e o painel do colaborador mostra o dia: horas, marcações, inconsistências.</div>
+    <div class="step"><span class="n">2</span><b>Colaborador justifica</b>No chat: "das 14h às 16h estava em reunião com franqueado X sem agenda". Anexa evidência se tiver. Relógio de 48h úteis conta a partir da notificação.</div>
     <div class="step"><span class="n">3</span><b>Card no Teams para o gestor</b>De: ocioso 14h a 16h. Para: reunião externa. Botões Aprovar / Recusar / Pedir mais informação. Prazo 2 dias úteis.</div>
     <div class="step"><span class="n">4</span><b>Decisão</b>Aprovado: classificação muda, fato bruto fica, log registra quem, quando, o quê. Recusado: colaborador é notificado com o motivo.</div>
     <div class="step red"><span class="n">5</span><b>Fora da janela ou dado de RH</b>Card vai para o DP; gestor só recomenda. DP decide e o log registra alçada superior.</div>
@@ -715,34 +728,34 @@
     <tbody>
       <tr><td>Horas trabalhadas estimadas</td><td>Soma das janelas de presença/atividade por dia e semana</td><td>Pessoa, time, área</td><td>Diária</td></tr>
       <tr><td>Aderência à jornada</td><td>Horas ÷ jornada contratual (44h/40h ou PJ); faixas: abaixo de 90%, 90 a 110%, acima de 110%</td><td>Pessoa, time</td><td>Semanal</td></tr>
-      <tr><td>Horas extras e fora do horário</td><td>Horas além da jornada diária; atividade antes das 7h e depois das 20h</td><td>Pessoa, área</td><td>Semanal</td></tr>
+      <tr><td>Horas extras e fora do horário</td><td>Horas além da jornada diária; atividade antes das 7h e depois das 20h</td><td>Pessoa, área (visível ao gestor, DP e G&amp;G; não ao colaborador)</td><td>Semanal</td></tr>
       <tr><td>Assiduidade</td><td>Dias com presença/atividade ÷ dias úteis; atrasos; saídas antecipadas</td><td>Pessoa, time</td><td>Mensal</td></tr>
       <tr><td>Índice de home office efetivo</td><td>Horas de atividade na estação em dias remotos ÷ jornada</td><td>Pessoa, área</td><td>Semanal</td></tr>
       <tr><td>Inconsistências por tipo</td><td>Contagem por tipo (ponto x catraca, sem catraca, sem atividade, geolocalização)</td><td>Pessoa, área, empresa</td><td>Diária</td></tr>
       <tr><td>Tempo de resolução de contestação</td><td>Horas entre pedido e decisão; % decididas dentro das 48h</td><td>Gestor, área</td><td>Mensal</td></tr>
       <tr><td>Saldo de banco de horas</td><td>Acumulado por pessoa e por área; distribuição</td><td>Pessoa, área</td><td>Mensal</td></tr>
-      <tr><td>Ociosidade na jornada</td><td>Horas sem atividade na estação dentro da janela de ponto, descontados intervalos e eventos externos</td><td>Pessoa</td><td>Diária</td></tr>
+      <tr><td>Ociosidade na jornada</td><td>Horas sem atividade na estação dentro da janela de ponto, descontados intervalos e eventos externos</td><td>Pessoa (visível ao gestor da área, DP e G&amp;G)</td><td>Diária</td></tr>
     </tbody>
   </table>
 
   <h3>Telas e saídas</h3>
   <div class="grid3">
-    <div class="card"><h4>Painel do colaborador</h4><p class="small">Meu dia e minha semana: marcações, presença, atividade, horas, saldo de banco, inconsistências abertas, botão de contestação e histórico de pedidos.</p></div>
-    <div class="card"><h4>Painel do gestor</h4><p class="small">Time: aderência, horas extras, inconsistências, pedidos pendentes de aprovação, home office efetivo. Filtro por pessoa e período.</p></div>
+    <div class="card"><h4>Painel do colaborador</h4><p class="small">Meu dia e minha semana: marcações, presença, atividade, horas, saldo de banco, inconsistências abertas, botão de contestação e histórico de pedidos. Não exibe horas extras, fora do horário nem ociosidade, que ficam com o gestor.</p></div>
+    <div class="card"><h4>Painel do gestor</h4><p class="small">Time: aderência, horas extras e fora do horário, ociosidade na jornada, inconsistências, pedidos pendentes de aprovação, home office efetivo. Filtro por pessoa e período. Gestor de gestores e diretor veem toda a árvore.</p></div>
     <div class="card"><h4>Painel do DP e G&amp;G</h4><p class="small">Empresa inteira: fechamento mensal, divergências, saldos, contestações fora da janela, exportação para a folha, estatísticas por área e por regime.</p></div>
   </div>
 
   <h3>Alertas de DP (entregues pelo Agente 5)</h3>
   <ul class="small">
     <li><strong>Tempo real</strong> ao gestor e ao diretor da área: ponto remoto sem catraca ou com catraca acima de 10 minutos depois, sem evento externo.</li>
-    <li><strong>Diário</strong> ao DP: lista de inconsistências do dia anterior; ao colaborador: lembrete de marcação faltante.</li>
+    <li><strong>Diário, 08h</strong> ao colaborador e ao gestor direto: cada inconsistência do dia anterior, abrindo a janela de 48h úteis para justificativa; ao DP: lista consolidada do dia.</li>
     <li><strong>Semanal</strong> ao gestor: pessoas acima de 110% ou abaixo de 90% da jornada; horas fora do horário recorrentes (também alimenta o Agente 3).</li>
     <li><strong>Mensal</strong> ao DP e G&amp;G: fechamento, saldos de banco e pendências.</li>
   </ul>
 </section>
 
 <!-- ============================ 10. AGENTE 5 ============================ -->
-<section class="section tight">
+<section class="section tight xtight">
   <div class="agent-head"><div class="num" style="background:var(--a5)">5</div><div><div class="kicker">Capítulo 10</div><h2>Reports e Alertas</h2><div class="who">Entrega para: colaboradores, gestores, diretores, Diretora de G&amp;G, equipe de DP e CEO, cada um no seu recorte</div></div></div>
 
   <h3>Objetivo</h3>
@@ -754,11 +767,12 @@
     <tbody>
       <tr><td><strong>Diário, 08h</strong></td><td>Cada colaborador</td><td>Resumo do dia do Organizador: três prioridades, reuniões, prazos de hoje e amanhã, vencidos, alertas de ruptura, carga da semana.</td><td>Teams</td></tr>
       <tr><td><strong>Diário, 08h</strong></td><td>Cada gestor</td><td>O próprio resumo mais o consolidado dos liderados: quem está acima da capacidade, prazos críticos, demandas sem dono, pedidos de aprovação pendentes.</td><td>Teams</td></tr>
-      <tr><td><strong>Diário, 08h</strong></td><td>Equipe de DP</td><td>Inconsistências de jornada do dia anterior e contestações fora da janela.</td><td>Teams</td></tr>
+      <tr><td><strong>Diário, 08h</strong></td><td>Colaborador e gestor direto; DP (consolidado)</td><td>Inconsistências de jornada do dia anterior identificadas pelo Agente 4, com botão para justificar em 48h úteis; o DP recebe a lista consolidada e as contestações fora da janela.</td><td>Teams</td></tr>
+      <tr><td><strong>Semanal, sexta 16h</strong></td><td>Colaborador e gestor</td><td>Modo "semana que vem": proposta da próxima semana ao colaborador e consolidado do time ao gestor para redistribuir antes da segunda.</td><td>Teams</td></tr>
       <tr><td><strong>Semanal, segunda 08h</strong></td><td>Gestores e diretores</td><td>Semana do time: carga, previsto x entregue, mix de origem e canal, informalidade, alertas abertos, SLAs em risco, aderência à jornada.</td><td>Teams e e-mail</td></tr>
       <tr><td><strong>Semanal, segunda 08h</strong></td><td>Diretor da área</td><td>Termômetro de humor da área com destaques e recomendações (apenas diretor).</td><td>Teams e e-mail</td></tr>
-      <tr><td><strong>Mensal, 1º dia útil</strong></td><td>Diretor de área</td><td>Relatório da área: principais acontecimentos, destaques de atividades e de colaboradores, KPIs dos quatro agentes, tendências, alertas do mês, recomendações.</td><td>E-mail (PDF) e Teams</td></tr>
-      <tr><td><strong>Mensal, 1º dia útil</strong></td><td>CEO</td><td>Relatório da empresa: visão por diretoria, comparativos, áreas em atenção, times que não entregam ou que recebem demanda excessiva não planejada, clima geral, decisões sugeridas.</td><td>E-mail (PDF) e Teams</td></tr>
+      <tr><td><strong>Mensal, 1º dia útil</strong></td><td>Diretor de área</td><td>Relatório da área: principais acontecimentos, destaques de atividades e de colaboradores, reconhecimento positivo (entregas no prazo, redução de backlog, boas práticas), KPIs dos quatro agentes, eficiência de reuniões, tendências, alertas do mês, recomendações.</td><td>E-mail (PDF) e Teams</td></tr>
+      <tr><td><strong>Mensal, 1º dia útil</strong></td><td>CEO</td><td>Relatório da empresa: visão por diretoria, comparativos, áreas em atenção, times que não entregam ou que recebem demanda excessiva não planejada, demanda de franqueados por canal, matriz de demanda entre áreas, capacidade por área, destaques positivos, clima geral, decisões sugeridas.</td><td>E-mail (PDF) e Teams</td></tr>
       <tr><td><strong>Mensal, 1º dia útil</strong></td><td>Diretora de G&amp;G e equipe de DP</td><td>Relatório de pessoas: jornada, banco de horas, inconsistências, home office, horas fora do horário, termômetro de humor consolidado (G&amp;G), contestações e tempos de resposta dos gestores.</td><td>E-mail (PDF) e Teams</td></tr>
       <tr><td><strong>Mensal</strong></td><td>TI</td><td>Relatório de logs: acessos, alterações aprovadas e recusadas, mudanças de parâmetro, falhas de coleta, volume processado.</td><td>E-mail</td></tr>
     </tbody>
@@ -770,14 +784,13 @@
     <thead><tr><th>Alerta</th><th style="width:20mm">Origem</th><th style="width:38mm">Destinatário</th><th style="width:20mm">Severidade</th></tr></thead>
     <tbody>
       <tr><td>Conversa sensível ou delicada envolvendo pessoa da área</td><td>Agente 3</td><td>Diretor da área, Diretora de G&amp;G</td><td><span class="pill p-bad">crítica</span></td></tr>
-      <tr><td>Pessoa entrando em faixa crítica de humor</td><td>Agente 3</td><td>Diretor da área</td><td><span class="pill p-bad">crítica</span></td></tr>
+      <tr><td>Pessoa entrando em faixa crítica de humor</td><td>Agente 3</td><td>Diretor da área, Diretora de G&amp;G</td><td><span class="pill p-bad">crítica</span></td></tr>
       <tr><td>Provável gargalo de entrega: prazo em 3 dias, sem progresso, pessoa acima de 100%</td><td>Agentes 1 e 2</td><td>Gestor; diretor se envolver franqueado ou CEO</td><td><span class="pill p-warn">alta</span></td></tr>
       <tr><td>Tema ou reunião importante identificado em conversa e ausente de agenda e e-mail</td><td>Agente 1</td><td>Diretor da área</td><td><span class="pill p-warn">alta</span></td></tr>
       <tr><td>SLA SULTS vencendo em 24h sem movimentação</td><td>Agente 1</td><td>Colaborador, gestor</td><td><span class="pill p-warn">alta</span></td></tr>
-      <tr><td>Irregularidade de controle: ponto remoto x catraca (10 min), ponto sem catraca, geolocalização fora do raio</td><td>Agente 4</td><td>Gestor, diretor da área, DP</td><td><span class="pill p-warn">alta</span></td></tr>
+      <tr><td>Irregularidade de controle: ponto remoto x catraca (10 min), ponto sem catraca, geolocalização fora do raio</td><td>Agente 4</td><td>Colaborador e gestor às 08h do dia seguinte; diretor da área e DP em tempo real</td><td><span class="pill p-warn">alta</span></td></tr>
       <tr><td>Sobrecarga sustentada (acima de 100% por 2 semanas) ou pico (acima de 120%)</td><td>Agente 1</td><td>Gestor; diretor em 4 semanas</td><td><span class="pill p-warn">alta</span></td></tr>
-      <tr><td>Demanda sem dono ou sem resposta há mais de 3 dias úteis</td><td>Agentes 1 e 2</td><td>Colaborador; gestor em 5 dias</td><td><span class="pill p-info">média</span></td></tr>
-      <tr><td>Concentração: uma pessoa com mais de 60% da carga do time</td><td>Agente 1</td><td>Gestor, diretor</td><td><span class="pill p-info">média</span></td></tr>
+      <tr><td>Demanda sem dono ou sem resposta há mais de 3 dias úteis; concentração de mais de 60% da carga do time em uma pessoa</td><td>Agentes 1 e 2</td><td>Colaborador e gestor (demanda); gestor e diretor (concentração)</td><td><span class="pill p-info">média</span></td></tr>
       <tr><td>Pedido de aprovação De/Para aguardando há mais de 2 dias úteis</td><td>Agente 6</td><td>Gestor; escala para gestor do gestor e DP</td><td><span class="pill p-info">média</span></td></tr>
       <tr><td>Falha de coleta em uma fonte por mais de 24h (ex.: WhatsApp Web desconectado)</td><td>Orquestrador</td><td>TI; colaborador se for a estação dele</td><td><span class="pill p-info">média</span></td></tr>
     </tbody>
@@ -802,8 +815,8 @@
   <table class="compact">
     <thead><tr><th>Perfil</th><th class="c">Monitor (1)</th><th class="c">Organizador (2)</th><th class="c">Humor (3)</th><th class="c">DP (4)</th><th class="c">Reports (5)</th><th class="c">Parâmetros (6)</th></tr></thead>
     <tbody>
-      <tr><td><strong>Colaborador</strong></td><td class="c">Próprio (leitura)</td><td class="c">Próprio (edita)</td><td class="c"><span class="no">—</span></td><td class="c">Próprio (leitura + contestação)</td><td class="c">Resumo diário próprio</td><td class="c"><span class="no">—</span></td></tr>
-      <tr><td><strong>Gestor direto</strong></td><td class="c">Próprio + liderados</td><td class="c">Próprio (edita) + liderados (leitura, sugere)</td><td class="c"><span class="no">—</span></td><td class="c">Próprio + liderados; aprova em 48h</td><td class="c">Diário e semanal do time</td><td class="c"><span class="no">—</span></td></tr>
+      <tr><td><strong>Colaborador</strong></td><td class="c">Próprio (leitura)</td><td class="c">Próprio (edita)</td><td class="c"><span class="no">—</span></td><td class="c">Próprio (leitura + contestação; sem horas extras e ociosidade)</td><td class="c">Resumo diário próprio</td><td class="c"><span class="no">—</span></td></tr>
+      <tr><td><strong>Gestor direto</strong></td><td class="c">Próprio + liderados</td><td class="c">Próprio (edita) + liderados (leitura e sugestões)</td><td class="c"><span class="no">—</span></td><td class="c">Próprio + liderados; aprova em 48h</td><td class="c">Diário e semanal do time</td><td class="c"><span class="no">—</span></td></tr>
       <tr><td><strong>Gestor de gestores</strong></td><td class="c">Toda a árvore abaixo</td><td class="c">Toda a árvore (leitura)</td><td class="c"><span class="no">—</span></td><td class="c">Toda a árvore; alçada de escalonamento</td><td class="c">Semanal consolidado</td><td class="c"><span class="no">—</span></td></tr>
       <tr><td><strong>Diretor de área</strong></td><td class="c">Toda a diretoria</td><td class="c">Toda a diretoria (leitura)</td><td class="c"><span class="yes">Sua área</span></td><td class="c">Toda a diretoria</td><td class="c">Semanal e mensal da área; alertas</td><td class="c"><span class="part">Parâmetros da área</span></td></tr>
       <tr><td><strong>Diretora de G&amp;G</strong></td><td class="c">Empresa</td><td class="c">Empresa (leitura)</td><td class="c"><span class="yes">Empresa</span></td><td class="c"><span class="yes">Empresa</span></td><td class="c">Mensal de pessoas e humor</td><td class="c"><span class="part">Limiares de humor e jornada</span></td></tr>
@@ -824,7 +837,7 @@
         <li>Abre no chat do Monitor ou do painel de DP, indicando o dado, o De/Para e a justificativa; anexa evidência se tiver.</li>
         <li>Card no Teams para o gestor direto com os dois valores lado a lado e link para o fato de origem.</li>
         <li>Gestor aprova, recusa ou pede informação. Dado de atividade: decisão do gestor basta. Dado de RH: gestor recomenda e o DP decide.</li>
-        <li>Após 48h úteis do cômputo do dado, qualquer pedido vai direto ao DP (jornada) ou continua com o gestor (atividade), conforme sua regra.</li>
+        <li>Após 48h úteis da notificação do dado, qualquer pedido vai direto ao DP (jornada) ou continua com o gestor (atividade).</li>
         <li>Colaborador é notificado; De/Para, decisão, aprovador e horário entram no log e aparecem no dashboard como "dado ajustado" com ícone.</li>
       </ol>
     </div>
@@ -859,7 +872,7 @@
       <tr><td>Pesos de prioridade do Organizador para a área (ex.: franqueado pesa mais em Operações)</td><td>Diretor da área</td><td>Autoaprovado, dentro de faixas definidas por TI; log</td></tr>
       <tr><td>Limiares de alerta da área dentro das faixas globais; silenciar alerta específico por período</td><td>Diretor da área</td><td>Autoaprovado; log</td></tr>
       <tr><td>Temas de interesse da área para destaque nos relatórios</td><td>Diretor da área</td><td>Autoaprovado; log</td></tr>
-      <tr><td>Permitir ou não que o gestor edite o Organizador dos liderados</td><td>Diretor da área</td><td>Autoaprovado; log</td></tr>
+      <tr><td>Prazo para o colaborador responder a uma sugestão do gestor no Organizador e lembrete</td><td>Diretor da área</td><td>Autoaprovado; log</td></tr>
       <tr><td>Cadastro de pessoas e hierarquia</td><td>G&amp;G</td><td>Autoaprovado com histórico; divergências geram pendência</td></tr>
     </tbody>
   </table>
@@ -890,7 +903,7 @@
     </div>
     <div class="box">
       <h4>Sinal de humor</h4>
-      <p class="small">Pessoa (interno) · área · data · fonte (tom de interação, padrão de horário, pulso Feedz) · valor normalizado · peso · contribuição para o índice · flag de conversa sensível.</p>
+      <p class="small">Pessoa (interno) · área · data · fonte (tom de interação, padrão de horário, pesquisa de clima) · valor normalizado · peso · contribuição para o índice · flag de conversa sensível.</p>
     </div>
     <div class="box">
       <h4>Pessoa e hierarquia</h4>
@@ -903,7 +916,7 @@
     <thead><tr><th style="width:30mm">Dimensão</th><th>Valores iniciais</th></tr></thead>
     <tbody>
       <tr><td><strong>Origem da demanda</strong></td><td>Gestor direto · Diretoria/CEO · Outra área da franqueadora · Franqueado · Cliente final · Fornecedor/parceiro · Rotina recorrente · Autodemanda</td></tr>
-      <tr><td><strong>Canal</strong></td><td>Planner/To Do · Asana · Trello · SULTS · Teams chat · Teams reunião · E-mail · WhatsApp corporativo · Intranet/portal · Presencial (registrado pelo colaborador)</td></tr>
+      <tr><td><strong>Canal</strong></td><td>Planner/To Do · Trello · Asana (residual) · SULTS · Teams chat · Teams reunião · E-mail · WhatsApp corporativo · Intranet/portal · Presencial (registrado pelo colaborador)</td></tr>
       <tr><td><strong>Planejamento</strong></td><td>Formal planejada · Formal reativa · Informal · Informal formalizada</td></tr>
       <tr><td><strong>Tipo de atividade</strong></td><td>Reunião · Planejamento e alinhamento · Execução · Atendimento · Externo/deslocamento · Pausa/intervalo · Ocioso · Pessoal</td></tr>
       <tr><td><strong>Categoria de aplicação</strong></td><td>Herda do fSense: Trabalho · Pessoal · Não aprovado; segundo nível por família: Office, Comunicação, Sistemas Buddha, Design/Mídia, Desenvolvimento, Navegação, Redes sociais, Streaming</td></tr>
@@ -918,8 +931,8 @@
 <section class="section">
   <div class="kicker">Capítulo 13</div>
   <h2>Catálogo consolidado de KPIs</h2>
-  <p class="lead">Os indicadores que aparecem nos dashboards e relatórios, agrupados por pergunta de gestão. Marcados com fase para orientar o roadmap (capítulo 17).</p>
-  <div class="legend"><span><span class="pill p-fase1">F1</span> piloto</span><span><span class="pill p-fase2">F2</span> expansão</span><span><span class="pill p-fase3">F3</span> maturidade</span></div>
+  <p class="lead">Os indicadores que aparecem nos dashboards e relatórios, agrupados por pergunta de gestão. Marcados com a fase de entrega do roadmap de 6 meses (capítulo 16).</p>
+  <div class="legend"><span><span class="pill p-fase1">F1</span> meses 1 e 2</span><span><span class="pill p-fase2">F2</span> meses 3 e 4</span><span><span class="pill p-fase3">F3</span> meses 5 e 6</span></div>
   <table class="compact">
     <thead><tr><th style="width:36mm">Pergunta de gestão</th><th>KPI</th><th style="width:16mm">Agente</th><th style="width:10mm" class="c">Fase</th></tr></thead>
     <tbody>
@@ -928,13 +941,13 @@
       <tr><td>Excedente da semana (horas que não cabem)</td><td>2</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
       <tr><td>Concentração de carga no time e pontos únicos de falha</td><td>1</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
       <tr><td rowspan="4"><strong>De onde vem e como chega?</strong></td><td>Mix de origem (gestor, outra área, franqueado, CEO, cliente)</td><td>1</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
-      <tr><td>Mix de canal (Planner, SULTS, Teams, e-mail, WhatsApp)</td><td>1</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
+      <tr><td>Mix de canal (Planner, SULTS, Teams, e-mail, WhatsApp) e adoção do Planner</td><td>1</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
       <tr><td>Taxa de demanda informal e tempo até formalização</td><td>1</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
       <tr><td>Matriz área x área: quem demanda quem, com volume e tom</td><td>1, 3</td><td class="c"><span class="pill p-fase3">F3</span></td></tr>
       <tr><td rowspan="4"><strong>Estamos entregando?</strong></td><td>Pontualidade (no prazo, atraso médio) e SLAs SULTS em risco</td><td>1</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
       <tr><td>Aderência de estimativa (realizado ÷ estimado)</td><td>1, 2</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
       <tr><td>Risco de ruptura (prazo próximo sem progresso)</td><td>2</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
-      <tr><td>Taxa de reabertura e retrabalho (SULTS, Asana)</td><td>1</td><td class="c"><span class="pill p-fase3">F3</span></td></tr>
+      <tr><td>Taxa de reabertura e retrabalho (SULTS, Planner)</td><td>1</td><td class="c"><span class="pill p-fase3">F3</span></td></tr>
       <tr><td rowspan="4"><strong>Onde o tempo é gasto?</strong></td><td>Mix de tipo de atividade (reunião, alinhamento, execução, atendimento)</td><td>1</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
       <tr><td>Top ferramentas e categorias de uso (trabalho, pessoal, não aprovado)</td><td>1</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
       <tr><td>Fragmentação e maior bloco de foco</td><td>1</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
@@ -946,6 +959,8 @@
       <tr><td rowspan="3"><strong>Como está o clima?</strong></td><td>Índice de humor por área e tendência</td><td>3</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
       <tr><td>% mensagens tensas, comunicação fora do horário, atrito entre áreas</td><td>3</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
       <tr><td>Correlação carga x humor x horas</td><td>3</td><td class="c"><span class="pill p-fase3">F3</span></td></tr>
+      <tr><td rowspan="2"><strong>Pedidos e uso aprovado</strong></td><td>Rastreador de pedidos do CEO e da diretoria</td><td>1</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
+      <tr><td>Uso não aprovado (shadow IT) por área</td><td>1, 6</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
       <tr><td rowspan="3"><strong>O sistema está funcionando?</strong></td><td>Sugestões aceitas x descartadas (precisão da detecção de demanda)</td><td>2, 6</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
       <tr><td>Uso do copiloto e abertura do resumo das 8h</td><td>2, 5</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
       <tr><td>Disponibilidade das coletas, tempo de aprovação, alertas por destinatário</td><td>6</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
@@ -973,7 +988,7 @@
       <h4>Minimização e retenção (propostas para validação do Jurídico)</h4>
       <ul class="small">
         <li>Conteúdo bruto de mensagens: 30 dias, só para reprocessamento; depois ficam metadados e classificações.</li>
-        <li>Screenshots fSense: desligados por padrão; se ligados, 7 dias e acesso só por investigação formal autorizada por G&amp;G e Jurídico.</li>
+        <li>Screenshots fSense: capturados pela ferramenta, mas não consumidos nem exibidos por este sistema; acesso só por investigação formal autorizada por G&amp;G e Jurídico, dentro do fSense.</li>
         <li>Geolocalização: usada apenas para validar marcação de ponto; não exibida em dashboards.</li>
         <li>Dados de jornada e alterações: 5 anos. Logs de acesso: 2 anos. Dados de humor por pessoa: 12 meses; agregados por área: indefinido.</li>
       </ul>
@@ -1002,11 +1017,11 @@
   <table class="compact">
     <thead><tr><th style="width:30mm">Fonte</th><th>Cuidado</th></tr></thead>
     <tbody>
-      <tr><td><strong>WhatsApp Web</strong></td><td>Sem API oficial; a leitura é feita pelo agente local na estação, como você já faz. Regras: somente leitura; nunca enviar, marcar como lido em massa ou automatizar; ritmo de leitura humano; pausa automática ao detectar aviso de segurança; coleta só com a estação ligada e sessão ativa; o colaborador vê no painel que a fonte está ativa. Se a conta for bloqueada, o Orquestrador alerta TI e a pessoa e o restante do sistema segue funcionando.</td></tr>
-      <tr><td><strong>fSense</strong></td><td>Usar categorias e horas; manter screenshots e geolocalização fora dos agentes 1 a 3. PJ incluído conforme parecer jurídico de outubro (comunicado prévio por escrito).</td></tr>
+      <tr><td><strong>WhatsApp Web</strong></td><td>Sem API oficial para leitura; a coleta é feita por um agente local na estação que usa a sessão já autenticada do WhatsApp Web para exportar, em lote e de forma incremental, todas as conversas e mídias do número corporativo, com transcrição automática dos áudios. Regras: somente leitura; nunca enviar, marcar como lido ou alterar estado; coleta só com a estação ligada e sessão ativa; o colaborador vê no painel que a fonte está ativa. Se a sessão cair ou a conta for restringida, o Orquestrador alerta TI e a pessoa, e o restante do sistema segue funcionando.</td></tr>
+      <tr><td><strong>fSense</strong></td><td>Usar categorias, horas e linha do tempo; screenshots e geolocalização, embora capturados pela ferramenta, ficam fora de todos os agentes. PJ incluído conforme parecer jurídico de outubro (comunicado prévio por escrito).</td></tr>
       <tr><td><strong>Teams e e-mail</strong></td><td>Acesso de leitura em nível organizacional pelo Microsoft Graph com escopo mínimo; filtro de pastas e contatos pessoais; sem leitura de webmail pessoal.</td></tr>
       <tr><td><strong>Control iD</strong></td><td>Dados de ponto são registro legal; nenhuma alteração sem aprovação do DP e log; o sistema não substitui o REP, apenas cruza.</td></tr>
-      <tr><td><strong>Feedz</strong></td><td>Somente agregados por área para pesquisas; posts públicos podem ser lidos individualmente.</td></tr>
+      <tr><td><strong>Feedz</strong></td><td>Fonte secundária, em avaliação de descontinuação; somente agregados por área e sem KPI principal dependente.</td></tr>
     </tbody>
   </table>
 </section>
@@ -1014,107 +1029,71 @@
 <!-- ============================ 15. COMPLEMENTOS ============================ -->
 <section class="section">
   <div class="kicker">Capítulo 15</div>
-  <h2>Complementos propostos além do escopo original</h2>
-  <p class="lead">Ideias que ampliam o ganho de eficiência com baixo custo adicional, porque usam os mesmos dados. Cada uma indica em qual agente se encaixa e em qual fase. Você decide quais entram.</p>
+  <h2>Funcionalidades complementares incorporadas ao escopo</h2>
+  <p class="lead">Catorze funcionalidades que ampliam o ganho de eficiência com baixo custo adicional, porque usam os mesmos dados. Todas foram aprovadas pela Diretoria e já estão refletidas nas regras, KPIs, relatórios e no roadmap. A tabela indica o agente responsável e a fase de entrega.</p>
 
   <table class="compact">
-    <thead><tr><th style="width:38mm">Complemento</th><th>O que faz e por que vale</th><th style="width:14mm">Agente</th><th style="width:10mm" class="c">Fase</th></tr></thead>
+    <thead><tr><th style="width:38mm">Funcionalidade</th><th>O que faz e por que vale</th><th style="width:14mm">Agente</th><th style="width:10mm" class="c">Fase</th></tr></thead>
     <tbody>
       <tr><td><strong>Eficiência de reuniões</strong></td><td>Horas de reunião por pessoa e área, participantes por reunião, reuniões sem pauta, sem ata ou sem item de ação, sobreposições, custo-hora estimado. A franqueadora tem forte cultura de reunião e nenhum indicador sobre ela.</td><td>1, 5</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
       <tr><td><strong>Matriz de demanda entre áreas</strong></td><td>Quem demanda quem, quanto, por qual canal e com que SLA. Mostra dependências estruturais (ex.: Marketing dependendo de TI, Operações de Jurídico) e alimenta a consultoria de processos do NR-1.</td><td>1</td><td class="c"><span class="pill p-fase3">F3</span></td></tr>
       <tr><td><strong>Demandas de franqueados por franquia</strong></td><td>Volume, tema, canal (SULTS x WhatsApp x e-mail) e tempo de resposta por franqueado. Identifica franqueados que concentram demanda informal e temas que deveriam virar FAQ ou processo.</td><td>1, 5</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
-      <tr><td><strong>Rastreador de pedidos do CEO e da diretoria</strong></td><td>Painel das demandas originadas em você e nos diretores, com status e responsável, para você acompanhar sem perguntar.</td><td>1, 2</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
+      <tr><td><strong>Rastreador de pedidos do CEO e da diretoria</strong></td><td>Painel das demandas originadas no CEO e nos diretores, com status e responsável, para acompanhamento sem necessidade de cobrança.</td><td>1, 2</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
       <tr><td><strong>Detecção de ponto único de falha</strong></td><td>Tipos de demanda que só uma pessoa atende e pessoas sem backup. Base para plano de sucessão e Talent Pool do NR-1.</td><td>1</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
       <tr><td><strong>Blocos de foco e fragmentação</strong></td><td>Mede quanto tempo contínuo a pessoa consegue trabalhar sem interrupção e sugere blocos no calendário. Alto impacto em execução e stress.</td><td>1, 2</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
       <tr><td><strong>Trabalho fora do horário como risco NR-1</strong></td><td>Mensagens e atividade fora da janela como indicador de risco psicossocial, por pessoa e área, com recomendação ao diretor.</td><td>3, 4</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
-      <tr><td><strong>Formalização assistida</strong></td><td>Quando o Organizador detecta demanda informal aceita pelo colaborador, oferece criar a tarefa no Planner/Asana ou abrir o chamado no SULTS com um clique. Reduz a informalidade na origem.</td><td>2</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
+      <tr><td><strong>Formalização assistida</strong></td><td>Quando o Organizador detecta demanda informal aceita pelo colaborador, oferece criar a tarefa no Planner ou abrir o chamado no SULTS com um clique. Reduz a informalidade na origem e acelera a adoção do Planner.</td><td>2</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
       <tr><td><strong>Capacidade por área para dimensionamento</strong></td><td>Horas de demanda por tipo versus horas disponíveis por área, mês a mês. É o insumo objetivo para a frente "estrutura e dimensionamento de equipes" do NR-1.</td><td>1, 5</td><td class="c"><span class="pill p-fase3">F3</span></td></tr>
       <tr><td><strong>Onboarding de novos colaboradores</strong></td><td>Nos primeiros 90 dias, o Organizador traz o plano de integração (projeto DHO) e o Monitor sinaliza subcarga ou isolamento (poucas interações).</td><td>1, 2</td><td class="c"><span class="pill p-fase3">F3</span></td></tr>
       <tr><td><strong>Shadow IT e uso não aprovado</strong></td><td>Aplicações e sites não aprovados com uso relevante, por área, para Segurança da Informação, a partir das categorias do fSense.</td><td>1, 6</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
       <tr><td><strong>Reconhecimento positivo</strong></td><td>O relatório mensal destaca entregas no prazo, redução de backlog e boas práticas, não só problemas. Equilibra a percepção do sistema e conecta com Feedz.</td><td>5</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
-      <tr><td><strong>Sincronização de nomenclaturas</strong></td><td>Unifica como Planner, Asana, Trello e SULTS nomeiam prioridade, status e prazo, para que os KPIs sejam comparáveis entre áreas.</td><td>6</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
+      <tr><td><strong>Sincronização de nomenclaturas</strong></td><td>Unifica como Planner, SULTS e as ferramentas residuais (Trello, Asana) nomeiam prioridade, status e prazo, para que os KPIs sejam comparáveis entre áreas.</td><td>6</td><td class="c"><span class="pill p-fase1">F1</span></td></tr>
       <tr><td><strong>Modo "semana que vem"</strong></td><td>Toda sexta o Organizador propõe a semana seguinte e o gestor recebe a visão consolidada para redistribuir antes da segunda.</td><td>2, 5</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
-    </tbody>
-  </table>
-</section>
-
-<!-- ============================ 16. RASTREABILIDADE ============================ -->
-<section class="section">
-  <div class="kicker">Capítulo 16</div>
-  <h2>Rastreabilidade: o que veio do seu material e o que foi ajustado</h2>
-  <p class="lead">Lista item a item do anexo que você enviou, com o tratamento dado neste documento.</p>
-  <div class="legend"><span><span class="pill p-ok">mantido</span> igual ao original</span><span><span class="pill p-warn">complementado</span> mantido com detalhamento</span><span><span class="pill p-info">ajustado</span> mantido com mudança de desenho</span><span><span class="pill p-bad">eliminado</span> retirado, com justificativa</span></div>
-  <table class="compact">
-    <thead><tr><th style="width:22mm">Bloco</th><th>Item original</th><th style="width:22mm">Tratamento</th><th>Onde e como</th></tr></thead>
-    <tbody>
-      <tr><td rowspan="2"><strong>Origens</strong></td><td>Databricks (SULTS, Control iD, Feedz, intranet, jurídico), fSense, Microsoft, dados do computador, Asana, WhatsApp Web</td><td><span class="pill p-warn">complementado</span></td><td>Cap. 5: adicionados Trello (você citou no texto), transcrições de reuniões Teams, cadastro de pessoas como fonte formal e SO da estação como redundância do fSense.</td></tr>
-      <tr><td>WhatsApp só via Web, só com PC ligado, somente leitura</td><td><span class="pill p-ok">mantido</span></td><td>Cap. 5 e 14: regras anti-bloqueio e exclusão do número pessoal explicitadas.</td></tr>
-      <tr><td rowspan="4"><strong>1 · Monitor</strong></td><td>Previsto x entrega; termômetro de volume x 44h; origens e canais; formal x sob demanda; divisão por tipo; ferramentas; pessoas de maior interação; KPIs; visão consolidada do time</td><td><span class="pill p-warn">complementado</span></td><td>Cap. 6: fórmulas, faixas, taxonomias e 13 KPIs; adicionados fragmentação, tempo de resposta, concentração e tempo até formalização.</td></tr>
-      <tr><td>Colaborador não altera dado do Monitor; pedido vai ao gestor via Teams com De/Para e log</td><td><span class="pill p-ok">mantido</span></td><td>Cap. 6 e 11: fluxo detalhado, escalonamento em 2 dias úteis.</td></tr>
-      <tr><td>Aprender com o histórico do colaborador para identificar gargalos</td><td><span class="pill p-warn">complementado</span></td><td>Cap. 6 e 7: estimativa por histórico pessoal e da área; aderência de estimativa como KPI.</td></tr>
-      <tr><td>Dados de uso do próprio Mac/Windows</td><td><span class="pill p-ok">mantido</span></td><td>Cap. 5: fonte "SO da estação", exige agente local.</td></tr>
-      <tr><td rowspan="4"><strong>2 · Organizador</strong></td><td>Puxa planejadas, histórico, gráficos, listas e kanban por tema e tempo</td><td><span class="pill p-ok">mantido</span></td><td>Cap. 7, telas.</td></tr>
-      <tr><td>Demandas não formalizadas só a partir de interações do próprio colaborador</td><td><span class="pill p-ok">mantido</span></td><td>Cap. 7, regra de participante/destinatário/mencionado.</td></tr>
-      <tr><td>Chat para ajustar estimativas, mover, cancelar, adicionar, subir arquivos; log</td><td><span class="pill p-warn">complementado</span></td><td>Cap. 7: criação opcional de tarefa no Planner/Asana com confirmação; itens "propostos pelo sistema" até aceite.</td></tr>
-      <tr><td>Gestor acessa o Organizador de toda a equipe; resumo diário às 8h para colaborador e gestor</td><td><span class="pill p-info">ajustado</span></td><td>Cap. 7: gestor vê e sugere, mas não edita (parâmetro de área permite mudar). Resumo das 8h mantido, com versões semanal e mensal.</td></tr>
-      <tr><td rowspan="3"><strong>3 · Humor</strong></td><td>Fontes, cruzamento com carga e DP, termômetro, acesso só diretor/CEO/G&amp;G, nenhum colaborador vê o próprio</td><td><span class="pill p-ok">mantido</span></td><td>Cap. 8.</td></tr>
-      <tr><td>Resumo semanal e mensal ao diretor; mensal a Diretor e G&amp;G; envio automatizado</td><td><span class="pill p-ok">mantido</span></td><td>Cap. 8 e 10, Teams e e-mail.</td></tr>
-      <tr><td>Não usar para decisão ou punição</td><td><span class="pill p-warn">complementado</span></td><td>Cap. 8 e 14: salvaguardas, agregação para áreas pequenas, política interna, log nominal de acesso.</td></tr>
-      <tr><td rowspan="3"><strong>4 · DP</strong></td><td>Cruzar Control iD, fSense, intranet, SO e Microsoft; 44h ou 40h; home office; gráficos</td><td><span class="pill p-warn">complementado</span></td><td>Cap. 9: ordem de autoridade das fontes, seis tipos de inconsistência, banco de horas.</td></tr>
-      <tr><td>Exemplos de irregularidade (ponto remoto x catraca 10 minutos; ponto sem catraca)</td><td><span class="pill p-ok">mantido</span></td><td>Cap. 9, com o parâmetro de 10 minutos ajustável.</td></tr>
-      <tr><td>Chat de justificativa; 48h úteis para o gestor; depois DP; aprovações via Teams; log em relatórios</td><td><span class="pill p-ok">mantido</span></td><td>Cap. 9 e 11, fluxo em cinco passos.</td></tr>
-      <tr><td rowspan="2"><strong>5 · Reports</strong></td><td>Report mensal por público (diretor, CEO, G&amp;G e DP)</td><td><span class="pill p-warn">complementado</span></td><td>Cap. 10: matriz com diário, semanal e mensal, e relatório mensal de logs para TI.</td></tr>
-      <tr><td>Alertas em tempo real ao diretor (conversas delicadas, gargalo, tema fora da agenda, irregularidade)</td><td><span class="pill p-warn">complementado</span></td><td>Cap. 10: catálogo de 11 alertas com severidade e regra anti-ruído.</td></tr>
-      <tr><td rowspan="4"><strong>6 · Governança</strong></td><td>Dashboards com filtros; CEO vê tudo; demais só equipe e o próprio; humor só gestores</td><td><span class="pill p-info">ajustado</span></td><td>Cap. 11: humor restrito a diretores (não a todos os gestores), conforme o item 3 do seu anexo; matriz completa de acesso.</td></tr>
-      <tr><td>Chat exclusivo de Alteração de Dados para gestores; RH só com DP; tudo com log para TI</td><td><span class="pill p-ok">mantido</span></td><td>Cap. 11.</td></tr>
-      <tr><td>Conversas só geram dado entre participantes, exceto diretor da área</td><td><span class="pill p-ok">mantido</span></td><td>Cap. 3 (princípio 5) e 11.</td></tr>
-      <tr><td>Painel de parametrização por TI com dupla aprovação; verificar o que o diretor pode parametrizar</td><td><span class="pill p-warn">complementado</span></td><td>Cap. 11: tabela com dez parâmetros e quem altera; quatro liberados ao diretor dentro de faixas.</td></tr>
-      <tr><td><strong>Geral</strong></td><td>Nenhum item do seu material foi eliminado</td><td><span class="pill p-ok">—</span></td><td>Alguns foram reposicionados (ex.: logs e parametrização viraram o Agente 6; o resumo das 8h é produzido pelo Agente 2 e entregue pelo Agente 5).</td></tr>
     </tbody>
   </table>
 </section>
 
 <!-- ============================ 17. ROADMAP ============================ -->
 <section class="section">
-  <div class="kicker">Capítulo 17</div>
-  <h2>Roadmap de implantação em fases</h2>
-  <p class="lead">Começar pelo que já tem dado pronto e menor risco jurídico, provar valor com um grupo piloto e expandir. A divisão no-code x Python é indicativa aqui e será detalhada no documento técnico.</p>
+  <div class="kicker">Capítulo 16</div>
+  <h2>Roadmap de implantação em 6 meses</h2>
+  <p class="lead">Implantação para toda a empresa desde a primeira fase, sem piloto: o fSense já está em todas as estações e as demais fontes já existem. Três fases de dois meses, cada uma colocando agentes completos em produção. A divisão no-code x código é indicativa aqui e está detalhada no documento técnico.</p>
 
   <div class="phases">
     <div class="phase ph1">
-      <h3>Fase 1 · Piloto</h3>
-      <div class="when">Meses 1 a 3 · grupo dos 14 colaboradores do piloto fSense mais seus gestores</div>
+      <h3>Fase 1 · Fundação</h3>
+      <div class="when">Meses 1 e 2 · toda a empresa</div>
       <ul class="small">
-        <li>Cadastro de pessoas e hierarquia saneado por G&amp;G.</li>
-        <li>Coletor para Microsoft 365, Databricks (SULTS, Control iD), fSense, Asana.</li>
-        <li>Agente 1 com carga, origem, canal, previsto x entregue e ferramentas.</li>
-        <li>Agente 4 com cruzamento ponto x catraca x facial x fSense e contestação em 48h.</li>
-        <li>Agente 6 com matriz de acesso, fluxo De/Para no Teams e logs.</li>
-        <li>Agente 5 com resumo diário das 8h (versão simples) e alertas de jornada e SLA.</li>
-        <li>Dashboards do colaborador e do gestor.</li>
+        <li>Cadastro de pessoas e hierarquia saneado por G&amp;G; comunicado aos colaboradores.</li>
+        <li>Coletor para Microsoft 365 (Teams, Outlook, Calendário, Planner), Databricks (SULTS, Control iD), fSense e Trello/Asana residual.</li>
+        <li>Agente 1 com carga, origem, canal, previsto x entregue, ferramentas, rastreador de pedidos do CEO e shadow IT.</li>
+        <li>Agente 4 com cruzamento ponto x catraca x facial x fSense, notificação às 08h e contestação em 48h.</li>
+        <li>Agente 6 com matriz de acesso, fluxo De/Para no Teams, logs e sincronização de nomenclaturas.</li>
+        <li>Agente 5 com resumo diário das 8h (versão inicial), alertas de jornada e SLA e reconhecimento positivo.</li>
+        <li>Dashboards do colaborador, do gestor e do DP.</li>
       </ul>
     </div>
     <div class="phase ph2">
-      <h3>Fase 2 · Expansão</h3>
-      <div class="when">Meses 4 a 6 · toda a franqueadora</div>
+      <h3>Fase 2 · Copiloto e clima</h3>
+      <div class="when">Meses 3 e 4 · toda a empresa</div>
       <ul class="small">
-        <li>Agente 2 completo: kanban, chat, estimativas, upload, formalização assistida.</li>
-        <li>WhatsApp Web e Trello no Coletor; transcrições de reunião.</li>
-        <li>Agente 3 com termômetro por área, após comunicado e política interna.</li>
+        <li>Agente 2 completo: kanban, chat, estimativas, upload, sugestões do gestor, formalização assistida, modo "semana que vem".</li>
+        <li>WhatsApp Web (exportação com transcrição de áudios) e transcrições de reunião no Coletor.</li>
+        <li>Agente 3 com termômetro por área e por pessoa para diretores e G&amp;G, após política interna.</li>
         <li>Relatórios semanais e mensais por público; catálogo completo de alertas.</li>
         <li>Painel de parametrização com dupla aprovação; parâmetros do diretor.</li>
-        <li>Complementos: reuniões, franqueados, foco, fora do horário, "semana que vem".</li>
+        <li>Eficiência de reuniões, demanda de franqueados, ponto único de falha, blocos de foco, fora do horário como risco NR-1.</li>
       </ul>
     </div>
     <div class="phase ph3">
-      <h3>Fase 3 · Maturidade</h3>
-      <div class="when">Meses 7 a 12</div>
+      <h3>Fase 3 · Inteligência de gestão</h3>
+      <div class="when">Meses 5 e 6 · toda a empresa</div>
       <ul class="small">
-        <li>Matriz área x área, capacidade para dimensionamento, ponto único de falha, retrabalho.</li>
-        <li>Correlação carga x humor x horas; onboarding; reconhecimento.</li>
+        <li>Matriz de demanda área x área, capacidade por área para dimensionamento, retrabalho e reabertura.</li>
+        <li>Correlação carga x humor x horas; acompanhamento de onboarding nos primeiros 90 dias.</li>
         <li>Aprendizado contínuo das estimativas e das taxonomias por área.</li>
         <li>Integração dos saldos de banco de horas com a folha (com validação do DP).</li>
-        <li>Revisão anual de finalidades e retenção com Jurídico.</li>
+        <li>Revisão de finalidades e retenção com Jurídico; encerramento da implantação e passagem para operação.</li>
       </ul>
     </div>
   </div>
@@ -1126,14 +1105,14 @@
       <ul class="small">
         <li>Fluxos de aprovação no Teams, cards, resumo das 8h, envio de relatórios: Power Automate ou n8n.</li>
         <li>Dashboards: Power BI sobre o Databricks, que a empresa já usa.</li>
-        <li>Conectores padrão para Microsoft Graph, Asana, Trello.</li>
+        <li>Conectores padrão para Microsoft Graph (Teams, Outlook, Planner), Trello e Asana residual.</li>
         <li>Orquestração de agendas simples.</li>
       </ul>
     </div>
     <div class="box bordo">
       <h4>Código (Python) onde segurança e controle mandam</h4>
       <ul class="small">
-        <li>Leitura do WhatsApp Web e telemetria do SO: agente local nas estações, assinado e distribuído por TI.</li>
+        <li>Exportação do WhatsApp Web (com transcrição de áudios) e telemetria do SO: agente local nas estações, assinado e distribuído por TI; pode ser Node ou Python, conforme detalhado no documento técnico.</li>
         <li>Classificador de IA (detecção de demanda, tom, estimativa): serviço próprio com prompts versionados, avaliação de precisão e sem envio de dados a terceiros fora do contrato.</li>
         <li>Cruzamento de jornada e cálculo de banco de horas: regras auditáveis, testes automatizados.</li>
         <li>Camada de permissões e logs imutáveis.</li>
@@ -1144,14 +1123,14 @@
 
 <!-- ============================ 18. RISCOS E DECISÕES ============================ -->
 <section class="section">
-  <div class="kicker">Capítulo 18</div>
-  <h2>Riscos, premissas e decisões pendentes para o CEO</h2>
+  <div class="kicker">Capítulo 17</div>
+  <h2>Riscos, premissas, decisões registradas e pendências</h2>
 
   <h3>Riscos e mitigação</h3>
   <table class="compact">
     <thead><tr><th style="width:40mm">Risco</th><th>Mitigação</th></tr></thead>
     <tbody>
-      <tr><td><strong>Bloqueio do WhatsApp corporativo</strong> pela leitura automatizada</td><td>Somente leitura, ritmo humano, pausa ao detectar aviso, coleta só com sessão ativa; WhatsApp é fonte complementar e sua queda não para o sistema. Avaliar WhatsApp Business API para números de atendimento a franqueados na Fase 3.</td></tr>
+      <tr><td><strong>Restrição do WhatsApp corporativo</strong> pela exportação automatizada</td><td>Somente leitura em lote, sem envio nem alteração de estado, coleta só com sessão ativa; WhatsApp é fonte complementar e sua queda não para o sistema. Avaliar WhatsApp Business API para números de atendimento a franqueados.</td></tr>
       <tr><td><strong>Classificação errada</strong> (demanda inexistente, tom mal lido)</td><td>Tudo que vem de IA entra como "proposto" e é validado pelo colaborador; KPI de aceitação; limiares conservadores no início; explicabilidade em cada item.</td></tr>
       <tr><td><strong>Percepção de vigilância</strong> e queda de confiança</td><td>Espelho para o colaborador, comunicado claro, Organizador como benefício visível desde o dia 1, reconhecimento positivo nos relatórios, humor restrito a diretores e sem uso decisório.</td></tr>
       <tr><td><strong>Hierarquia desatualizada</strong> gerando acesso indevido</td><td>Cadastro com vigência e validação automática; pendências para G&amp;G; revisão mensal.</td></tr>
@@ -1163,26 +1142,36 @@
 
   <h3>Premissas adotadas</h3>
   <ul class="small">
-    <li>Todos os colaboradores, CLT e PJ, têm ciência contratual do monitoramento das ferramentas corporativas, conforme você informou e o Jurídico validou.</li>
+    <li>Todos os colaboradores, CLT e PJ, têm ciência contratual do monitoramento das ferramentas corporativas, conforme validado pelo Jurídico em outubro/2026.</li>
     <li>A relação de colaboradores e gestores mantida por G&amp;G é a hierarquia de partida; o organograma vigente complementa a visão de áreas.</li>
     <li>O Databricks continua como repositório central e recebe as novas fontes (fSense, Microsoft, WhatsApp).</li>
+    <li>O Planner é a ferramenta oficial de tarefas; Asana e Trello são residuais e tendem a desaparecer.</li>
+    <li>Implantação completa em 6 meses, para toda a empresa, sem fase piloto.</li>
     <li>O Teams é o canal de aprovações e alertas; e-mail é o canal dos relatórios.</li>
   </ul>
 
-  <h3>Decisões que preciso de você para fechar o escopo</h3>
+  <h3>Decisões registradas pela Diretoria</h3>
   <div class="grid2">
-    <div class="box gold"><h4>1 · Gestor edita o Organizador do liderado?</h4><p class="small">Proposta: vê e sugere, não edita (parâmetro por área). Alternativa: edita com log.</p></div>
-    <div class="box gold"><h4>2 · Humor no nível pessoa para o diretor?</h4><p class="small">Proposta: sim, com os sinais que o compõem, e apenas faixa para áreas com menos de 4 pessoas. Alternativa: só nível de área.</p></div>
-    <div class="box gold"><h4>3 · Screenshots do fSense</h4><p class="small">Proposta: desligados por padrão; ligados apenas em investigação formal. Alternativa: ligados com retenção de 7 dias.</p></div>
-    <div class="box gold"><h4>4 · Retenção de conteúdo bruto de mensagens</h4><p class="small">Proposta: 30 dias. Precisa de validação do Jurídico.</p></div>
-    <div class="box gold"><h4>5 · Grupo piloto</h4><p class="small">Proposta: os 14 do piloto fSense mais seus gestores. Alternativa: uma diretoria inteira (Operações, por ser a maior e com mais SULTS).</p></div>
-    <div class="box gold"><h4>6 · Complementos da Fase 1</h4><p class="small">Proposta: rastreador de pedidos do CEO, shadow IT, reconhecimento positivo e sincronização de nomenclaturas. Confirmar ou cortar.</p></div>
-    <div class="box gold"><h4>7 · PJ no Agente 4</h4><p class="small">Proposta: apenas aderência à jornada contratual para capacidade, sem banco de horas. Confirmar com Jurídico.</p></div>
-    <div class="box gold"><h4>8 · Perímetro de pessoas</h4><p class="small">Proposta: toda a franqueadora e holding, incluindo operação internacional e Instituto, com gestor definido no cadastro de G&amp;G. Alternativa: apenas a sede.</p></div>
+    <div class="box ok"><h4>Organizador é do colaborador</h4><p class="small">O gestor pode alterar prioridades, mas a alteração chega como sugestão e só vale com o aceite do colaborador. Mudanças diretas do gestor apenas nos sistemas de origem (Planner, SULTS).</p></div>
+    <div class="box ok"><h4>Humor no nível pessoa</h4><p class="small">Visível ao diretor da área e à Diretora de G&amp;G, com os sinais que o compõem; faixa crítica gera alerta aos dois.</p></div>
+    <div class="box ok"><h4>Screenshots do fSense</h4><p class="small">A ferramenta já captura; o sistema não os consome nem exibe.</p></div>
+    <div class="box ok"><h4>Faixas de carga</h4><p class="small">Até 65% possível ociosidade; 65 a 90% saudável; 90 a 100% atenção; acima de 100% sobrecarga.</p></div>
+    <div class="box ok"><h4>Toda a empresa desde a Fase 1</h4><p class="small">Sem piloto; implantação completa em 6 meses em três fases de dois meses.</p></div>
+    <div class="box ok"><h4>Funcionalidades complementares</h4><p class="small">As catorze do capítulo 15 estão aprovadas e incorporadas ao escopo e ao roadmap.</p></div>
+    <div class="box ok"><h4>Visibilidade de jornada</h4><p class="small">Horas extras, fora do horário e ociosidade na jornada: apenas gestor, linha hierárquica, DP e G&amp;G. Inconsistências notificadas às 08h do dia seguinte ao colaborador e ao gestor.</p></div>
+    <div class="box ok"><h4>Fontes</h4><p class="small">Planner como ferramenta oficial de tarefas; Asana residual; Feedz secundário e sem KPI principal; WhatsApp por exportação completa, não por leitura conversa a conversa.</p></div>
+  </div>
+
+  <h3>Pendências para validação</h3>
+  <div class="grid2">
+    <div class="box gold"><h4>1 · Retenção de conteúdo bruto de mensagens</h4><p class="small">Proposta: 30 dias. Depende de validação do Jurídico.</p></div>
+    <div class="box gold"><h4>2 · PJ no Agente 4</h4><p class="small">Proposta: apenas aderência à jornada contratual para gestão de capacidade, sem banco de horas. Confirmar com Jurídico.</p></div>
+    <div class="box gold"><h4>3 · Perímetro de pessoas</h4><p class="small">Proposta: toda a franqueadora e holding, incluindo operação internacional e Instituto, com gestor definido no cadastro de G&amp;G.</p></div>
+    <div class="box gold"><h4>4 · Viabilidade técnica da exportação do WhatsApp</h4><p class="small">TI valida em prova de conceito a exportação em lote com transcrição de áudios, conforme o documento técnico, antes da Fase 2.</p></div>
   </div>
 
   <div class="callout green" style="margin-top:4mm">
-    <strong>Próximo passo.</strong> Com o seu "ok" e as oito decisões acima, preparo o documento técnico para o time de Tecnologia: definição de cada agente e dos prompts, ferramentas e APIs por fonte (Microsoft Graph, Databricks, fSense, Asana, Trello, agente local para WhatsApp Web e SO), modelo de dados no lakehouse, arquitetura de permissões e logs, o que fica em no-code e o que vai para Python, infraestrutura, segurança e plano de entrega por sprint.
+    <strong>Documento complementar.</strong> O documento "Requisitos Técnicos e Arquitetura" detalha, para o time de Tecnologia, a definição de cada agente e seus prompts, as integrações e APIs por fonte (Microsoft Graph, Databricks, fSense, Trello, agente local para WhatsApp Web e sistema operacional), o modelo de dados no lakehouse, a arquitetura de permissões e logs, a divisão entre no-code e código, infraestrutura, segurança e o plano de entrega por sprint para os 6 meses.
   </div>
 </section>
 

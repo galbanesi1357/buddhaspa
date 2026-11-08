@@ -1,0 +1,105 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Organizador de Atividades</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.grid{grid-template-columns:1fr 340px;grid-template-rows:1fr 228px}
+.kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;flex:1;min-height:0}
+.col{background:#f7f2ec;border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.col h4{margin:0 0 2px 0;font-size:11.5px;font-weight:600;color:var(--cafe2);display:flex;justify-content:space-between;text-transform:uppercase;letter-spacing:.04em}
+.col h4 span{background:#fff;border-radius:10px;padding:0 7px;font-size:10.5px;color:var(--muted)}
+.kc{background:#fff;border-radius:9px;padding:9px 10px;box-shadow:0 1px 2px rgba(57,38,23,.08);font-size:11.5px;display:flex;flex-direction:column;gap:5px}
+.kc b{font-size:12px;color:var(--ink);line-height:1.25}
+.kc .m{display:flex;gap:4px;flex-wrap:wrap}
+.kc .f{display:flex;justify-content:space-between;color:var(--muted);font-size:10.5px}
+.kc.prop{border:1px dashed var(--gold);background:#fffaf0}
+.kc.sug{border:1px dashed #4a6cc0;background:#f3f6fd}
+.kc .act{display:flex;gap:6px;margin-top:2px}
+.kc .act span{border-radius:6px;padding:3px 8px;font-size:10.5px;font-weight:600;background:var(--terra);color:#fff}
+.kc .act span.sec{background:#fff;border:1px solid var(--line);color:var(--cafe2)}
+.chat{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
+.msg{max-width:92%;border-radius:12px;padding:8px 11px;font-size:11.8px;line-height:1.35}
+.msg.me{align-self:flex-end;background:var(--terra);color:#fff;border-bottom-right-radius:4px}
+.msg.bot{align-self:flex-start;background:var(--cream);color:var(--ink);border-bottom-left-radius:4px}
+.msg.bot b{color:var(--cafe2)}
+.input{border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;margin-top:auto}
+.resumo{background:var(--terra);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.resumo h3{color:#fff;margin:0}
+.resumo .sub{color:var(--gold2)}
+.resumo ol{margin:6px 0 0 0;padding-left:18px;font-size:12px;line-height:1.5}
+.resumo .foot{font-size:11px;color:#d9c9b8;margin-top:8px}
+.week{display:grid;grid-template-columns:70px repeat(5,1fr);gap:8px;flex:1}
+.day{background:#f7f2ec;border-radius:10px;padding:8px;position:relative;display:flex;flex-direction:column;gap:5px}
+.day h5{margin:0;font-size:11.5px;font-weight:600;color:var(--cafe2);display:flex;justify-content:space-between}
+.day h5 span{font-weight:500;color:var(--muted)}
+.ev{border-radius:6px;padding:4px 7px;font-size:10.5px;color:#fff;line-height:1.2}
+.ev.sug{background:#fff;border:1px dashed var(--gold);color:#7d5a14}
+.cap{height:6px;border-radius:3px;background:#e9e1d7;margin-top:auto;position:relative}
+.cap b{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.cap+span{font-size:10px;color:var(--muted)}
+.hrs{display:flex;flex-direction:column;justify-content:space-between;font-size:10px;color:var(--muted);padding:26px 0 18px 0}
+</style></head><body>
+<div class="topbar"><div class="logo"><img src="../../../novo_logo_BUDDHA_SPA_fundo_branco.png" alt=""></div><div class="brand">Sistema de Eficiência<small>Buddha Spa</small></div>
+<nav><span>Monitor de Atividades</span><span class="on">Organizador</span><span>Minha Jornada</span><span>Meus dados</span></nav><div class="sp"></div>
+<span class="chip">Alertas · 2</span><span class="chip"><span class="av">AP</span>Ana P. · Analista · Operações</span></div>
+<div class="filters"><div class="title">Meu plano da semana<small>Semana 45 · capacidade 44h · 41h20 planejadas · 2h40 livres</small></div>
+<div class="f">Visão <b>Kanban</b></div><div class="f">Tema <b>Todos</b></div><div class="f">Origem <b>Todas</b></div><div class="f">Período <b>Esta semana</b></div>
+<div class="sp"></div><span class="pill p-info"><i></i>1 sugestão do gestor aguardando sua decisão</span><span class="btn">Replanejar semana</span><span class="btn primary">+ Nova demanda</span></div>
+
+<div class="grid">
+  <div class="card" style="grid-row:span 1">
+    <div class="kanban">
+      <div class="col"><h4>Proposto pelo sistema <span>3</span></h4>
+        <div class="kc prop"><b>Enviar planilha de repasse atualizada para franqueado Campinas</b><div class="m"><span class="tag t5">WhatsApp</span><span class="tag t1">Franqueado</span></div><div class="f"><span>detectado ontem 17:42</span><span>est. 1h30</span></div><div class="act"><span>Aceitar</span><span class="sec">Ajustar</span><span class="sec">Descartar</span></div></div>
+        <div class="kc prop"><b>Item de ação da reunião de alinhamento: revisar checklist de implantação</b><div class="m"><span class="tag t4">Reunião Teams</span><span class="tag">Gestor</span></div><div class="f"><span>ata de hoje 10:30</span><span>est. 3h</span></div><div class="act"><span>Aceitar</span><span class="sec">Ajustar</span><span class="sec">Descartar</span></div></div>
+        <div class="kc sug"><b>Sugestão do gestor: priorizar o manual de implantação v3 antes do treinamento Curitiba</b><div class="f"><span>enviada hoje 08:12</span><span>reordena 2 itens</span></div><div class="act"><span>Acatar</span><span class="sec">Manter meu plano</span></div></div>
+      </div>
+      <div class="col"><h4>A fazer <span>9</span></h4>
+        <div class="kc"><b>Manual de implantação v3</b><div class="m"><span class="tag t3">Planner</span><span class="tag">Gestor</span><span class="pill p-bad" style="padding:1px 7px"><i></i>prazo 09/11</span></div><div class="f"><span>formal planejada</span><span>est. 8h · 20% feito</span></div></div>
+        <div class="kc"><b>Treinamento remoto · franqueado Curitiba</b><div class="m"><span class="tag t1">SULTS #48244</span><span class="tag t1">Franqueado</span></div><div class="f"><span>SLA 31h</span><span>est. 2h</span></div></div>
+        <div class="kc"><b>Relatório mensal de SAF para diretoria</b><div class="m"><span class="tag t3">Planner</span><span class="tag t4">Diretoria</span></div><div class="f"><span>prazo 13/11</span><span>est. 4h</span></div></div>
+        <div class="kc"><b>Responder pedido de Marketing · campanha Black November</b><div class="m"><span class="tag t4">Teams</span><span class="tag t2">Outra área</span></div><div class="f"><span>informal · 4 dias</span><span>est. 1h</span></div></div>
+      </div>
+      <div class="col"><h4>Em andamento <span>4</span></h4>
+        <div class="kc"><b>Ajuste de agenda · unidade Moema</b><div class="m"><span class="tag t1">SULTS #48213</span><span class="pill p-bad" style="padding:1px 7px"><i></i>SLA 14h</span></div><div class="f"><span>formal reativa</span><span>est. 1h · 60%</span></div></div>
+        <div class="kc"><b>Revisão do fluxo de onboarding de recepção</b><div class="m"><span class="tag t3">Planner</span><span class="tag">Gestor</span></div><div class="f"><span>prazo 20/11</span><span>est. 6h · 45%</span></div></div>
+        <div class="kc"><b>Conciliação de vouchers · outubro</b><div class="m"><span class="tag t4">E-mail</span><span class="tag t2">Financeiro</span></div><div class="f"><span>formal reativa</span><span>est. 3h · 70%</span></div></div>
+      </div>
+      <div class="col"><h4>Aguardando terceiros <span>3</span></h4>
+        <div class="kc"><b>Contrato unidade Santos · parecer jurídico</b><div class="m"><span class="tag t1">SULTS #48260</span><span class="tag t2">Jurídico</span></div><div class="f"><span>aguardando há 2 dias</span><span>SLA 46h</span></div></div>
+        <div class="kc"><b>Acesso ao sistema de agenda · chamado TI</b><div class="m"><span class="tag t4">Teams</span><span class="tag t2">TI</span></div><div class="f"><span>aguardando há 1 dia</span><span>—</span></div></div>
+        <div class="kc"><b>Confirmação de data · franqueado Recife</b><div class="m"><span class="tag t5">WhatsApp</span><span class="tag t1">Franqueado</span></div><div class="f"><span>sem resposta há 3 dias</span><span>lembrete sugerido</span></div></div>
+      </div>
+      <div class="col"><h4>Concluído na semana <span>9</span></h4>
+        <div class="kc" style="opacity:.8"><b>Planilha de repasse · outubro</b><div class="m"><span class="tag t3">Planner</span><span class="pill p-ok" style="padding:1px 7px"><i></i>no prazo</span></div><div class="f"><span>est. 4h · real 5h10</span><span>qua</span></div></div>
+        <div class="kc" style="opacity:.8"><b>Chamado #48102 · Moema</b><div class="m"><span class="tag t1">SULTS</span><span class="pill p-ok" style="padding:1px 7px"><i></i>no SLA</span></div><div class="f"><span>est. 1h · real 0h40</span><span>ter</span></div></div>
+        <div class="kc" style="opacity:.8"><b>Briefing de treinamento · College</b><div class="m"><span class="tag t4">E-mail</span><span class="pill p-warn" style="padding:1px 7px"><i></i>1 dia atraso</span></div><div class="f"><span>est. 2h · real 2h30</span><span>seg</span></div></div>
+        <div class="small muted" style="text-align:center;margin-top:4px">+ 6 itens</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="grid-row:span 2">
+    <div class="resumo"><h3>Resumo das 08h · sexta, 06 nov</h3><div class="sub">Onde concentrar energia hoje</div>
+      <ol><li>Fechar <b>ajuste de agenda Moema</b> (SLA vence 14h)</li><li>Avançar <b>manual de implantação v3</b> (prazo 09/11, 20%)</li><li>Preparar <b>reunião franqueado Campinas</b> 16h</li></ol>
+      <div class="foot">2 reuniões · 1 prazo amanhã · 1 item vencido ontem · carga da semana 94%</div></div>
+    <h3>Copiloto</h3><div class="sub">Converse para ajustar o plano. Tudo fica registrado.</div>
+    <div class="chat">
+      <div class="msg me">O manual v3 vai levar 12h, não 8h. E a conciliação de vouchers foi cancelada pelo Financeiro.</div>
+      <div class="msg bot">Atualizei a estimativa do <b>manual v3 para 12h</b> e removi a <b>conciliação de vouchers</b> do plano (registrado como cancelada pelo solicitante).<br>Com isso sua semana vai a <b>102%</b>. Sugiro mover o <b>relatório mensal de SAF</b> para segunda, dia 09: ele cabe na manhã livre e o prazo continua atendido. Aplico?</div>
+      <div class="msg me">Sim. E saí de uma reunião com o franqueado Recife: precisamos entregar o cronograma de implantação até dia 18.</div>
+      <div class="msg bot">Criei <b>"Cronograma de implantação · Recife"</b>, origem franqueado, prazo 18/11, estimativa inicial 4h (base: cronogramas anteriores). Quer que eu também crie a tarefa no <b>Planner</b>?</div>
+      <div class="input"><span>Digite ou anexe um arquivo…</span><span>↑</span></div>
+    </div>
+  </div>
+
+  <div class="card"><div class="hd"><div><h3>Agenda da semana · capacidade por dia</h3><div class="sub">Reuniões reais, blocos sugeridos e horas disponíveis após reserva para interações</div></div>
+    <div class="legend" style="margin:0"><span style="--c:#4a6cc0">Reunião</span><span style="--c:#17998e">Bloco de execução</span><span style="--c:#fff;border:1px dashed #b8862b">Sugerido</span></div></div>
+    <div class="week">
+      <div class="hrs"><span>08h</span><span>12h</span><span>18h</span></div>
+      <div class="day"><h5>Seg 02 <span>8h00</span></h5><div class="ev" style="background:#4a6cc0">Alinhamento SAF</div><div class="ev" style="background:#17998e">Manual v3</div><div class="ev" style="background:#4a6cc0">1:1 gestor</div><div class="cap"><b style="width:88%;background:#3f8f4f"></b></div><span>88% alocado</span></div>
+      <div class="day"><h5>Ter 03 <span>8h00</span></h5><div class="ev" style="background:#17998e">Chamados SULTS</div><div class="ev" style="background:#17998e">Fluxo onboarding</div><div class="cap"><b style="width:95%;background:#b8862b"></b></div><span>95% alocado</span></div>
+      <div class="day"><h5>Qua 04 <span>8h00</span></h5><div class="ev" style="background:#4a6cc0">Reunião diretoria</div><div class="ev" style="background:#17998e">Relatório SAF</div><div class="ev" style="background:#4a6cc0">Treinamento Curitiba</div><div class="cap"><b style="width:100%;background:#c0392b"></b></div><span>104% · excedente 20min</span></div>
+      <div class="day"><h5>Qui 05 <span>8h00</span></h5><div class="ev" style="background:#17998e">Manual v3</div><div class="ev sug">Bloco de foco sugerido 14h–16h</div><div class="cap"><b style="width:80%;background:#3f8f4f"></b></div><span>80% alocado</span></div>
+      <div class="day"><h5>Sex 06 <span>8h00</span></h5><div class="ev" style="background:#17998e">Agenda Moema</div><div class="ev sug">Cronograma Recife · sugerido</div><div class="ev" style="background:#4a6cc0">Franqueado Campinas 16h</div><div class="cap"><b style="width:92%;background:#b8862b"></b></div><span>92% alocado</span></div>
+    </div></div>
+</div>
+</body></html>

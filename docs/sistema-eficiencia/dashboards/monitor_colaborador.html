@@ -1,0 +1,80 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Monitor de Atividades · Colaborador</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.grid{grid-template-columns:repeat(12,1fr);grid-template-rows:286px 150px 1fr}
+.tl{position:relative;height:74px;margin-top:6px}
+.tl .hours{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-bottom:6px}
+.tl .lane{position:relative;height:26px;border-radius:6px;background:#f3ede6}
+.tl .blk{position:absolute;top:3px;height:20px;border-radius:5px;font-size:10.5px;color:#fff;display:flex;align-items:center;padding:0 7px;white-space:nowrap;overflow:hidden}
+.tl .lab{position:absolute;left:0;font-size:10.5px;color:var(--muted);width:70px;line-height:26px}
+.tl .lanewrap{display:flex;gap:8px;align-items:center}
+.tl .lanewrap .lane{flex:1}
+.kpis3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.kpis3 div{background:var(--cream);border-radius:10px;padding:10px 12px}
+.kpis3 .kpi{font-size:24px}
+.kpis3 .l{font-size:11px;color:var(--muted);margin-top:4px}
+.inter{display:flex;flex-direction:column;gap:7px}
+.inter .r{display:flex;align-items:center;gap:8px;font-size:12px}
+.inter .av{width:26px;height:26px;border-radius:50%;background:var(--sand);color:var(--cafe2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.inter .bar{flex:1}
+</style></head><body>
+<div class="topbar"><div class="logo"><img src="../../../novo_logo_BUDDHA_SPA_fundo_branco.png" alt=""></div><div class="brand">Sistema de Eficiência<small>Buddha Spa</small></div>
+<nav><span class="on">Monitor de Atividades</span><span>Organizador</span><span>Minha Jornada</span><span>Meus dados</span></nav><div class="sp"></div>
+<span class="chip">Alertas · 2</span><span class="chip"><span class="av">AP</span>Ana P. · Analista · Operações</span></div>
+<div class="filters"><div class="title">Minha semana<small>Semana 45 · 02 a 08 nov 2026 · atualizado hoje 07:40</small></div>
+<div class="f">Período <b>Esta semana</b></div><div class="f">Tipo de atividade <b>Todos</b></div><div class="f">Origem <b>Todas</b></div><div class="f">Canal <b>Todos</b></div>
+<div class="sp"></div><span class="btn warn">! Isto está errado ou incompleto</span><span class="btn">Exportar</span></div>
+
+<div class="grid">
+  <div class="card" style="grid-column:span 3"><div class="hd"><div><h3>Termômetro de carga</h3><div class="sub">Carga estimada ÷ capacidade semanal de 44h</div></div><span class="pill p-warn"><i></i>Atenção</span></div>
+    <div id="g" style="display:flex;justify-content:center"></div>
+    <div class="small muted" style="text-align:center;margin-top:-2px">41h20 estimadas · 32 demandas abertas · 11h de reuniões</div></div>
+
+  <div class="card" style="grid-column:span 5"><div class="hd"><div><h3>Tendência de carga · 8 semanas</h3><div class="sub">Faixas: até 65% ociosidade · 65 a 90% saudável · 90 a 100% atenção · acima de 100% sobrecarga</div></div><span class="delta down">▲ 9 pts vs. semana anterior</span></div>
+    <div id="trend"></div></div>
+
+  <div class="card" style="grid-column:span 4"><div class="hd"><div><h3>Minhas demandas</h3><div class="sub">Como chegaram e o quanto estavam planejadas</div></div></div>
+    <div class="kpis3"><div><div class="kpi">32</div><div class="l">abertas</div></div><div><div class="kpi">7</div><div class="l">novas na semana</div></div><div><div class="kpi">9</div><div class="l">concluídas · 7 no prazo</div></div></div>
+    <div class="small" style="margin-bottom:6px;color:var(--ink2)">Planejamento das demandas abertas</div>
+    <div id="plan"></div>
+    <div class="legend"><span style="--c:#5d3c29">Formal planejada · 16</span><span style="--c:#b8862b">Formal reativa · 9</span><span style="--c:#a03a62">Informal · 7</span></div>
+    <div class="small muted" style="margin-top:8px">Tempo médio até formalização das informais: <b style="color:var(--ink)">3,4 dias</b></div></div>
+
+  <div class="card" style="grid-column:span 12"><div class="hd"><div><h3>Linha do tempo de hoje · sexta, 06 nov</h3><div class="sub">Blocos classificados a partir de calendário, Teams, fSense e SULTS. Cada bloco abre a origem.</div></div>
+    <div class="legend" style="margin:0"><span style="--c:#4a6cc0">Reunião</span><span style="--c:#17998e">Execução</span><span style="--c:#b8862b">Alinhamento / mensagens</span><span style="--c:#a8552a">Atendimento SULTS</span><span style="--c:#7f8aa3">Sem atividade detectada</span></div></div>
+    <div class="tl">
+      <div class="hours"><span style="margin-left:78px">08h</span><span>09h</span><span>10h</span><span>11h</span><span>12h</span><span>13h</span><span>14h</span><span>15h</span><span>16h</span><span>17h</span><span>18h</span></div>
+      <div class="lanewrap"><span class="lab">Atividade</span><div class="lane">
+        <div class="blk" style="left:0%;width:9%;background:#b8862b">E-mails e Teams</div>
+        <div class="blk" style="left:9.5%;width:14%;background:#4a6cc0">Alinhamento semanal SAF</div>
+        <div class="blk" style="left:24%;width:18%;background:#17998e">Planilha de repasse · Planner</div>
+        <div class="blk" style="left:42.5%;width:9%;background:#a8552a">Chamados SULTS (3)</div>
+        <div class="blk" style="left:52%;width:9%;background:#f3ede6;color:var(--muted);border:1px dashed #d9cfc3">Almoço</div>
+        <div class="blk" style="left:61.5%;width:12%;background:#17998e">Revisão manual franqueado</div>
+        <div class="blk" style="left:74%;width:9%;background:#7f8aa3">Sem atividade</div>
+        <div class="blk" style="left:83.5%;width:16%;background:#4a6cc0">Reunião franqueado Campinas</div>
+      </div></div>
+    </div></div>
+
+  <div class="card" style="grid-column:span 3"><h3>Origem das demandas</h3><div class="sub">Quem pediu · horas estimadas abertas</div><div id="orig"></div></div>
+  <div class="card" style="grid-column:span 3"><h3>Canal de chegada</h3><div class="sub">Por onde chegou · número de demandas</div><div id="canal"></div></div>
+  <div class="card" style="grid-column:span 3"><h3>Principais ferramentas</h3><div class="sub">Horas na semana · fSense e estação</div><div id="tools"></div></div>
+  <div class="card" style="grid-column:span 3"><h3>Principais interações</h3><div class="sub">Mensagens, reuniões e chamados trocados</div>
+    <div class="inter">
+      <div class="r"><span class="av">GS</span><span style="width:120px">Gestor(a) direto</span><div class="bar"><b style="width:92%"></b></div><span class="muted">64</span></div>
+      <div class="r"><span class="av">FR</span><span style="width:120px">Franqueado Campinas</span><div class="bar"><b style="width:70%"></b></div><span class="muted">48</span></div>
+      <div class="r"><span class="av">TI</span><span style="width:120px">Time TI · Suporte</span><div class="bar"><b style="width:46%"></b></div><span class="muted">31</span></div>
+      <div class="r"><span class="av">MK</span><span style="width:120px">Marketing · Mídia</span><div class="bar"><b style="width:35%"></b></div><span class="muted">24</span></div>
+      <div class="r"><span class="av">FI</span><span style="width:120px">Financeiro · Contas</span><div class="bar"><b style="width:28%"></b></div><span class="muted">19</span></div>
+      <div class="r"><span class="av">CO</span><span style="width:120px">Colega B · SAF</span><div class="bar"><b style="width:22%"></b></div><span class="muted">15</span></div>
+    </div></div>
+</div>
+<script src="common.js"></script>
+<script>
+fill('g',gauge(250,94,{max:130,label:'da capacidade semanal',bands:[{from:0,to:65,color:'#c9cfdb',label:'ociosidade'},{from:65,to:90,color:'#9fc3a6',label:'saudável'},{from:90,to:100,color:'#e3c47a',label:'atenção'},{from:100,to:130,color:'#d98c84',label:'sobrecarga'}]}));
+fill('trend',line(560,196,[{values:[71,78,74,83,88,86,85,94],color:'#5d3c29',label:''}],['S38','S39','S40','S41','S42','S43','S44','S45'],{min:40,max:120,fmt:v=>v+'%',bands:[{from:40,to:65,color:'#eef0f4'},{from:65,to:90,color:'#edf5ee'},{from:90,to:100,color:'#f8f1dd'},{from:100,to:120,color:'#f9e9e7'}]}));
+fill('plan',stack(400,12,[{value:16,color:'#5d3c29'},{value:9,color:'#b8862b'},{value:7,color:'#a03a62'}]));
+fill('orig',hbars(300,[{label:'Franqueados',value:14.5},{label:'Gestor direto',value:9},{label:'Outras áreas',value:7.5},{label:'Diretoria / CEO',value:4},{label:'Rotina',value:3.5},{label:'Clientes',value:2}],{labelW:100,valueFmt:v=>v+'h'}));
+fill('canal',hbars(300,[{label:'SULTS',value:11,color:'#a8552a'},{label:'Planner',value:8,color:'#5d3c29'},{label:'Teams chat',value:6,color:'#b8862b'},{label:'WhatsApp',value:4,color:'#a03a62'},{label:'E-mail',value:2,color:'#4a6cc0'},{label:'Reunião',value:1,color:'#17998e'}],{labelW:100}));
+fill('tools',hbars(300,[{label:'Teams',value:11.2,color:'#4a6cc0'},{label:'Excel',value:8.4,color:'#17998e'},{label:'SULTS (web)',value:6.1,color:'#a8552a'},{label:'Outlook',value:4.3,color:'#4a6cc0'},{label:'Planner',value:2.2,color:'#5d3c29'},{label:'Navegação',value:1.9,color:'#7f8aa3'}],{labelW:100,valueFmt:v=>v+'h'}));
+</script></body></html>

@@ -1,0 +1,76 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Termômetro de Comunicação e Humor</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.grid{grid-template-columns:repeat(12,1fr);grid-template-rows:266px 246px minmax(0,1fr)}
+.therm{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.therm .r{display:flex;align-items:center;gap:10px;font-size:12px}
+.therm .r span:first-child{width:150px}
+.therm .tr{flex:1;height:12px;border-radius:6px;background:linear-gradient(90deg,#e7eef0 0 35%,#f3e6c7 35% 65%,#f1d3d0 65% 100%);position:relative}
+.therm .tr b{position:absolute;top:-4px;width:20px;height:20px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2);margin-left:-10px}
+.therm .v{width:34px;text-align:right;font-weight:600}
+.lock{font-size:10.5px;color:var(--muted);background:#f3ede6;border-radius:6px;padding:2px 7px}
+.sens{border:1px solid #e9c9c9;background:#fbf3f3;border-radius:12px;padding:10px 12px}
+.sens b{display:block;color:var(--crit);font-size:12.5px;margin-bottom:4px}
+.sens .acts{display:flex;gap:6px;margin-top:8px}
+.sens .acts span{border-radius:6px;padding:5px 10px;font-size:11.5px;font-weight:600;background:var(--terra);color:#fff}
+.sens .acts span.n{background:#fff;border:1px solid var(--line);color:var(--ink2)}
+.sig{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.kpi3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.kpi3 div{background:var(--cream);border-radius:10px;padding:7px 10px}
+.kpi3 .kpi{font-size:20px}
+.kpi3 .l{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.25}
+.card table td{padding:4px 8px 4px 0}
+.card table .tag{font-size:10px;padding:1px 6px}
+.card table td:first-child,.card table td:nth-child(2),.card table td:nth-child(3){white-space:nowrap}
+.sens .small{display:block;line-height:1.3}
+</style></head><body>
+<div class="topbar"><div class="logo"><img src="../../../novo_logo_BUDDHA_SPA_fundo_branco.png" alt=""></div><div class="brand">Sistema de Eficiência<small>Buddha Spa</small></div>
+<nav><span>Monitor · Diretoria</span><span>Organizador · Diretoria</span><span>Jornada · Diretoria</span><span class="on">Termômetro de Humor</span></nav><div class="sp"></div>
+<span class="chip">Alertas · 2</span><span class="chip"><span class="av">DO</span>Diretor(a) · Operações</span></div>
+<div class="filters"><div class="title">Comunicação e humor · Diretoria de Operações<small>Semana 45 · 23 pessoas · 5 times · acesso restrito: diretor da área, Diretoria de G&amp;G e CEO</small></div>
+<div class="f">Período <b>Últimas 8 semanas</b></div><div class="f">Time <b>Todos</b></div><div class="f">Fonte <b>Teams, e-mail, WhatsApp, SULTS</b></div>
+<div class="sp"></div><span class="lock">Uso informativo · não embasa decisão sobre pessoas · acessos registrados em log nominal</span></div>
+
+<div class="grid">
+  <div class="card" style="grid-column:span 4"><div class="hd"><div><h3>Termômetro por time</h3><div class="sub">0–35 sereno · 36–65 atenção · 66–100 crítico</div></div><span class="pill p-warn"><i></i>Área: 48 · atenção</span></div>
+    <div class="therm" id="therm"></div></div>
+
+  <div class="card" style="grid-column:span 5"><div class="hd"><div><h3>Tendência · 8 semanas</h3><div class="sub">Índice de humor por time (0–100)</div></div><span class="delta down">SAF ▲ 21 pts em 4 semanas</span></div><div id="trend"></div></div>
+
+  <div class="card" style="grid-column:span 3"><h3>Sinais da semana</h3><div class="sub">Área inteira</div>
+    <div class="kpi3" style="grid-template-columns:1fr 1fr"><div><div class="kpi">18%</div><div class="l">mensagens com tom tenso ou urgente</div></div><div><div class="kpi">9,4%</div><div class="l">comunicação fora do horário</div></div><div><div class="kpi">4<small>pessoas</small></div><div class="l">em sobrecarga e em atenção ao mesmo tempo</div></div><div><div class="kpi">2</div><div class="l">conversas sensíveis sinalizadas</div></div></div></div>
+
+  <div class="card" style="grid-column:span 4"><div class="hd"><div><h3>Mapa de atrito entre áreas</h3><div class="sub">Threads tensas, reaberturas e escalonamentos · últimas 4 semanas</div></div></div><div id="atrito"></div>
+    <div class="legend"><span style="--c:#eef1f4">baixo</span><span style="--c:#f3e6c7">médio</span><span style="--c:#e3a9a2">alto</span></div></div>
+
+  <div class="card" style="grid-column:span 4"><h3>Temas recorrentes de tensão</h3><div class="sub">Assuntos mais frequentes nas mensagens tensas</div><div id="temas"></div></div>
+
+  <div class="card" style="grid-column:span 4"><h3>Comunicação fora do horário</h3><div class="sub">% de mensagens antes das 7h, após as 20h e fins de semana · por semana</div><div id="fora"></div>
+    <div class="small muted">Entra no acompanhamento de riscos psicossociais da NR-1 e alimenta o relatório mensal de G&amp;G.</div></div>
+
+  <div class="card" style="grid-column:span 8"><div class="hd"><div><h3>Pessoas em atenção · com os sinais que compõem o índice</h3><div class="sub">Visível apenas ao diretor da área, G&amp;G e CEO. Recomendação de cuidado, nunca de medida disciplinar.</div></div><span class="lock">log nominal de acesso</span></div>
+    <table style="font-size:11px"><thead><tr><th>Pessoa</th><th>Time</th><th>Índice</th><th>Sinais observados</th><th>Correlação</th><th>Recomendação</th></tr></thead><tbody>
+      <tr><td>Colaborador C</td><td>SAF</td><td><span class="pill p-bad"><i></i>71 · crítico</span></td><td><div class="sig"><span class="tag">tom tenso 31%</span><span class="tag">após 20h 6 dias</span><span class="tag">"urgente" 14x</span></div></td><td>carga 112% · 3 semanas</td><td>Conversa 1:1 e redistribuição de demandas de franqueados</td></tr>
+      <tr><td>Colaborador A</td><td>Implantação</td><td><span class="pill p-warn"><i></i>58 · atenção</span></td><td><div class="sig"><span class="tag">tempo de resposta caindo</span><span class="tag">escalonamentos 4x</span></div></td><td>carga 106% · prazo crítico</td><td>Revisar prazo do manual v3</td></tr>
+      <tr><td>Colaborador F</td><td>SAF</td><td><span class="pill p-warn"><i></i>52 · atenção</span></td><td><div class="sig"><span class="tag">atrito com Marketing</span><span class="tag">fins de semana 2x</span></div></td><td>carga 103%</td><td>Alinhar fluxo com Marketing</td></tr>
+          </tbody></table></div>
+
+  <div class="card" style="grid-column:span 4"><h3>Alertas em tempo real</h3><div class="sub">Enviados ao diretor da área e à Diretoria de G&amp;G</div>
+    <div class="sens"><b>! Conversa sensível identificada · time SAF · hoje 11:20</b><span class="small">Conversa classificada como sensível envolvendo uma pessoa do time. O conteúdo não é transcrito; o acesso pelo canal autorizado fica em log nominal.</span>
+      <div class="acts"><span>Acessar pelo canal autorizado</span><span class="n">Marcar como tratado</span></div></div>
+    </div>
+</div>
+<script src="common.js"></script>
+<script>
+const col=v=>v>65?'#c0392b':v>35?'#b8862b':'#7f8aa3';
+const t=[['SAF',66],['Implantação',52],['Onboarding',41],['Líderes Comerciais',39],['Expansão',28]];
+fill('therm',t.map(r=>`<div class="r"><span>${r[0]}</span><div class="tr"><b style="left:${r[1]}%;background:${col(r[1])}"></b></div><span class="v">${r[1]}</span></div>`).join(''));
+fill('trend',line(540,164,[{values:[40,42,45,47,52,58,63,66],color:'#a8552a',label:'SAF'},{values:[44,41,46,48,50,49,53,52],color:'#4a6cc0',label:'Implantação'},{values:[36,38,35,39,40,42,40,41],color:'#17998e',label:'Onboarding'},{values:[30,31,29,33,30,28,27,28],color:'#7f8aa3',label:'Expansão'}],['S38','S39','S40','S41','S42','S43','S44','S45'],{min:0,max:100,pad:{l:34,r:84,t:10,b:22},bands:[{from:0,to:35,color:'#f1f3f6'},{from:35,to:65,color:'#faf3e2'},{from:65,to:100,color:'#f9ebe9'}],marker:false}));
+const areas=['Operações','Marketing','Financeiro','TI','G&G','College'];
+const M=[[0,3,2,2,1,1],[3,0,1,2,0,1],[2,1,0,1,1,0],[2,2,1,0,0,1],[1,0,1,0,0,0],[1,1,0,1,0,0]];
+(function(){const w=380,lab=86,cs=(w-lab-4)/6,ch=18;let out='';areas.forEach((a,i)=>{out+=`<text x="${lab+i*cs+cs/2}" y="10" text-anchor="middle" class="axis">${a.slice(0,6)}</text>`;});
+areas.forEach((a,r)=>{out+=`<text x="0" y="${22+r*(ch+3)+ch/2+4}" font-size="11.5" fill="#241a12">${a}</text>`;M[r].forEach((v,c)=>{const f=r===c?'#f7f3ee':v>=3?'#e3a9a2':v===2?'#f3e6c7':'#eef1f4';out+=`<rect x="${lab+c*cs+1.5}" y="${22+r*(ch+3)}" width="${cs-3}" height="${ch}" rx="4" fill="${f}"/>`;});});
+fill('atrito',svg(w,22+6*(ch+3),out));})();
+fill('temas',hbars(380,[{label:'Prazo de franqueado',value:38,color:'#a8552a'},{label:'Aprovação pendente',value:27,color:'#a8552a'},{label:'Sistema de agenda fora',value:19,color:'#a8552a'},{label:'Retrabalho de material',value:14,color:'#a8552a'},{label:'Troca de prioridade',value:11,color:'#a8552a'}],{labelW:150,rowH:30}));
+fill('fora',cols(380,128,[{label:'S38',value:5.1},{label:'S39',value:5.8},{label:'S40',value:6.2},{label:'S41',value:7.0},{label:'S42',value:7.9},{label:'S43',value:8.6},{label:'S44',value:9.1},{label:'S45',value:9.4,color:'#b8862b'}],{max:12,color:'#5d3c29',fmt:v=>v+'%'}));
+</script></body></html>

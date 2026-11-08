@@ -1,0 +1,89 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Gestão de DP · Jornada</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.grid{grid-template-columns:repeat(12,1fr);grid-template-rows:270px minmax(0,1fr) minmax(0,1fr)}
+.lanes{display:flex;flex-direction:column;gap:13px;margin-top:17px}
+.lane{display:flex;align-items:center;gap:10px}
+.lane .lab{width:150px;font-size:11.5px;color:var(--ink2)}
+.lane .tr{flex:1;height:20px;background:#f3ede6;border-radius:5px;position:relative}
+.mk{position:absolute;top:2px;height:16px;border-radius:4px}
+.dot{position:absolute;top:1px;width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+.hours{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);padding-left:160px}
+.teams{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff}
+.teams .h{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);margin-bottom:8px}
+.teams .h i{width:22px;height:22px;border-radius:5px;background:#4b53bc;display:inline-block}
+.teams b{display:block;font-size:12.5px;margin-bottom:4px}
+.teams .dp{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.teams .dp div{background:var(--cream);border-radius:8px;padding:7px 9px;font-size:11.5px}
+.teams .dp div span{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.teams .acts{display:flex;gap:6px}
+.teams .acts span{border-radius:6px;padding:5px 10px;font-size:11.5px;font-weight:600;background:var(--ok);color:#fff}
+.teams .acts span.n{background:#fff;border:1px solid var(--line);color:var(--ink2)}
+.inc td{font-size:11.8px}
+.kpi2{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kpi2 div{background:var(--cream);border-radius:10px;padding:8px 10px}
+.kpi2 .kpi{font-size:20px}
+.kpi2 .l{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.25}
+.lock{font-size:10.5px;color:var(--muted);background:#f3ede6;border-radius:6px;padding:2px 7px}
+.card table td{padding:5px 8px 5px 0}
+.inc td{font-size:11.3px}
+</style></head><body>
+<div class="topbar"><div class="logo"><img src="../../../novo_logo_BUDDHA_SPA_fundo_branco.png" alt=""></div><div class="brand">Sistema de Eficiência<small>Buddha Spa</small></div>
+<nav><span>Monitor de Atividades</span><span>Organizador do time</span><span class="on">Jornada do time</span><span>Aprovações · 3</span></nav><div class="sp"></div>
+<span class="chip">Alertas · 5</span><span class="chip"><span class="av">GO</span>Gestor(a) · Operações · SAF e Implantação</span></div>
+<div class="filters"><div class="title">Jornada e assiduidade · Colaborador A<small>Quinta, 05 nov 2026 · regime híbrido · jornada 44h · CLT com ponto</small></div>
+<div class="f">Pessoa <b>Colaborador A</b></div><div class="f">Período <b>Semana 45</b></div><div class="f">Visão <b>Dia</b></div>
+<div class="sp"></div><span class="pill p-warn"><i></i>1 inconsistência aguardando justificativa</span><span class="btn">Solicitar ajuste (De/Para)</span><span class="btn primary">Exportar</span></div>
+
+<div class="grid">
+  <div class="card" style="grid-column:span 8"><div class="hd"><div><h3>Composição do dia · quinta, 05 nov</h3><div class="sub">Fontes em ordem de autoridade: ponto, catraca e facial, atividade na estação, calendário</div></div>
+    <div class="legend" style="margin:0"><span style="--c:#5d3c29">Marcação de ponto</span><span style="--c:#a8552a">Catraca / facial</span><span style="--c:#17998e">Atividade na estação (fSense)</span><span style="--c:#4a6cc0">Evento externo do calendário</span><span style="--c:#e3c47a">Inconsistência</span></div></div>
+    <div class="hours"><span>07h</span><span>08h</span><span>09h</span><span>10h</span><span>11h</span><span>12h</span><span>13h</span><span>14h</span><span>15h</span><span>16h</span><span>17h</span><span>18h</span><span>19h</span></div>
+    <div class="lanes">
+      <div class="lane"><span class="lab">Ponto (app, remoto)</span><div class="tr"><span class="dot" style="left:11.5%;background:#5d3c29"></span><span class="dot" style="left:42%;background:#5d3c29"></span><span class="dot" style="left:50.5%;background:#5d3c29"></span><span class="dot" style="left:91%;background:#5d3c29"></span>
+        <span style="position:absolute;left:12.8%;top:-16px;font-size:10px;color:#5d3c29">08h31 · app, a caminho</span><span style="position:absolute;left:92.5%;top:-16px;font-size:10px;color:#5d3c29">18h05</span></div></div>
+      <div class="lane"><span class="lab">Catraca e facial</span><div class="tr"><span class="mk" style="left:11.5%;width:4.2%;background:#e3c47a"></span><span class="dot" style="left:15.7%;background:#a8552a"></span><span class="dot" style="left:42.5%;background:#a8552a"></span><span class="dot" style="left:50%;background:#a8552a"></span><span class="dot" style="left:91.6%;background:#a8552a"></span>
+        <span style="position:absolute;left:17%;top:-16px;font-size:10px;color:#8f2a1f;font-weight:600">08h56 · 25 min após o ponto</span></div></div>
+      <div class="lane"><span class="lab">Atividade na estação</span><div class="tr"><span class="mk" style="left:16%;width:26%;background:#17998e"></span><span class="mk" style="left:50.5%;width:17%;background:#17998e"></span><span class="mk" style="left:67.5%;width:7%;background:#cfd4de"></span><span class="mk" style="left:74.5%;width:17%;background:#17998e"></span>
+        <span style="position:absolute;left:68.2%;top:3px;font-size:10px;color:#4f5872">55 min</span></div></div>
+      <div class="lane"><span class="lab">Calendário</span><div class="tr"><span class="mk" style="left:67%;width:8%;background:#4a6cc0"></span><span style="position:absolute;left:75.8%;top:3px;font-size:10px;color:#2f4b96">Visita unidade Pinheiros · 14h30–15h40</span></div></div>
+    </div>
+    <div class="row" style="margin-top:12px;gap:16px"><span class="small"><b>Horas estimadas do dia:</b> 8h34</span><span class="small"><b>Intervalo:</b> 1h04</span><span class="small"><b>Jornada contratual:</b> 8h48</span><span class="small"><b>Aderência:</b> 97%</span><span class="small muted">Ausência de atividade 14h40–15h35 coberta pelo evento externo do calendário (sem inconsistência)</span></div></div>
+
+  <div class="card" style="grid-column:span 4;grid-row:span 3"><div class="hd"><div><h3>Aprovação pendente · card do Teams</h3><div class="sub">Como o gestor recebe a solicitação do colaborador</div></div><span class="pill p-warn"><i></i>48h úteis · restam 31h</span></div>
+    <div class="teams"><div class="h"><i></i>Sistema de Eficiência · Alteração de dado</div>
+      <b>Colaborador A solicita ajuste de classificação · 05/11</b>
+      <span class="small muted">Inconsistência: ponto remoto às 08h31 e catraca às 08h56 (25 min; limite 10 min). Sem evento externo na agenda.</span>
+      <div class="dp"><div><span>De</span>Inconsistência ponto x catraca · 25 min</div><div><span>Para</span>Deslocamento a serviço · retirada de material na gráfica</div></div>
+      <span class="small"><b>Justificativa:</b> "Passei na gráfica para buscar os materiais do treinamento de Curitiba a pedido da coordenação." · <b>Evidência:</b> nota fiscal anexada (1)</span>
+      <div class="acts" style="margin-top:10px"><span>Aprovar</span><span class="n">Recusar</span><span class="n">Pedir informação</span></div>
+      <div class="small muted" style="margin-top:8px">Dado de RH: a aprovação do gestor segue para validação do DP. Fato bruto permanece registrado; a classificação muda com log De/Para.</div></div>
+    <h3 style="margin-top:14px">Trilha de auditoria</h3>
+    <div class="list">
+      <div class="item"><span class="ic" style="background:#eee6de;color:#5d3c29">1</span><div><b>06/11 08h00 · Notificação enviada</b><span>Card no Teams para colaborador e gestor. Prazo de justificativa até 10/11 08h00 (48h úteis).</span></div></div>
+      <div class="item"><span class="ic" style="background:#eee6de;color:#5d3c29">2</span><div><b>06/11 09h12 · Colaborador justificou</b><span>Texto + 1 anexo. Status: aguardando gestor.</span></div></div>
+    </div></div>
+
+  <div class="card" style="grid-column:span 4"><div class="hd"><div><h3>Inconsistências · semana 45</h3><div class="sub">Detectadas automaticamente; notificação às 08h do dia seguinte</div></div></div>
+    <table class="inc"><thead><tr><th>Dia</th><th>Tipo</th><th style="white-space:nowrap">Status</th></tr></thead><tbody>
+      <tr><td>Qui 05</td><td>Ponto remoto x catraca &gt; 10 min</td><td><span class="pill p-warn"><i></i>Justificada · gestor</span></td></tr>
+      <tr><td>Ter 03</td><td>Ponto sem catraca (dia remoto)</td><td><span class="pill p-ok"><i></i>Sem inconsistência · regime</span></td></tr>
+      <tr><td>Seg 02</td><td>Saída catraca antes do ponto</td><td><span class="pill p-ok"><i></i>Aprovada · DP</span></td></tr>
+      <tr><td>S44 · Qua 28</td><td>Ponto com estação inativa 3h</td><td><span class="pill p-bad"><i></i>Recusada · gestor</span></td></tr>
+    </tbody></table></div>
+
+  <div class="card" style="grid-column:span 4"><div class="hd"><div><h3>Aderência à jornada · semana</h3><div class="sub">Horas estimadas por dia vs. jornada contratual de 8h48</div></div></div><div id="ader"></div>
+    <div class="row" style="gap:16px;margin-top:4px"><span class="small"><b>Semana:</b> 43h10 de 44h · 98%</span><span class="pill p-ok"><i></i>Dentro da faixa 90–110%</span></div></div>
+
+  <div class="card" style="grid-column:span 4"><div class="hd"><div><h3>Visão do gestor · time (12)</h3><div class="sub">Horas extras, fora do horário e ociosidade · não exibidos ao colaborador</div></div><span class="lock">gestor · DP · G&amp;G</span></div>
+    <div class="kpi2"><div><div class="kpi">14h20</div><div class="l">horas extras · semana</div></div><div><div class="kpi">3<small>pessoas</small></div><div class="l">atividade após 20h recorrente</div></div><div><div class="kpi">6,1%</div><div class="l">ociosidade na jornada</div></div><div><div class="kpi">+22h</div><div class="l">banco de horas · time</div></div></div>
+    <div class="small muted" style="margin-top:6px">Maior ociosidade: Colaborador G 13,5% · Colaborador D 11,2% · Colaborador B 7,8%.</div></div>
+
+  <div class="card" style="grid-column:span 4"><div class="hd"><div><h3>Banco de horas · Colaborador A</h3><div class="sub">Saldo recalculado a cada aprovação</div></div><span class="pill p-ok"><i></i>+6h40</span></div><div id="banco"></div>
+    <div class="small muted" style="margin-top:4px">Fechamento mensal gera relatório de divergências pendentes e saldos para o DP; nada vai para a folha sem validação humana.</div></div>
+</div>
+<script src="common.js"></script>
+<script>
+fill('ader',cols(380,118,[{label:'Seg',value:8.9},{label:'Ter',value:8.5},{label:'Qua',value:9.4,color:'#b8862b'},{label:'Qui',value:8.6},{label:'Sex',value:7.8}],{max:11,color:'#5d3c29',fmt:v=>v+'h'}));
+fill('banco',line(380,112,[{values:[-2.5,-1.2,0.8,2.4,3.9,4.6,5.8,6.7],color:'#5d3c29',label:''}],['S38','S39','S40','S41','S42','S43','S44','S45'],{min:-5,max:10,fmt:v=>v+'h'}));
+</script></body></html>

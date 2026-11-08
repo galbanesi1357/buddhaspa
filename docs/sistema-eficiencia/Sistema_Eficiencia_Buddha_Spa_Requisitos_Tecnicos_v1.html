@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Sistema de Eficiência Buddha Spa — Requisitos Técnicos e Arquitetura v1</title>
+<style>
+  :root{
+    --terra:#392617; --cafe:#1c130c; --cafe2:#5d3c29; --bordo:#7e0000; --bordo2:#9d3f3f;
+    --gold:#b8862b; --gold2:#d9b36a; --cream:#f6f0e8; --sand:#ead9c6; --light:#fbf8f4;
+    --ink:#2a1d14; --muted:#7a6a5e; --line:#e2d6c8; --ok:#4f6b3a; --warn:#b8862b; --bad:#7e0000;
+    --a1:#392617; --a2:#b8862b; --a3:#7e0000; --a4:#5d3c29; --a5:#4a4f5c; --a6:#6d6a64;
+  }
+  @page{ size:A4; margin:18mm 16mm 20mm 16mm; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#fff;color:var(--ink);font-family:Inter,"Inter Display",Helvetica,Arial,sans-serif;font-size:9.5pt;line-height:1.4}
+  h1,h2,h3,h4{font-family:"Inter Display",Inter,Helvetica,Arial,sans-serif;color:var(--terra);margin:0;line-height:1.15}
+  h1{font-size:30pt;font-weight:600;letter-spacing:-.01em}
+  h2{font-size:19pt;font-weight:600;margin:0 0 4mm 0;padding-bottom:2.5mm;border-bottom:2px solid var(--gold)}
+  h3{font-size:12pt;font-weight:600;margin:4mm 0 1.8mm 0;color:var(--cafe)}
+  h4{font-size:10.5pt;font-weight:600;margin:3mm 0 1.5mm 0;color:var(--cafe2);text-transform:uppercase;letter-spacing:.04em}
+  p{margin:0 0 2.6mm 0}
+  ul,ol{margin:0 0 2.6mm 0;padding-left:5mm}
+  li{margin-bottom:.9mm}
+  strong{color:var(--cafe)}
+  .section{break-before:page}
+  .tight .small,.tight table.compact td,.tight table.compact th{font-size:7.5pt}
+  .xtight table.compact td,.xtight table.compact th{font-size:7.2pt;padding:.8mm 1.3mm}
+  .tight li{margin-bottom:.6mm}
+  .tight .box,.tight .callout{padding:2.4mm 3mm;margin-bottom:2.4mm}
+  .cont{margin-top:2mm}
+  .cont.chapter{margin-top:8mm}
+  .kicker{font-size:8.5pt;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:2mm}
+  .lead{font-size:11.5pt;color:var(--cafe2);margin-bottom:4mm}
+  .muted{color:var(--muted)}
+  .small{font-size:8.3pt}
+  .tiny{font-size:8pt}
+
+  /* cover */
+  .cover{height:257mm;display:flex;flex-direction:column;justify-content:space-between;background:var(--terra);color:#fff;margin:-18mm -16mm -20mm -16mm;padding:22mm 20mm 18mm 20mm;position:relative;overflow:hidden}
+  .cover h1{color:#fff;font-size:34pt;margin-top:6mm}
+  .cover .sub{color:var(--gold2);font-size:14pt;margin-top:4mm;font-weight:500}
+  .cover .meta{font-size:9.5pt;color:#d9c9b8;line-height:1.7}
+  .cover .logo{width:52mm;height:52mm;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .cover .logo img{width:100%;height:100%;object-fit:cover}
+  .cover .band{position:absolute;right:-40mm;top:40mm;width:150mm;height:150mm;border-radius:50%;background:radial-gradient(circle at 30% 30%,#d9b36a 0%,#b8862b 45%,#8a6218 100%);opacity:.18}
+  .cover .band2{position:absolute;right:-10mm;bottom:-50mm;width:120mm;height:120mm;border-radius:50%;background:#5d3c29;opacity:.35}
+  .cover .tag{display:inline-block;border:1px solid var(--gold2);color:var(--gold2);border-radius:20px;padding:1.2mm 4mm;font-size:8.5pt;letter-spacing:.1em;text-transform:uppercase}
+
+  /* boxes */
+  .box{border:1px solid var(--line);border-radius:3mm;padding:3mm 3.5mm;margin:0 0 3mm 0;background:#fff;break-inside:avoid}
+  .box.cream{background:var(--cream);border-color:var(--sand)}
+  .box.terra{background:var(--terra);color:#fff;border-color:var(--terra)}
+  .box.terra h3,.box.terra h4,.box.terra strong{color:#fff}
+  .box.terra .kicker{color:var(--gold2)}
+  .box.gold{border-left:4px solid var(--gold)}
+  .box.bordo{border-left:4px solid var(--bordo)}
+  .box.bordo p{margin:0}
+  .box.ok{border-left:4px solid var(--ok)}
+  .callout{background:var(--cream);border-left:4px solid var(--gold);padding:3mm 4mm;border-radius:0 2mm 2mm 0;margin:0 0 3.5mm 0;break-inside:avoid}
+  .callout.red{border-left-color:var(--bordo);background:#f9efef}
+  .callout.green{border-left-color:var(--ok);background:#f1f4ec}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:3.5mm}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3.5mm}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm}
+  .card{border:1px solid var(--line);border-radius:3mm;padding:2.6mm 3mm;background:#fff;break-inside:avoid}
+  .card h4{margin-top:0}
+  .stat{background:var(--cream);border-radius:3mm;padding:3mm;text-align:center;border:1px solid var(--sand)}
+  .stat .n{font-family:"Inter Display",Inter;font-size:22pt;font-weight:600;color:var(--terra);line-height:1}
+  .stat .l{font-size:8.5pt;color:var(--muted);margin-top:1.5mm;line-height:1.25}
+  .pill{display:inline-block;border-radius:12px;padding:.6mm 2.6mm;font-size:8pt;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+  .p-a1{background:#eee6de;color:var(--a1)} .p-a2{background:#f6ecd6;color:#7d5a14} .p-a3{background:#f6e3e3;color:var(--a3)} .p-a4{background:#ece3dc;color:var(--a4)} .p-a5{background:#e4e6ec;color:var(--a5)} .p-a6{background:#e9e8e5;color:#44423e}
+  .p-ok{background:#e6ecdd;color:var(--ok)} .p-warn{background:#f6ecd6;color:#7d5a14} .p-bad{background:#f6e3e3;color:var(--bad)} .p-info{background:#e4e6ec;color:var(--a5)}
+  .p-fase1{background:var(--terra);color:#fff} .p-fase2{background:var(--gold);color:#fff} .p-fase3{background:#9a8a7a;color:#fff}
+
+  /* tables */
+  table{width:100%;border-collapse:collapse;margin:0 0 3mm 0;font-size:8.5pt;break-inside:auto}
+  thead{display:table-header-group}
+  tr{break-inside:avoid}
+  th{background:var(--terra);color:#fff;text-align:left;padding:2mm 2.2mm;font-weight:600;font-size:8.4pt;letter-spacing:.03em;vertical-align:bottom}
+  td{padding:1.5mm 2mm;border-bottom:1px solid var(--line);vertical-align:top}
+  tbody tr:nth-child(even) td{background:var(--light)}
+  table.compact td,table.compact th{padding:1mm 1.5mm;font-size:7.8pt}
+  td.c,th.c{text-align:center}
+  .yes{color:var(--ok);font-weight:700} .no{color:#b4a79a} .part{color:var(--gold);font-weight:700}
+
+  /* agent header */
+  .agent-head{display:flex;align-items:center;gap:4mm;margin-bottom:3mm;break-inside:avoid}
+  .agent-head .num{width:16mm;height:16mm;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:"Inter Display",Inter;font-weight:600;font-size:14pt;flex:none}
+  .agent-head h2{border:none;margin:0;padding:0}
+  .agent-head .who{font-size:9pt;color:var(--muted)}
+
+  /* architecture diagram */
+  .arch{border:1px solid var(--line);border-radius:3mm;padding:4mm;background:var(--light)}
+  .layer{break-inside:avoid}
+  .layer{display:grid;grid-template-columns:30mm 1fr;gap:3mm;align-items:stretch;margin-bottom:2.5mm}
+  .layer .lab{background:var(--terra);color:#fff;border-radius:2mm;padding:2.5mm;font-size:8.3pt;font-weight:600;display:flex;flex-direction:column;justify-content:center}
+  .layer .lab span{display:block;font-weight:400;color:var(--gold2);font-size:7.5pt;margin-top:1mm}
+  .layer .items{display:flex;flex-wrap:wrap;gap:2mm}
+  .node{border:1px solid var(--line);background:#fff;border-radius:2mm;padding:1.8mm 2.6mm;font-size:8.3pt;line-height:1.25;flex:1 1 auto;min-width:26mm}
+  .node b{display:block;color:var(--cafe);font-size:8.6pt}
+  .node.a1{border-top:3px solid var(--a1)} .node.a2{border-top:3px solid var(--a2)} .node.a3{border-top:3px solid var(--a3)} .node.a4{border-top:3px solid var(--a4)} .node.a5{border-top:3px solid var(--a5)} .node.a6{border-top:3px solid var(--a6)}
+  .node.src{background:var(--cream);border-color:var(--sand)}
+  .arrow{text-align:center;color:var(--gold);font-size:12pt;line-height:1;margin:-1mm 0 1.5mm 0}
+
+  /* flow */
+  .flow{display:flex;gap:2mm;align-items:stretch;margin:2mm 0 3.5mm 0;padding-top:3.5mm;break-inside:avoid}
+  .step{flex:1;background:#fff;border:1px solid var(--line);border-radius:2mm;padding:2.5mm;font-size:8.4pt;position:relative;line-height:1.3}
+  .step b{display:block;color:var(--terra);margin-bottom:1mm;font-size:8.8pt}
+  .step .n{position:absolute;top:-3mm;left:2.5mm;background:var(--gold);color:#fff;border-radius:50%;width:6mm;height:6mm;display:flex;align-items:center;justify-content:center;font-size:7.5pt;font-weight:700}
+  .step.red .n{background:var(--bordo)}
+
+  /* timeline */
+  .phases{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3mm}
+  .phase{border-radius:3mm;padding:3.5mm;color:#fff;break-inside:avoid}
+  .phase h3{color:#fff;margin-top:0}
+  .phase ul{padding-left:4mm}
+  .phase .when{font-size:8.5pt;opacity:.85;margin-bottom:2mm}
+  .ph1{background:var(--terra)} .ph2{background:var(--gold)} .ph3{background:#7b6b5b}
+
+  .toc li{margin-bottom:1.6mm;display:flex;justify-content:space-between;border-bottom:1px dotted var(--line);padding-bottom:1mm}
+  .toc ol{list-style:none;padding:0;counter-reset:toc}
+  .toc li::before{counter-increment:toc;content:counter(toc,decimal-leading-zero) "  ";color:var(--gold);font-weight:600;margin-right:2mm}
+  .toc li span:first-child{flex:1}
+  .toc li span:last-child{color:var(--muted);font-size:9pt}
+
+  .legend{display:flex;gap:3mm;flex-wrap:wrap;margin-bottom:3mm}
+  .legend span{font-size:8pt}
+  .sw{display:inline-block;width:3mm;height:3mm;border-radius:1mm;vertical-align:middle;margin-right:1mm}
+  .avoid{break-inside:avoid}
+  .chk{display:inline-block;width:4mm;color:var(--ok);font-weight:700}
+  .x{display:inline-block;width:4mm;color:var(--bordo);font-weight:700}
+  .mono{font-family:"DejaVu Sans Mono",Menlo,monospace;font-size:7.9pt;background:var(--cream);padding:0 1mm;border-radius:1mm}
+  pre.mono{line-height:1.35;break-inside:avoid}
+</style>
+</head>
+<body>
+<!-- ============================ CAPA ============================ -->
+<section class="cover">
+  <div class="band"></div><div class="band2"></div>
+  <div style="position:relative;z-index:1">
+    <div class="logo"><img src="../../novo_logo_BUDDHA_SPA_fundo_branco.png" alt="Buddha Spa"></div>
+    <div style="margin-top:14mm"><span class="tag">Requisitos Técnicos e Arquitetura · v1.0</span></div>
+    <h1>Sistema de Eficiência<br>Buddha Spa</h1>
+    <div class="sub">Como construir a rede de agentes: arquitetura, integrações, modelo de dados, IA, segurança e plano de entrega em 6 meses</div>
+  </div>
+  <div style="position:relative;z-index:1" class="meta">
+    <div><strong style="color:#fff">Documento para o time de Tecnologia.</strong> Complementa o documento "Visão de Negócio e Escopo Funcional v2", que define as regras de negócio, KPIs e governança.</div>
+    <div>Buddha Wellness Group · Buddha Spa · Tecnologia, Dados e Segurança da Informação · Novembro de 2026</div>
+    <div>Confidencial. Uso interno da franqueadora.</div>
+  </div>
+</section>
+
+<!-- ============================ SUMÁRIO ============================ -->
+<section class="section">
+  <div class="kicker">Sumário</div>
+  <h2>O que este documento contém</h2>
+  <div class="toc">
+    <ol>
+      <li><span>Objetivo, público e como usar este documento</span><span>pág. 3</span></li>
+      <li><span>Decisões de arquitetura e stack recomendada</span><span>pág. 4</span></li>
+      <li><span>Arquitetura técnica de referência</span><span>pág. 6</span></li>
+      <li><span>Integrações por fonte: APIs, permissões, estratégia de ingestão</span><span>pág. 8</span></li>
+      <li><span>Agente local da estação: WhatsApp Web e telemetria do sistema operacional</span><span>pág. 9</span></li>
+      <li><span>Modelo de dados no lakehouse (bronze, silver, gold)</span><span>pág. 10</span></li>
+      <li><span>Camada de IA: Classificador, agentes, prompts e saídas estruturadas</span><span>pág. 12</span></li>
+      <li><span>Orquestração, cadências e reprocessamento</span><span>pág. 14</span></li>
+      <li><span>Canais de entrega: Teams, dashboards, web app e e-mail</span><span>pág. 15</span></li>
+      <li><span>Segurança, permissões, logs e LGPD na prática</span><span>pág. 16</span></li>
+      <li><span>No-code versus código: decisão por componente</span><span>pág. 17</span></li>
+      <li><span>Infraestrutura, ambientes e estimativa de custos</span><span>pág. 18</span></li>
+      <li><span>Plano de entrega em 6 meses: sprints, equipe e critérios de aceite</span><span>pág. 19</span></li>
+      <li><span>Riscos técnicos, dependências externas e provas de conceito</span><span>pág. 20</span></li>
+      <li><span>Anexo A · Permissões Microsoft Graph e consultas</span><span>pág. 21</span></li>
+      <li><span>Anexo B · Esquemas JSON das saídas dos agentes</span><span>pág. 22</span></li>
+      <li><span>Anexo C · Prompts de sistema de referência</span><span>pág. 23</span></li>
+    </ol>
+  </div>
+  <div class="callout" style="margin-top:6mm">
+    <strong>Convenções.</strong> "Visão v2" refere-se ao documento de Visão de Negócio e Escopo Funcional, versão 2. Os agentes são numerados como lá: 1 Monitor, 2 Organizador, 3 Termômetro, 4 DP, 5 Reports e Alertas, 6 Governança. Nomes de tabelas, campos e serviços aqui propostos são referência para o time; a nomenclatura final é decisão de Tecnologia, desde que mantida a rastreabilidade com as entidades da Visão v2.
+  </div>
+</section>
+
+<!-- ============================ 1 ============================ -->
+<section class="section">
+  <div class="kicker">Capítulo 1</div>
+  <h2>Objetivo, público e como usar este documento</h2>
+  <p class="lead">Este documento traduz o escopo de negócio em decisões técnicas executáveis: o que construir, com quais tecnologias, em que ordem e com quais critérios de aceite. Foi escrito para a Diretoria de Tecnologia e para os times de Engenharia e Arquitetura, Infraestrutura e Segurança da Informação, Data Analytics e BI, com participação de Gente &amp; Gestão e Jurídico nos pontos indicados.</p>
+
+  <div class="grid3">
+    <div class="card"><h4>O que já está decidido</h4><ul class="small"><li>Seis agentes, regras, KPIs e governança: Visão v2.</li><li>Toda a empresa desde a Fase 1, sem piloto, implantação em 6 meses.</li><li>Databricks como repositório central; Microsoft 365 e Teams como canal; Planner como ferramenta oficial de tarefas.</li><li>fSense em todas as estações; screenshots não consumidos.</li><li>WhatsApp por exportação em lote, somente leitura.</li></ul></div>
+    <div class="card"><h4>O que este documento decide</h4><ul class="small"><li>Stack, componentes e fronteiras entre eles.</li><li>Como cada fonte é integrada, com que permissões e cadência.</li><li>Modelo de dados e regras de retenção.</li><li>Modelos de IA, prompts, saídas estruturadas e avaliação.</li><li>Segurança, permissões e logs.</li><li>O que é no-code e o que é código.</li><li>Sprints, equipe e critérios de aceite.</li></ul></div>
+    <div class="card"><h4>O que fica para o time</h4><ul class="small"><li>Nomes finais de recursos, repositórios e pipelines.</li><li>Escolha entre alternativas equivalentes marcadas como "opção".</li><li>Dimensionamento fino de clusters e SKUs após as provas de conceito.</li><li>Padrões internos de código, revisão e CI/CD.</li></ul></div>
+  </div>
+
+  <h3>Princípios técnicos (derivados dos princípios de negócio)</h3>
+  <table class="compact">
+    <thead><tr><th style="width:44mm">Princípio de negócio (Visão v2)</th><th>Consequência técnica</th></tr></thead>
+    <tbody>
+      <tr><td>Somente leitura nas fontes</td><td>Conectores com permissões de leitura apenas; nenhuma credencial de escrita em Teams, Outlook, WhatsApp, SULTS ou fSense. A única escrita externa (Planner, SULTS) é um serviço separado, acionado só após confirmação explícita do colaborador, com credencial própria e log.</td></tr>
+      <tr><td>Dado observado é imutável; interpretação é corrigível</td><td>Camada bronze imutável (append-only). Classificações e justificativas vivem em tabelas de "interpretação" versionadas, nunca sobrescrevem o bruto. Toda alteração gera linha nova com De/Para.</td></tr>
+      <tr><td>Hierarquia define visibilidade</td><td>Permissões derivadas em tempo de consulta a partir da tabela de hierarquia com vigência: row-level security no Power BI e no serviço de API, filtros de linha no Unity Catalog.</td></tr>
+      <tr><td>Conversa pertence aos participantes</td><td>Conteúdo bruto de mensagens em tabelas segregadas com mascaramento de coluna; os agentes recebem apenas o recorte do participante. O Termômetro nunca devolve texto, apenas sinais e referências.</td></tr>
+      <tr><td>Toda alteração passa por fluxo de aprovação</td><td>Máquina de estados de solicitação (aberta, aguardando gestor, aguardando DP, aprovada, recusada, expirada) com temporizadores de 48h úteis e 2 dias úteis, implementada no serviço de governança; Teams só exibe e coleta a decisão.</td></tr>
+      <tr><td>Minimização e retenção</td><td>Jobs de expurgo por tabela e por classe de dado (30 dias conteúdo bruto, 12 meses humor por pessoa, 5 anos jornada, 2 anos acessos) com registro de execução.</td></tr>
+      <tr><td>Parametrizável com dupla aprovação</td><td>Tabela de parâmetros com versionamento e aprovação em duas etapas; nenhum limiar fixo em código.</td></tr>
+      <tr><td>Explicável</td><td>Toda linha de KPI, alerta e sugestão carrega os identificadores dos fatos de origem; a interface mostra "por que" com link para a fonte.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 2 ============================ -->
+<section class="section">
+  <div class="kicker">Capítulo 2</div>
+  <h2>Decisões de arquitetura e stack recomendada</h2>
+  <p class="lead">A recomendação aproveita o que a empresa já tem (Microsoft 365, Databricks em AWS, Power BI, n8n, fSense) e adiciona o mínimo: um serviço de IA em Python, um agente local nas estações e um web app para o Organizador. Nada de plataforma nova de dados nem de novo canal de comunicação.</p>
+
+  <table>
+    <thead><tr><th style="width:34mm">Componente</th><th style="width:40mm">Recomendação</th><th>Por quê</th><th style="width:34mm">Alternativa aceitável</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Repositório de dados</strong></td><td>Databricks (AWS) com Unity Catalog, arquitetura medalhão (bronze, silver, gold)</td><td>Já recebe SULTS, Control iD, intranet e portal jurídico; governança de acesso por linha e coluna nativa; Delta Lake dá histórico e auditoria.</td><td>Microsoft Fabric (se a empresa decidir consolidar na Microsoft; implica migração)</td></tr>
+      <tr><td><strong>Ingestão Microsoft 365</strong></td><td>Microsoft Graph API com permissões de aplicativo, consultas delta e notificações de mudança, em jobs Python no Databricks</td><td>Fonte oficial e suportada; cobre Teams, Outlook, Calendário, Planner, OneDrive, SharePoint e transcrições.</td><td>n8n para fontes de baixo volume (Planner, Calendário) na Fase 1</td></tr>
+      <tr><td><strong>Ingestão fSense, Trello, Asana</strong></td><td>APIs REST dos fornecedores em jobs Python; se o fSense não expuser API suficiente, exportação agendada de relatórios para o lakehouse</td><td>Volume moderado; lógica simples.</td><td>n8n com conectores HTTP</td></tr>
+      <tr><td><strong>Agente local da estação</strong></td><td>Aplicação Node.js assinada, distribuída por Intune (Windows) e Jamf ou perfil MDM (macOS); exporta WhatsApp Web e, opcionalmente, telemetria do SO</td><td>Bibliotecas maduras de acesso ao WhatsApp Web são JavaScript; distribuição e atualização centralizadas pela TI.</td><td>Python empacotado (PyInstaller) se o time preferir uma linguagem só</td></tr>
+      <tr><td><strong>Serviço de IA</strong></td><td>Python (FastAPI) em Azure Container Apps, usando o SDK oficial da Anthropic; Claude Opus 5.5 como modelo padrão, Sonnet 5.5 e Haiku 5.5 para volume</td><td>Claude já é o ecossistema adotado pela Diretoria; SDK oficial dá saídas estruturadas, lotes, cache de prompt e fallbacks. Azure mantém identidade e rede no tenant Microsoft.</td><td>Mesmo serviço rodando em Databricks Apps ou AWS, se a TI preferir manter tudo na AWS</td></tr>
+      <tr><td><strong>Orquestração</strong></td><td>Databricks Workflows para coleta, classificação em lote e KPIs; n8n para fluxos de notificação e aprovação no Teams</td><td>Dois orquestradores com fronteira clara: dados no Databricks, pessoas no n8n.</td><td>Power Automate no lugar do n8n (licenciamento já incluso no M365; menos flexível)</td></tr>
+      <tr><td><strong>Aprovações e alertas</strong></td><td>Cards adaptáveis (Adaptive Cards) no Teams via n8n ou Power Automate, com webhook de resposta para o serviço de governança</td><td>Botões "Aprovar / Recusar" nativos; registro de quem clicou e quando; sem desenvolver bot na Fase 1.</td><td>Bot Teams (Bot Framework) na Fase 2 para o chat do Organizador dentro do Teams</td></tr>
+      <tr><td><strong>Dashboards</strong></td><td>Power BI sobre Databricks SQL, com segurança em nível de linha pela hierarquia</td><td>Já usado pela TI; RLS nativa; publicação para 100 usuários simples.</td><td>Databricks AI/BI Dashboards para visões internas de TI</td></tr>
+      <tr><td><strong>Web app do Organizador e chats</strong></td><td>Aplicação web (React) autenticada por Entra ID, falando com o serviço de IA; publicada como aba do Teams</td><td>Kanban, chat com IA, upload e sugestões do gestor exigem interface própria; a aba no Teams evita mais um lugar para o colaborador ir.</td><td>Power Apps para a Fase 1 (sem chat de IA); migra para o web app na Fase 2</td></tr>
+      <tr><td><strong>Identidade e segredos</strong></td><td>Entra ID (SSO, grupos), Azure Key Vault para segredos, identidades gerenciadas entre serviços</td><td>Tenant já existente; sem senhas em código ou em n8n.</td><td>AWS Secrets Manager para o que roda no Databricks</td></tr>
+      <tr><td><strong>Transcrição de áudio (WhatsApp)</strong></td><td>Whisper (faster-whisper) em serviço próprio no Azure ou Databricks, modelo pt-BR</td><td>Custo fixo baixo, dados não saem do ambiente.</td><td>Azure AI Speech (pt-BR) por minuto</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Decisão estrutural: uma camada de IA, não seis sistemas.</strong> Os seis agentes compartilham um único serviço de IA com um catálogo de "tarefas" (classificar demanda, inferir tom, estimar esforço, gerar resumo das 08h, responder no chat, gerar relatório). Cada agente é um conjunto de tarefas, cadências e permissões, não uma aplicação separada. Isso reduz custo de manutenção e garante que uma regra mudada em um lugar vale para todos.
+  </div>
+</section>
+
+<!-- ============================ 3 ============================ -->
+<section class="section">
+  <div class="kicker">Capítulo 3</div>
+  <h2>Arquitetura técnica de referência</h2>
+  <p class="lead">Cinco camadas, da coleta à entrega. As setas indicam o fluxo principal de dados; permissões e logs cruzam todas as camadas.</p>
+
+  <div class="arch">
+    <div class="layer">
+      <div class="lab">Fontes<span>sistemas existentes</span></div>
+      <div class="items">
+        <div class="node src"><b>Microsoft Graph</b>Teams chats e canais, reuniões e transcrições, Outlook, Calendário, Planner/To Do, OneDrive, SharePoint, usuários</div>
+        <div class="node src"><b>Databricks (já carregado)</b>SULTS, Control iD (ponto, catraca, facial), intranet, portal jurídico, Feedz</div>
+        <div class="node src"><b>fSense</b>API ou exportação agendada</div>
+        <div class="node src"><b>Trello / Asana residual</b>REST</div>
+        <div class="node src"><b>Estação do colaborador</b>agente local: WhatsApp Web, telemetria do SO</div>
+      </div>
+    </div>
+    <div class="arrow">▼</div>
+    <div class="layer">
+      <div class="lab">Ingestão<span>Databricks Workflows · n8n · agente local</span></div>
+      <div class="items">
+        <div class="node a6"><b>Conectores por fonte</b>Jobs Python incrementais (delta/webhooks) gravando em <span class="mono">bronze.&lt;fonte&gt;_&lt;objeto&gt;</span>, com marca d'água, idempotência e quarentena de erros</div>
+        <div class="node a6"><b>Receptor do agente local</b>Endpoint HTTPS autenticado por certificado da estação; recebe lotes de exportação do WhatsApp e telemetria, grava em bronze</div>
+        <div class="node a6"><b>Transcrição</b>Fila de áudios → Whisper → texto anexado à mensagem</div>
+      </div>
+    </div>
+    <div class="arrow">▼</div>
+    <div class="layer">
+      <div class="lab">Dados<span>Unity Catalog</span></div>
+      <div class="items">
+        <div class="node"><b>Bronze</b>bruto imutável por fonte, retenção por classe</div>
+        <div class="node"><b>Silver</b>entidades padronizadas: pessoa, hierarquia, demanda, interação, bloco de tempo, evento de jornada, sinal de humor, solicitação, parâmetro, log</div>
+        <div class="node"><b>Gold</b>marts de KPI por agente e por nível (pessoa, time, área, empresa), prontos para Power BI e relatórios</div>
+      </div>
+    </div>
+    <div class="arrow">▼</div>
+    <div class="layer">
+      <div class="lab">IA e regras<span>Serviço de IA (Python) · jobs de regras</span></div>
+      <div class="items">
+        <div class="node a1"><b>Classificador</b>demanda, origem, canal, tema, prazo, estimativa, tom; em lote (Message Batches) a cada ciclo</div>
+        <div class="node a4"><b>Motor de regras determinísticas</b>carga x capacidade, cruzamento ponto x catraca x facial x fSense, SLAs, limiares de alerta, banco de horas</div>
+        <div class="node a2"><b>Agentes interativos</b>chat do Organizador, chat de solicitação de ajuste, chat de alteração de dados (gestor) via tool use</div>
+        <div class="node a5"><b>Geradores</b>resumo das 08h, semanal, mensal por público; texto de alertas</div>
+        <div class="node a6"><b>Governança</b>permissões, máquina de estados de aprovação, parâmetros com dupla aprovação, logs imutáveis</div>
+      </div>
+    </div>
+    <div class="arrow">▼</div>
+    <div class="layer">
+      <div class="lab">Entrega<span>Teams · Power BI · web app · e-mail</span></div>
+      <div class="items">
+        <div class="node"><b>Teams</b>cards de alerta e aprovação (n8n/Power Automate), resumo das 08h, aba do web app</div>
+        <div class="node"><b>Power BI</b>dashboards dos Agentes 1, 3 e 4 com RLS</div>
+        <div class="node"><b>Web app</b>Organizador (kanban, agenda, chat), painel de DP do colaborador, "Meus dados", painel de parâmetros</div>
+        <div class="node"><b>E-mail</b>relatórios periódicos em PDF gerados pelo serviço</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Fluxo de um dia típico</h3>
+  <div class="flow">
+    <div class="step"><span class="n">1</span><b>A cada hora</b>Conectores Graph trazem mensagens, e-mails, eventos e tarefas novas (delta). Trello/Asana idem.</div>
+    <div class="step"><span class="n">2</span><b>Madrugada</b>fSense do dia anterior, Control iD, SULTS e demais tabelas do Databricks são consolidados; agente local envia a exportação incremental do WhatsApp quando a estação liga.</div>
+    <div class="step"><span class="n">3</span><b>03h a 06h</b>Classificador processa o lote do dia (Message Batches); motor de regras recalcula carga, jornada, inconsistências e KPIs; gold é atualizado.</div>
+    <div class="step"><span class="n">4</span><b>08h</b>Geradores produzem o resumo diário por pessoa e por gestor e as notificações de inconsistência de jornada; n8n entrega no Teams.</div>
+    <div class="step"><span class="n">5</span><b>Durante o dia</b>Alertas em tempo real a partir de eventos (SLA, ponto x catraca, conversa sensível); chats interativos sob demanda; aprovações via cards.</div>
+  </div>
+</section>
+
+<!-- ============================ 4 ============================ -->
+<section class="section tight">
+  <div class="kicker">Capítulo 4</div>
+  <h2>Integrações por fonte</h2>
+  <p class="lead">Para cada fonte: forma de acesso, permissões, estratégia de ingestão incremental, volume esperado e pontos de atenção. As permissões do Microsoft Graph estão listadas em detalhe no Anexo A.</p>
+
+  <h3>Microsoft 365 (Microsoft Graph)</h3>
+  <table class="compact">
+    <thead><tr><th style="width:26mm">Objeto</th><th>Estratégia</th><th style="width:30mm">Permissão de aplicativo</th><th style="width:38mm">Atenção</th></tr></thead>
+    <tbody>
+      <tr><td>Chats 1:1 e em grupo</td><td>Notificações de mudança por usuário mais consulta delta de reconciliação horária; ou "getAllMessages" por usuário quando a licença permitir</td><td>Chat.Read.All</td><td>API protegida: exige aprovação da Microsoft e pode ter cobrança por mensagem no modelo de exportação. Solicitar acesso na primeira semana.</td></tr>
+      <tr><td>Canais de equipes</td><td>Delta por canal, horário</td><td>ChannelMessage.Read.All</td><td>Mesma aprovação de API protegida.</td></tr>
+      <tr><td>Reuniões, transcrições e gravações</td><td>Evento de calendário → transcrição ao término (notificação) → texto para o Classificador (itens de ação, participantes)</td><td>OnlineMeetingTranscript.Read.All, OnlineMeetings.Read.All, CallRecords.Read.All</td><td>Transcrição deve estar habilitada na política de reuniões do tenant; transcrição só para reuniões internas por padrão.</td></tr>
+      <tr><td>E-mail</td><td>Delta por caixa postal, horário; só metadados e corpo em texto; anexos apenas nome e tipo</td><td>Mail.Read</td><td>Política de acesso a aplicativos (ApplicationAccessPolicy) restringindo o aplicativo às caixas corporativas; excluir pastas pessoais.</td></tr>
+      <tr><td>Calendário</td><td>Delta por calendário, horário; eventos com local, categorias, participantes, resposta</td><td>Calendars.Read</td><td>Evento externo = justificativa para o Agente 4.</td></tr>
+      <tr><td>Planner e To Do</td><td>Planos, buckets e tarefas por grupo e por usuário, horário; ETag para detectar mudanças</td><td>Tasks.Read.All, Group.Read.All</td><td>Sem delta nativo em Planner: varredura completa é aceitável no volume atual. Escrita (formalização assistida) usa Tasks.ReadWrite em serviço separado.</td></tr>
+      <tr><td>OneDrive e SharePoint</td><td>Delta de itens de unidade; só metadados (nome, pasta, autor, datas)</td><td>Files.Read.All, Sites.Read.All</td><td>Conteúdo só quando o colaborador anexa no Organizador.</td></tr>
+      <tr><td>Usuários e grupos</td><td>Varredura diária para reconciliar o cadastro de pessoas (e-mail, cargo, gestor no Entra)</td><td>User.Read.All</td><td>O gestor do Entra ID não substitui o cadastro de G&amp;G; serve para apontar divergências.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Databricks (fontes já carregadas)</h3>
+  <ul class="small">
+    <li><strong>SULTS</strong>: chamados, SLAs, status, responsáveis, interações e satisfação. Confirmar com o parceiro Cloud3 a latência atual da carga (diária) e avaliar aumento para horária; alternativamente consumir a API do SULTS diretamente para alertas de SLA em tempo real.</li>
+    <li><strong>Control iD</strong>: marcações de ponto (com origem e geolocalização), eventos de catraca por terminal e sentido, reconhecimento facial. Validar o esquema atual com o DP, que já faz o cruzamento manual, e reproduzir as regras na camada silver.</li>
+    <li><strong>Intranet e portal jurídico</strong>: solicitações e aprovações com prazos; viram demandas formais reativas.</li>
+    <li><strong>Feedz</strong>: fonte secundária; carga semanal de posts públicos e agregados de pesquisas; nenhuma dependência estrutural, para permitir descontinuação sem impacto.</li>
+  </ul>
+
+  <h3>fSense</h3>
+  <ul class="small">
+    <li>Confirmar com o fornecedor a disponibilidade de API de relatórios (horas por aplicação e categoria, linha do tempo, atividade e ociosidade por usuário e dia) ou exportação agendada para armazenamento (S3/SFTP). Esta confirmação é uma das provas de conceito da primeira semana.</li>
+    <li>Ingestão diária (ideal: horária) para <span class="mono">bronze.fsense_atividade</span>; mapeamento de usuário fSense para pessoa do cadastro; categorias de aplicação mantidas no fSense e espelhadas na taxonomia do sistema.</li>
+    <li>Screenshots e geolocalização não são extraídos. Se a API os devolver, são descartados na ingestão (nunca gravados).</li>
+  </ul>
+
+  <h3>Trello e Asana residual</h3>
+  <ul class="small">
+    <li>APIs REST com token de serviço por workspace; ingestão horária de cartões e tarefas dos usuários que ainda usam; mapeamento de status e prioridade para a taxonomia unificada.</li>
+    <li>Marcar como fontes em descontinuação; o Organizador sugere migração para o Planner.</li>
+  </ul>
+</section>
+
+<!-- ============================ 5 ============================ -->
+<section class="cont chapter tight">
+  <div class="kicker">Capítulo 5</div>
+  <h2>Agente local da estação: WhatsApp Web e telemetria do SO</h2>
+  <p class="lead">O WhatsApp não oferece API oficial de leitura para números comuns. A coleta é feita por um agente instalado na estação corporativa que usa a sessão já autenticada do WhatsApp Web para exportar, em lote, o histórico e as novidades de todas as conversas do número corporativo. Esta é a abordagem de "exportação completa" definida na Visão v2, em vez de leitura conversa a conversa.</p>
+
+  <h3>Como funciona a exportação em lote</h3>
+  <div class="grid2">
+    <div class="box">
+      <h4>Mecanismo</h4>
+      <ul class="small">
+        <li>O agente usa uma biblioteca de acesso ao protocolo do WhatsApp Web multi-dispositivo (opções abaixo) para se conectar como um "dispositivo vinculado" do número corporativo, com a sessão persistida com segurança na estação.</li>
+        <li>No primeiro pareamento, o protocolo entrega a <strong>sincronização de histórico</strong> (conversas e mensagens recentes de todas as conversas) de uma só vez. Depois, o agente recebe novas mensagens em tempo real enquanto estiver conectado e, para reconciliar, busca em lote as mensagens de todas as conversas desde a última marca d'água.</li>
+        <li>Mídias de áudio são baixadas e enviadas para transcrição; demais mídias só metadados (tipo, tamanho, nome).</li>
+        <li>O agente empacota a exportação (JSON por conversa, com identificadores estáveis) e envia por HTTPS ao receptor no backend, autenticando com certificado da estação.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Regras de somente leitura</h4>
+      <ul class="small">
+        <li>Nenhuma chamada de envio, de marcação de leitura ou de presença; a biblioteca é configurada para não emitir recibos nem "online".</li>
+        <li>Nenhuma automação de navegação na interface; nada de abrir conversa a conversa.</li>
+        <li>Coleta só com estação ligada, usuário logado e sessão válida; o colaborador vê no painel "Meus dados" o status da fonte.</li>
+        <li>Se a sessão cair ou a conta for restringida, o agente para, registra o evento e o Orquestrador alerta TI e o colaborador; o restante do sistema segue.</li>
+        <li>Somente o número corporativo. O agente valida o número pareado contra o cadastro antes de coletar.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Opções de biblioteca</h3>
+  <table class="compact">
+    <thead><tr><th style="width:36mm">Opção</th><th>Como</th><th>Prós</th><th>Contras</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Protocolo multi-dispositivo direto</strong> (bibliotecas de código aberto em Node.js, como Baileys, ou em Go, como whatsmeow)</td><td>Conecta por WebSocket ao servidor do WhatsApp como dispositivo vinculado; recebe sincronização de histórico e eventos; sem navegador</td><td>Leve, rápido, exportação de histórico nativa, sem abrir Chrome; fácil de empacotar</td><td>Não oficial; atualizações do protocolo exigem manter a biblioteca atualizada</td></tr>
+      <tr><td><strong>Automação do WhatsApp Web em navegador oculto</strong> (biblioteca whatsapp-web.js)</td><td>Executa o WhatsApp Web em um Chromium controlado e lê os dados pela interface interna</td><td>Muito usada; API simples para listar conversas e buscar mensagens em lote</td><td>Mais pesada (navegador), mais sensível a mudanças da interface</td></tr>
+      <tr><td><strong>Exportação nativa do aplicativo</strong></td><td>"Exportar conversa" do próprio WhatsApp</td><td>Oficial</td><td>Manual, uma conversa por vez, sem mídia estruturada: inviável para 100 pessoas</td></tr>
+      <tr><td><strong>WhatsApp Business API (oficial)</strong></td><td>Número migrado para a plataforma oficial</td><td>Oficial, estável, sem risco de restrição</td><td>Muda a experiência do número (sem app no celular); só faz sentido para números de atendimento a franqueados. Avaliar para SAF/SAC.</td></tr>
+    </tbody>
+  </table>
+  <p class="small"><strong>Recomendação:</strong> protocolo multi-dispositivo direto em Node.js, por ser a opção mais leve e com exportação de histórico nativa. A implementação pessoal de exportação já existente na Diretoria deve ser entregue à TI como referência de funcionamento. O time decide a linguagem final; Python é aceitável se houver biblioteca equivalente mantida, e não é obrigatório.</p>
+
+  <h3>Telemetria do sistema operacional (opcional, Fase 3)</h3>
+  <ul class="small">
+    <li>O fSense já cobre uso de aplicações e ociosidade. A telemetria do SO entra como redundância quando o fSense falha ou para estações onde não esteja instalado.</li>
+    <li>macOS: leitura de uso por aplicação (Screen Time ou amostragem do aplicativo ativo via APIs do sistema) exige permissão de acesso total ao disco concedida por MDM. Windows: amostragem da janela em foco e eventos de bloqueio e desbloqueio.</li>
+    <li>Mesmo canal de envio do agente local; mesma tabela de blocos de tempo.</li>
+  </ul>
+
+  <h3>Distribuição, atualização e segurança do agente</h3>
+  <ul class="small">
+    <li>Pacote assinado (Windows: MSI via Intune; macOS: PKG via Jamf ou MDM equivalente); atualização automática com verificação de assinatura.</li>
+    <li>Certificado por estação emitido pela TI; o receptor aceita apenas estações cadastradas e associa a estação à pessoa.</li>
+    <li>Dados em trânsito cifrados (TLS 1.2+); nada é armazenado em claro na estação além da fila temporária cifrada; a sessão do WhatsApp fica no cofre do sistema operacional.</li>
+    <li>Log local de operação enviado ao backend; nenhum conteúdo de mensagem nos logs.</li>
+  </ul>
+</section>
+
+<!-- ============================ 6 ============================ -->
+<section class="cont chapter">
+  <div class="kicker">Capítulo 6</div>
+  <h2>Modelo de dados no lakehouse</h2>
+  <p class="lead">Três camadas no Unity Catalog. Bronze guarda o bruto por fonte; silver padroniza nas entidades da Visão v2; gold entrega KPIs prontos. As tabelas abaixo são referência de campos mínimos; tipos Delta padrão.</p>
+
+  <h3>Catálogo e esquemas</h3>
+  <table class="compact">
+    <thead><tr><th style="width:30mm">Esquema</th><th>Conteúdo</th><th style="width:30mm">Retenção</th><th style="width:38mm">Acesso</th></tr></thead>
+    <tbody>
+      <tr><td><span class="mono">bronze</span></td><td>Uma tabela por fonte e objeto (<span class="mono">graph_chat_message</span>, <span class="mono">graph_mail</span>, <span class="mono">graph_event</span>, <span class="mono">planner_task</span>, <span class="mono">fsense_atividade</span>, <span class="mono">controlid_ponto</span>, <span class="mono">controlid_catraca</span>, <span class="mono">sults_chamado</span>, <span class="mono">whatsapp_mensagem</span>, <span class="mono">trello_card</span>...), com <span class="mono">ingest_ts</span>, <span class="mono">source_id</span>, <span class="mono">payload</span></td><td>Conteúdo de mensagens: 30 dias (parâmetro); demais: 13 meses</td><td>Apenas serviços; TI vê metadados, coluna <span class="mono">payload</span> mascarada</td></tr>
+      <tr><td><span class="mono">silver</span></td><td>Entidades padronizadas (abaixo)</td><td>Conforme classe de dado</td><td>Serviços; analistas de BI com mascaramento de texto livre</td></tr>
+      <tr><td><span class="mono">gold</span></td><td>Marts de KPI por agente e nível; tabelas de alerta e de relatório</td><td>5 anos</td><td>Power BI com RLS; serviços</td></tr>
+      <tr><td><span class="mono">gov</span></td><td>Pessoa, hierarquia, perfis, parâmetros, solicitações, logs</td><td>Logs 2 a 5 anos</td><td>Serviço de governança; auditoria para G&amp;G e CEO</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Tabelas silver (campos mínimos)</h3>
+  <table class="compact">
+    <thead><tr><th style="width:34mm">Tabela</th><th>Campos</th></tr></thead>
+    <tbody>
+      <tr><td><span class="mono">silver.demanda</span></td><td>demanda_id, pessoa_id, solicitante_id (ou nome externo), origem, canal, planejamento (formal_planejada | formal_reativa | informal | informal_formalizada), tema, tipo_atividade, dt_chegada, prazo, sla_origem, estimativa_sistema_h, estimativa_colaborador_h, status, dt_conclusao, fonte_tipo, fonte_id, demanda_vinculada_id, confianca_classificacao, versao_classificador, criado_em</td></tr>
+      <tr><td><span class="mono">silver.interacao</span></td><td>interacao_id, canal, thread_id, remetente_id, destinatarios (array), participantes_area (array), dt_hora, fora_horario (bool), direcao, tom, urgencia, menciona_demanda (bool), demanda_id, tempo_resposta_min, conteudo_ref (ponteiro para bronze com expiração), sensivel (bool)</td></tr>
+      <tr><td><span class="mono">silver.bloco_tempo</span></td><td>bloco_id, pessoa_id, inicio, fim, fonte (calendario | fsense | so | teams_reuniao), aplicacao_ou_evento, categoria (trabalho | pessoal | nao_aprovado), tipo_atividade, demanda_id, ajustado (bool), ajuste_id</td></tr>
+      <tr><td><span class="mono">silver.evento_jornada</span></td><td>evento_id, pessoa_id, dt_hora, tipo (ponto_entrada | ponto_saida | catraca_entrada | catraca_saida | facial | atividade_inicio | atividade_fim | evento_externo), origem_marcacao (app | rep | web), local, geo_lat, geo_lon, terminal, inconsistencia_id, status_contestacao</td></tr>
+      <tr><td><span class="mono">silver.inconsistencia_jornada</span></td><td>inconsistencia_id, pessoa_id, data, tipo (ponto_remoto_catraca_tardia | ponto_sem_catraca | catraca_sem_ponto | ponto_sem_atividade | saida_antes_ponto | intervalo_nao_registrado | geo_fora_raio), evidencias (array de evento_id), notificado_em, prazo_justificativa, status</td></tr>
+      <tr><td><span class="mono">silver.sinal_humor</span></td><td>sinal_id, pessoa_id, area_id, data, fonte (tom | padrao_horario | pesquisa_clima), valor_normalizado, peso, contribuicao, sensivel (bool), interacao_ref</td></tr>
+      <tr><td><span class="mono">silver.sugestao_organizador</span></td><td>sugestao_id, pessoa_id, origem (sistema | gestor), gestor_id, demanda_id, campo (prioridade | prazo | estimativa | novo_item), valor_proposto, status (pendente | aceita | recusada | expirada), justificativa, dt_resposta</td></tr>
+      <tr><td><span class="mono">gov.pessoa</span>, <span class="mono">gov.hierarquia</span></td><td>pessoa_id, nome, email_corporativo, cargo, area_id, diretoria_id, vinculo (CLT | PJ), jornada_semanal_h, regime (presencial | hibrido | remoto), unidade, status, ids_externos (graph, fsense, controlid, sults, trello); hierarquia: pessoa_id, gestor_id, vigencia_inicio, vigencia_fim</td></tr>
+      <tr><td><span class="mono">gov.solicitacao_alteracao</span></td><td>solicitacao_id, solicitante_id, alvo_pessoa_id, agente, tabela, registro_id, campo, valor_de, valor_para, justificativa, evidencia_ref, alcada_atual (gestor | dp), aprovador_id, decisao, dt_abertura, dt_decisao, prazo_alcada, log_ids</td></tr>
+      <tr><td><span class="mono">gov.parametro</span></td><td>parametro_id, chave, escopo (global | area:&lt;id&gt;), valor, versao, proposto_por, aprovador_1, aprovador_2, vigencia_inicio</td></tr>
+      <tr><td><span class="mono">gov.log</span></td><td>log_id, ts, tipo (acesso | alteracao | operacao | parametro), ator_id, perfil, objeto, detalhe (sem conteúdo de mensagens), hash_anterior, hash (cadeia para imutabilidade)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Marts gold (exemplos)</h3>
+  <ul class="small">
+    <li><span class="mono">gold.carga_semanal</span>: pessoa_id, semana, horas_demanda_estimada, horas_reuniao, horas_interacao_media, capacidade_h, indice_carga, faixa (ociosidade | saudavel | atencao | sobrecarga).</li>
+    <li><span class="mono">gold.demanda_mix</span>: pessoa_id ou area_id, semana, origem, canal, planejamento, qtd, horas.</li>
+    <li><span class="mono">gold.entrega</span>: pessoa_id, semana, concluidas, no_prazo, atrasadas, atraso_medio_dias, aderencia_estimativa.</li>
+    <li><span class="mono">gold.jornada_diaria</span>: pessoa_id, data, horas_estimadas, horas_jornada, horas_extras, fora_horario_min, ociosidade_min, inconsistencias.</li>
+    <li><span class="mono">gold.humor_area</span>: area_id, semana, indice, faixa, pct_tenso, fora_horario_pct, atrito_pares.</li>
+    <li><span class="mono">gold.reunioes</span>, <span class="mono">gold.franqueado_demanda</span>, <span class="mono">gold.matriz_area</span>, <span class="mono">gold.alerta</span>, <span class="mono">gold.relatorio</span>.</li>
+  </ul>
+
+  <h3>Regras de retenção e expurgo (jobs diários)</h3>
+  <table class="compact">
+    <thead><tr><th>Classe de dado</th><th>Retenção</th><th>Mecanismo</th></tr></thead>
+    <tbody>
+      <tr><td>Conteúdo bruto de mensagens (Teams, e-mail, WhatsApp) e transcrições</td><td>30 dias (parâmetro; validar com Jurídico)</td><td>Expurgo físico em bronze; <span class="mono">conteudo_ref</span> em silver passa a nulo; metadados e classificações permanecem</td></tr>
+      <tr><td>Áudios do WhatsApp</td><td>Apagados após transcrição bem-sucedida</td><td>Fila com exclusão imediata</td></tr>
+      <tr><td>Sinais de humor por pessoa</td><td>12 meses</td><td>Expurgo; agregados por área permanecem</td></tr>
+      <tr><td>Jornada, inconsistências, solicitações e aprovações</td><td>5 anos</td><td>Arquivamento em camada fria após 2 anos</td></tr>
+      <tr><td>Logs de acesso</td><td>2 anos</td><td>Arquivamento</td></tr>
+      <tr><td>Blocos de tempo (fSense, calendário)</td><td>13 meses em detalhe; agregados semanais indefinidos</td><td>Agregação e expurgo</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 7 ============================ -->
+<section class="section">
+  <div class="kicker">Capítulo 7</div>
+  <h2>Camada de IA: Classificador, agentes, prompts e saídas estruturadas</h2>
+  <p class="lead">Um serviço Python único usando o SDK oficial da Anthropic. Três tipos de uso: processamento em lote (Classificador, geradores), interativo (chats com ferramentas) e determinístico (motor de regras, sem IA). A IA nunca aplica uma regra de negócio numérica; ela classifica, extrai, resume e conversa. Os limiares ficam no motor de regras, parametrizados.</p>
+
+  <h3>Modelos e quando usar cada um</h3>
+  <table class="compact">
+    <thead><tr><th style="width:30mm">Tarefa</th><th style="width:30mm">Modelo</th><th>Justificativa</th><th style="width:36mm">Modo</th></tr></thead>
+    <tbody>
+      <tr><td>Chat do Organizador, chat de ajuste, chat de alteração de dados</td><td>Claude Opus 5.5 (<span class="mono">claude-opus-5-5</span>)</td><td>Raciocínio sobre contexto rico do colaborador, uso de ferramentas (ler plano, criar sugestão, abrir tarefa), tom profissional em português</td><td>Interativo, streaming, tool use, thinking adaptativo com effort médio</td></tr>
+      <tr><td>Resumo das 08h, relatórios semanal e mensal, texto de alertas</td><td>Claude Opus 5.5</td><td>Qualidade de síntese e priorização; volume baixo (100 por dia)</td><td>Lote diário, saída estruturada</td></tr>
+      <tr><td>Classificação de demanda, origem, canal, tema, prazo, estimativa inicial</td><td>Claude Sonnet 5.5 (<span class="mono">claude-sonnet-5-5</span>)</td><td>Alto volume (dezenas de milhares de mensagens por dia agrupadas em threads); boa relação custo e qualidade; Opus 5.5 para threads de baixa confiança</td><td>Message Batches (50% de desconto), saída estruturada, cache de prompt</td></tr>
+      <tr><td>Tom, urgência, sinal sensível</td><td>Claude Haiku 5.5 (<span class="mono">claude-haiku-5-5</span>) com revisão por Sonnet 5.5 nos casos "sensível"</td><td>Tarefa curta e repetitiva; o segundo passo evita falso positivo em alerta crítico</td><td>Message Batches</td></tr>
+      <tr><td>Itens de ação em transcrições de reunião</td><td>Claude Sonnet 5.5</td><td>Textos longos, extração estruturada</td><td>Lote ao término da reunião</td></tr>
+    </tbody>
+  </table>
+  <p class="small">Práticas obrigatórias no serviço: saídas estruturadas (<span class="mono">output_config.format</span>) com esquema JSON validado (Anexo B); cache de prompt para o prefixo estável (taxonomias, instruções); <span class="mono">fallbacks: "default"</span> habilitado para recusas de segurança; registro de <span class="mono">usage</span> por chamada para custo; prompts versionados em repositório com conjunto de avaliação (golden set) e precisão mínima medida antes de cada mudança.</p>
+
+  <h3>Tarefas do Classificador</h3>
+  <table class="compact">
+    <thead><tr><th style="width:34mm">Tarefa</th><th>Entrada</th><th>Saída (Anexo B)</th><th style="width:30mm">Regra de aplicação</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Extrair demandas</strong></td><td>Thread (chat, e-mail, WhatsApp, transcrição) com participantes, horários e o perfil do colaborador alvo; últimas demandas conhecidas dele para deduplicar</td><td>Lista de demandas: título, solicitante, origem, canal, prazo explícito ou inferido, tema, estimativa inicial, confiança, trecho de evidência</td><td>Só para threads em que o colaborador é participante, destinatário ou mencionado. Confiança abaixo do limiar entra como "proposto" com destaque; dedupe por similaridade com demandas abertas.</td></tr>
+      <tr><td><strong>Classificar interação</strong></td><td>Mensagem com contexto mínimo da thread</td><td>tom, urgência, menciona_demanda, sensível, tema</td><td>Sensível verdadeiro dispara revisão por modelo maior antes de alertar.</td></tr>
+      <tr><td><strong>Estimar esforço</strong></td><td>Demanda mais histórico de demandas semelhantes da pessoa e da área (realizado)</td><td>horas estimadas, faixa, justificativa curta</td><td>Histórico pesa mais que o texto; a estimativa do colaborador sempre prevalece.</td></tr>
+      <tr><td><strong>Detectar formalização</strong></td><td>Demanda informal aberta e tarefas/chamados novos</td><td>vínculo demanda informal → tarefa formal, confiança</td><td>Vincula e marca "informal formalizada", calcula tempo até formalização.</td></tr>
+      <tr><td><strong>Classificar tipo de atividade</strong></td><td>Aplicação ou evento do bloco de tempo, categoria fSense, calendário</td><td>tipo_atividade</td><td>Tabela de mapeamento primeiro (determinística); IA só para aplicações não mapeadas, com resultado gravado na tabela para TI validar.</td></tr>
+      <tr><td><strong>Extrair itens de ação de reunião</strong></td><td>Transcrição ou resumo</td><td>ações com responsável, prazo, tema</td><td>Vira demanda só para participantes.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="cont">
+  <h3>Agentes interativos (tool use)</h3>
+  <table class="compact">
+    <thead><tr><th style="width:34mm">Agente</th><th>Ferramentas expostas ao modelo</th><th>Limites</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Copiloto do Organizador</strong> (colaborador)</td><td>ler_plano(pessoa, periodo); listar_demandas(filtros); atualizar_item(demanda_id, campo, valor); criar_item(dados); descartar_item(demanda_id, motivo); responder_sugestao(sugestao_id, aceita, justificativa); anexar_contexto(arquivo); propor_blocos_foco(semana); formalizar(demanda_id, destino: planner | sults) [exige confirmação]</td><td>Só o próprio plano. Nunca lê dados de terceiros. Escrita externa apenas por formalizar, após confirmação explícita na interface.</td></tr>
+      <tr><td><strong>Chat de solicitação de ajuste</strong> (colaborador, Monitor e DP)</td><td>ler_meu_dado(tabela, registro); abrir_solicitacao(registro, campo, valor_para, justificativa, evidencia); consultar_solicitacoes()</td><td>Não altera nada; apenas cria solicitações na máquina de estados.</td></tr>
+      <tr><td><strong>Chat de alteração de dados</strong> (gestor)</td><td>ler_dado_liderado(pessoa, tabela, registro); abrir_solicitacao(...); aprovar_propria_solicitacao() [apenas dados de atividade]; sugerir_no_organizador(pessoa, demanda, campo, valor)</td><td>Dados de RH vão obrigatoriamente ao DP. O modelo não decide alçada: o serviço de governança decide.</td></tr>
+      <tr><td><strong>Copiloto do gestor</strong> (consolidado do time)</td><td>ler_consolidado(time, periodo); listar_alertas(time); sugerir_redistribuicao(demanda, de, para) [gera sugestões para os dois colaboradores]</td><td>Leitura da árvore; qualquer mudança vira sugestão.</td></tr>
+    </tbody>
+  </table>
+  <p class="small">As ferramentas são funções do serviço com validação de permissão no servidor (o modelo nunca recebe mais do que o perfil do usuário autenticado pode ver). Implementação com o tool runner do SDK, ferramentas com esquema estrito, conversa persistida por sessão, compaction para sessões longas.</p>
+
+  <h3>Geradores</h3>
+  <ul class="small">
+    <li><strong>Resumo das 08h</strong>: entrada é o estado gold da pessoa (plano do dia, prazos, vencidos, alertas, carga) já calculado pelo motor de regras; o modelo só redige em português, no formato do card. O mesmo para o consolidado do gestor.</li>
+    <li><strong>Relatórios semanal e mensal</strong>: entrada são tabelas gold filtradas pelo público; saída é um documento estruturado (seções, destaques, tabelas de KPI, recomendações) renderizado em PDF pelo serviço e em card resumido no Teams. Reconhecimento positivo é seção obrigatória.</li>
+    <li><strong>Texto de alertas</strong>: templates determinísticos com campos; IA apenas para o resumo de contexto em alertas de gargalo e tema fora da agenda.</li>
+  </ul>
+
+  <h3>Avaliação e qualidade</h3>
+  <table class="compact">
+    <thead><tr><th>Métrica</th><th>Meta inicial</th><th>Como medir</th></tr></thead>
+    <tbody>
+      <tr><td>Precisão de detecção de demanda</td><td>≥ 80% das sugestões aceitas pelos colaboradores após o primeiro mês; falsos negativos medidos por amostragem</td><td>KPI "sugestões aceitas x descartadas" (Visão v2) mais golden set de 300 threads rotuladas por G&amp;G e gestores voluntários</td></tr>
+      <tr><td>Precisão de tom e de "sensível"</td><td>≥ 90% de concordância com rotulagem humana; zero alertas sensíveis falsos sem revisão</td><td>Golden set de 500 mensagens; revisão dupla em "sensível"</td></tr>
+      <tr><td>Erro de estimativa</td><td>Mediana do realizado ÷ estimado entre 0,7 e 1,4 após 3 meses</td><td>KPI de aderência de estimativa</td></tr>
+      <tr><td>Latência interativa</td><td>Primeiro token em menos de 3 s; resposta completa em menos de 20 s</td><td>Telemetria do serviço</td></tr>
+      <tr><td>Custo por pessoa por mês</td><td>Dentro da estimativa do capítulo 12</td><td>Registro de <span class="mono">usage</span> por tarefa</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================ 8 ============================ -->
+<section class="section">
+  <div class="kicker">Capítulo 8</div>
+  <h2>Orquestração, cadências e reprocessamento</h2>
+  <p class="lead">Dois orquestradores com fronteira clara. Databricks Workflows comanda tudo o que é dado: coleta, classificação, regras, KPIs, expurgo. n8n comanda tudo o que é pessoa: cards, lembretes, escalonamentos, relatórios por e-mail. O "Orquestrador" da Visão v2 é a soma dos dois mais o painel de execução.</p>
+
+  <table class="compact">
+    <thead><tr><th style="width:28mm">Cadência</th><th>Pipeline</th><th style="width:30mm">Orquestrador</th><th style="width:40mm">Dependências e falhas</th></tr></thead>
+    <tbody>
+      <tr><td>Contínuo</td><td>Notificações de mudança do Graph (mensagens, transcrições), webhooks do SULTS (se disponível), eventos do agente local</td><td>Receptores HTTPS → fila → bronze</td><td>Fila com repetição; nada se perde se o Databricks estiver parado</td></tr>
+      <tr><td>Horária</td><td>Delta Graph (chats, canais, e-mail, calendário, Planner), Trello/Asana; silver incremental de interações e demandas formais; alertas de SLA e de ponto x catraca</td><td>Databricks Workflows</td><td>Marca d'água por fonte; reexecução idempotente</td></tr>
+      <tr><td>Diária, 02h a 06h</td><td>fSense, Control iD, SULTS, intranet; Classificador em lote (Batches); motor de regras; gold; inconsistências de jornada; expurgo</td><td>Databricks Workflows</td><td>Se o lote de IA atrasar, o resumo das 08h sai com o estado do dia anterior e marca "parcial"</td></tr>
+      <tr><td>Diária, 08h</td><td>Resumo das 08h (colaborador, gestor); notificações de inconsistência de jornada (colaborador, gestor, DP)</td><td>n8n (gatilho agendado lê gold e envia cards)</td><td>Horário parametrizável; fuso América/São_Paulo</td></tr>
+      <tr><td>Semanal, segunda 08h e sexta 16h</td><td>Semanal do time e termômetro da área; "semana que vem"</td><td>Databricks (gera) → n8n (entrega)</td><td></td></tr>
+      <tr><td>Mensal, 1º dia útil</td><td>Relatórios por público, relatório de logs para TI, fechamento de jornada para o DP</td><td>Databricks (gera PDF) → n8n (e-mail e Teams)</td><td>Calendário de dias úteis parametrizado</td></tr>
+      <tr><td>Por evento</td><td>Solicitação aberta → card ao aprovador; sem resposta em 2 dias úteis → escalonamento; 48h úteis → troca de alçada</td><td>Serviço de governança (temporizadores) → n8n</td><td>Estados persistidos; temporizadores recalculados em reinício</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Painel de execução (para TI)</h3>
+  <ul class="small">
+    <li>Por pipeline e fonte: última execução, volume, erros, atraso em relação ao esperado; disponibilidade da coleta por estação para o WhatsApp.</li>
+    <li>Reprocessamento: qualquer janela pode ser reprocessada a partir do bronze; classificações são versionadas pelo campo <span class="mono">versao_classificador</span> e nunca apagam a anterior.</li>
+    <li>Alertas operacionais ao canal de TI no Teams: fonte sem dados por mais de 24h, taxa de erro do Classificador, custo de IA acima do orçamento diário.</li>
+  </ul>
+</section>
+
+<!-- ============================ 9 ============================ -->
+<section class="section">
+  <div class="kicker">Capítulo 9</div>
+  <h2>Canais de entrega</h2>
+
+  <h3>Teams</h3>
+  <div class="grid2">
+    <div class="box">
+      <h4>Cards de alerta e de aprovação</h4>
+      <ul class="small">
+        <li>Adaptive Cards enviados por n8n (ou Power Automate) em chat 1:1 com o destinatário; card de aprovação com De/Para lado a lado, justificativa, evidência e botões Aprovar, Recusar, Pedir informação.</li>
+        <li>A resposta do botão chama um webhook do serviço de governança, que valida quem respondeu (identidade do Teams) contra a alçada esperada, registra o log e atualiza o card (sem botões, com a decisão).</li>
+        <li>Agrupamento anti-ruído por destinatário e severidade conforme parâmetros; digest no fim do dia.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h4>Resumo das 08h e aba do aplicativo</h4>
+      <ul class="small">
+        <li>Card do resumo com três prioridades, reuniões, prazos, vencidos, alertas e link "abrir Organizador".</li>
+        <li>O web app é publicado como aplicativo do Teams (aba pessoal) com SSO; o colaborador não precisa de outro login.</li>
+        <li>Fase 2: bot do Teams para conversar com o Copiloto diretamente no chat (Bot Framework), reutilizando o mesmo serviço de IA.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Power BI</h3>
+  <ul class="small">
+    <li>Conjuntos de dados sobre Databricks SQL (DirectQuery ou importação diária, conforme desempenho); modelo semântico com tabelas gold e <span class="mono">gov.hierarquia</span>.</li>
+    <li>Segurança em nível de linha dinâmica: a função de RLS resolve o usuário autenticado para pessoa_id e expande a árvore de liderados vigente; perfis especiais (CEO, Diretora de G&amp;G, DP) por grupo do Entra ID.</li>
+    <li>Relatórios: Monitor (colaborador, gestor, diretor), DP (colaborador, gestor, DP), Termômetro (diretor, G&amp;G, CEO), Executivo (CEO). Páginas com filtros de período, pessoa, time, área, origem, canal, tipo.</li>
+    <li>Páginas do Termômetro publicadas em workspace separado, com acesso só aos grupos autorizados; nenhuma visual expõe texto de mensagem.</li>
+  </ul>
+
+  <h3>Web app</h3>
+  <ul class="small">
+    <li>React com autenticação Entra ID (MSAL); API em FastAPI; componentes: kanban, agenda semanal, gráficos por tema e origem, chat com streaming, upload, lista de sugestões do gestor, painel de DP do colaborador com contestação, "Meus dados", painel de parâmetros (TI e diretores) e painel de auditoria (G&amp;G, CEO).</li>
+    <li>Toda chamada de API passa pelo serviço de permissões; a interface nunca recebe dados fora do perfil.</li>
+  </ul>
+
+  <h3>E-mail</h3>
+  <ul class="small">
+    <li>Relatórios em PDF gerados pelo serviço (HTML renderizado) e enviados pelo Graph com caixa de serviço dedicada; o PDF nunca contém texto de mensagens, apenas KPIs, destaques e referências.</li>
+  </ul>
+</section>
+
+<!-- ============================ 10 ============================ -->
+<section class="section">
+  <div class="kicker">Capítulo 10</div>
+  <h2>Segurança, permissões, logs e LGPD na prática</h2>
+
+  <h3>Identidade e autorização</h3>
+  <ul class="small">
+    <li>SSO por Entra ID em web app, Power BI e Teams. Grupos de segurança para perfis especiais: <span class="mono">SE-CEO</span>, <span class="mono">SE-DiretorGG</span>, <span class="mono">SE-DP</span>, <span class="mono">SE-TI-Admin</span>, <span class="mono">SE-Diretores</span>. O perfil de gestor não é grupo: é derivado da tabela de hierarquia vigente.</li>
+    <li>Serviço de permissões central (biblioteca compartilhada) que responde "este usuário pode ver este dado desta pessoa neste agente?" conforme a matriz da Visão v2, capítulo 11. Power BI (RLS), API e ferramentas dos agentes de IA usam a mesma função.</li>
+    <li>Regras especiais codificadas: humor só diretor da área, G&amp;G e CEO, nunca a pessoa; horas extras, fora do horário e ociosidade na jornada não exibidos ao colaborador; TI só metadados e logs; acesso excepcional de suporte com autorização registrada da Diretora de G&amp;G e prazo.</li>
+  </ul>
+
+  <h3>Proteção do conteúdo</h3>
+  <ul class="small">
+    <li>Conteúdo de mensagens em colunas com mascaramento no Unity Catalog; só o serviço de IA e o serviço de permissões têm desmascaramento, por identidade gerenciada.</li>
+    <li>Nenhum conteúdo de mensagem em logs, alertas, relatórios ou cards; apenas referências com link que exige perfil autorizado e registra acesso nominal.</li>
+    <li>Cifragem em repouso (chaves gerenciadas pela nuvem; avaliar chaves próprias) e em trânsito; segredos em Key Vault; sem credenciais em n8n além de referências a segredos.</li>
+    <li>Dados enviados ao provedor de IA: somente o necessário à tarefa; contrato com retenção zero ou mínima e proibição de treinamento; registrar no inventário LGPD como operador.</li>
+  </ul>
+
+  <h3>Logs imutáveis</h3>
+  <ul class="small">
+    <li>Tabela <span class="mono">gov.log</span> append-only com cadeia de hash (cada linha carrega o hash da anterior); verificação diária de integridade; exportação mensal assinada para TI.</li>
+    <li>Eventos registrados: acesso a dashboards e a conteúdo, solicitações e decisões, mudanças de parâmetro com os dois aprovadores, execuções de pipeline, acessos de suporte.</li>
+  </ul>
+
+  <h3>Máquina de estados de alteração de dados</h3>
+  <div class="flow">
+    <div class="step"><span class="n">1</span><b>Aberta</b>Colaborador (ou gestor) abre; serviço define alçada: dados de atividade → gestor; dados de RH → DP; fora da janela de 48h úteis → DP.</div>
+    <div class="step"><span class="n">2</span><b>Aguardando aprovador</b>Card no Teams; prazo de 2 dias úteis; lembrete no meio do prazo.</div>
+    <div class="step"><span class="n">3</span><b>Escalonada</b>Sem resposta: gestor do gestor e DP notificados; card reenviado.</div>
+    <div class="step"><span class="n">4</span><b>Decidida</b>Aprovada: nova linha de interpretação com De/Para e ícone "ajustado" nos dashboards; recusada: motivo ao solicitante. Log em ambos.</div>
+    <div class="step red"><span class="n">5</span><b>Expirada</b>Sem decisão após o prazo final (parâmetro): fecha como expirada, DP notificado, solicitante pode reabrir.</div>
+  </div>
+
+  <h3>Checklist LGPD para a entrada em produção</h3>
+  <ul class="small">
+    <li>Registro de operações de tratamento atualizado (finalidades, bases legais, categorias, retenção, operadores: Microsoft, Databricks/AWS, Anthropic, fSense).</li>
+    <li>Relatório de impacto (RIPD) elaborado com Jurídico e G&amp;G, com foco em fSense, WhatsApp e Termômetro.</li>
+    <li>Comunicado aos colaboradores e política interna publicada (uso não decisório do Termômetro, acesso, contestação).</li>
+    <li>Página "Meus dados" e canal de contestação em funcionamento desde o primeiro dia.</li>
+    <li>Jobs de expurgo testados e monitorados; revisão anual.</li>
+  </ul>
+</section>
+
+<!-- ============================ 11 ============================ -->
+<section class="section">
+  <div class="kicker">Capítulo 11</div>
+  <h2>No-code versus código: decisão por componente</h2>
+  <p class="lead">Regra: no-code onde o fluxo é simples, muda com frequência e não manipula conteúdo sensível; código onde há segurança, lógica de negócio auditável ou IA.</p>
+  <table class="compact">
+    <thead><tr><th style="width:44mm">Componente</th><th style="width:26mm">Abordagem</th><th>Ferramenta</th><th>Motivo</th></tr></thead>
+    <tbody>
+      <tr><td>Cards de alerta e aprovação no Teams</td><td><span class="pill p-ok">no-code</span></td><td>n8n (ou Power Automate)</td><td>Fluxo simples, muda com frequência; o serviço de governança decide, o n8n só entrega e coleta</td></tr>
+      <tr><td>Envio de relatórios por e-mail e Teams</td><td><span class="pill p-ok">no-code</span></td><td>n8n</td><td>Agendamento e distribuição</td></tr>
+      <tr><td>Conectores de baixo volume (Planner, Calendário, Trello) na Fase 1</td><td><span class="pill p-warn">no-code inicial, código na Fase 2</span></td><td>n8n → Python</td><td>Velocidade de entrega; migração quando o volume e a necessidade de delta justificarem</td></tr>
+      <tr><td>Dashboards</td><td><span class="pill p-ok">no-code</span></td><td>Power BI</td><td>Ferramenta já dominada; RLS nativa</td></tr>
+      <tr><td>Conectores Graph de mensagens e e-mail; agente local; transcrição</td><td><span class="pill p-bad">código</span></td><td>Python (Databricks), Node.js (estação)</td><td>Conteúdo sensível, volume, resiliência, assinatura e distribuição</td></tr>
+      <tr><td>Classificador, geradores e chats de IA</td><td><span class="pill p-bad">código</span></td><td>Python com SDK Anthropic</td><td>Saídas estruturadas, cache, lotes, avaliação, controle de custo</td></tr>
+      <tr><td>Motor de regras (carga, jornada, SLA, banco de horas)</td><td><span class="pill p-bad">código</span></td><td>Python/SQL no Databricks com testes automatizados</td><td>Auditável e testável; regras legais</td></tr>
+      <tr><td>Permissões, máquina de estados, logs imutáveis, parâmetros</td><td><span class="pill p-bad">código</span></td><td>Python (FastAPI) e Delta</td><td>Segurança e integridade</td></tr>
+      <tr><td>Web app do Organizador</td><td><span class="pill p-bad">código</span></td><td>React + FastAPI</td><td>Chat com IA, kanban e sugestões exigem interface própria</td></tr>
+      <tr><td>Expurgo e retenção</td><td><span class="pill p-bad">código</span></td><td>Jobs Databricks</td><td>Obrigação legal, precisa de evidência de execução</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><strong>Uso de Claude Code no desenvolvimento.</strong> O time pode usar Claude Code para acelerar a construção (conectores, esquemas, testes, componentes do web app) e para manter os prompts e golden sets versionados no repositório. Convenção sugerida: um repositório monolítico com pastas <span class="mono">connectors/</span>, <span class="mono">rules/</span>, <span class="mono">ai-service/</span>, <span class="mono">governance/</span>, <span class="mono">webapp/</span>, <span class="mono">station-agent/</span>, <span class="mono">n8n/</span>, <span class="mono">powerbi/</span>, com CLAUDE.md descrevendo as regras da Visão v2 como fonte de verdade.</div>
+</section>
+
+<!-- ============================ 12 ============================ -->
+<section class="section">
+  <div class="kicker">Capítulo 12</div>
+  <h2>Infraestrutura, ambientes e estimativa de custos</h2>
+
+  <h3>Recursos</h3>
+  <table class="compact">
+    <thead><tr><th style="width:40mm">Recurso</th><th>Uso</th><th style="width:40mm">Dimensionamento inicial</th></tr></thead>
+    <tbody>
+      <tr><td>Databricks (existente)</td><td>Workflows de ingestão, regras, KPIs; SQL Warehouse para Power BI</td><td>Job cluster pequeno por pipeline; SQL Warehouse serverless pequeno com auto-stop</td></tr>
+      <tr><td>Azure Container Apps</td><td>Serviço de IA, serviço de governança/API, receptor do agente local, web app</td><td>2 a 4 réplicas pequenas com escala a zero fora do horário para o receptor</td></tr>
+      <tr><td>Azure Functions ou Container Apps Jobs</td><td>Webhooks do Graph, temporizadores de alçada</td><td>Plano de consumo</td></tr>
+      <tr><td>Azure Key Vault, Entra ID (existente), Storage (fila e arquivos temporários)</td><td>Segredos, identidade, filas</td><td>Padrão</td></tr>
+      <tr><td>Serviço de transcrição</td><td>Whisper em contêiner com GPU pequena, ou Azure AI Speech</td><td>Uma GPU compartilhada ou pagamento por minuto</td></tr>
+      <tr><td>n8n (existente)</td><td>Fluxos de entrega e aprovação</td><td>Instância atual; avaliar alta disponibilidade</td></tr>
+      <tr><td>Power BI (existente)</td><td>Dashboards</td><td>Licenças Pro para 100 usuários ou capacidade</td></tr>
+      <tr><td>Anthropic API</td><td>IA</td><td>Conta organizacional, chaves por ambiente, limites de gasto</td></tr>
+    </tbody>
+  </table>
+  <p class="small">Ambientes: desenvolvimento, homologação e produção, com dados reais apenas em produção; homologação usa dados sintéticos ou anonimizados. Infraestrutura como código (Terraform ou Bicep) e CI/CD com testes do motor de regras e avaliação dos prompts.</p>
+
+  <h3>Estimativa de custo de IA (ordem de grandeza)</h3>
+  <table class="compact">
+    <thead><tr><th>Carga</th><th>Premissas</th><th>Estimativa mensal</th></tr></thead>
+    <tbody>
+      <tr><td>Classificação de mensagens e e-mails</td><td>100 pessoas, cerca de 250 itens por pessoa por dia agrupados em threads; aproximadamente 3.000 chamadas por dia com 3 mil tokens de entrada e 500 de saída; Sonnet 5.5 em lote (50%) com cache do prefixo</td><td>USD 300 a 500</td></tr>
+      <tr><td>Tom e sinais (Haiku 5.5) com revisão de sensíveis</td><td>25 mil mensagens por dia, 300 tokens cada</td><td>USD 30 a 60</td></tr>
+      <tr><td>Resumos das 08h e relatórios (Opus 5.5)</td><td>130 resumos por dia com 5 mil tokens de entrada e 800 de saída; relatórios mensais</td><td>USD 100 a 150</td></tr>
+      <tr><td>Chats interativos (Opus 5.5)</td><td>100 pessoas, 8 mensagens por dia, 8 mil tokens de contexto com cache</td><td>USD 400 a 900</td></tr>
+      <tr><td>Transcrição de áudios</td><td>Whisper próprio (custo de GPU) ou 1.500 min/dia em serviço gerenciado</td><td>USD 150 a 400</td></tr>
+      <tr><td><strong>Total IA e transcrição</strong></td><td>Variação principal: adoção do chat e volume de WhatsApp</td><td><strong>USD 1.000 a 2.000</strong></td></tr>
+    </tbody>
+  </table>
+  <p class="tiny muted">Preços de lista da API Anthropic em novembro de 2026: Opus 5.5 USD 4 por milhão de tokens de entrada e USD 20 de saída; Sonnet 5.5 USD 2 e USD 10; Haiku 5.5 USD 0,10 e USD 0,50; lotes com 50% de desconto; leitura de cache a 10% do preço de entrada. Custos de nuvem (Container Apps, Databricks adicional, transcrição, armazenamento) estimados em USD 800 a 1.500 por mês. Confirmar na prova de conceito com medição real de <span class="mono">usage</span>.</p>
+</section>
+
+<!-- ============================ 13 ============================ -->
+<section class="section">
+  <div class="kicker">Capítulo 13</div>
+  <h2>Plano de entrega em 6 meses</h2>
+  <p class="lead">Doze sprints de duas semanas, três fases de dois meses, toda a empresa em produção desde o fim da Fase 1. As duas primeiras semanas são de provas de conceito e aprovações externas, que são o maior risco de prazo.</p>
+
+  <div class="phases">
+    <div class="phase ph1">
+      <h3>Fase 1 · Fundação</h3>
+      <div class="when">Sprints 1 a 4 · meses 1 e 2</div>
+      <ul class="small">
+        <li><strong>S1</strong>: provas de conceito (Graph protegido, fSense, WhatsApp); pedido de acesso às APIs protegidas da Microsoft; cadastro de pessoas e hierarquia com G&amp;G; infraestrutura base e repositório.</li>
+        <li><strong>S2</strong>: conectores Graph (calendário, Planner, e-mail), Control iD e SULTS para silver; motor de regras de jornada; golden set inicial.</li>
+        <li><strong>S3</strong>: Classificador v1 em lote (demandas de e-mail, Planner, SULTS, Teams se já aprovado); carga e KPIs do Monitor; dashboards Power BI do Monitor e do DP; serviço de permissões e RLS.</li>
+        <li><strong>S4</strong>: máquina de estados e cards de aprovação; notificação de inconsistências às 08h; resumo das 08h v1; rastreador de pedidos da diretoria; shadow IT; logs; comunicado e entrada em produção para toda a empresa.</li>
+      </ul>
+    </div>
+    <div class="phase ph2">
+      <h3>Fase 2 · Copiloto e clima</h3>
+      <div class="when">Sprints 5 a 8 · meses 3 e 4</div>
+      <ul class="small">
+        <li><strong>S5</strong>: agente local do WhatsApp em produção gradual por diretoria; transcrição; conectores de chats e canais do Teams; transcrições de reunião.</li>
+        <li><strong>S6</strong>: web app do Organizador (kanban, agenda, chat, upload); sugestões do gestor; formalização assistida no Planner e SULTS.</li>
+        <li><strong>S7</strong>: Termômetro (tom, padrões, índice por área e pessoa), política interna publicada, dashboards de diretor e G&amp;G; alertas sensíveis com dupla revisão.</li>
+        <li><strong>S8</strong>: relatórios semanal e mensal por público; catálogo completo de alertas; painel de parâmetros com dupla aprovação; eficiência de reuniões, franqueados, ponto único de falha, blocos de foco, fora do horário, "semana que vem".</li>
+      </ul>
+    </div>
+    <div class="phase ph3">
+      <h3>Fase 3 · Inteligência de gestão</h3>
+      <div class="when">Sprints 9 a 12 · meses 5 e 6</div>
+      <ul class="small">
+        <li><strong>S9</strong>: matriz área x área, capacidade por área, retrabalho e reabertura; bot do Teams para o Copiloto.</li>
+        <li><strong>S10</strong>: correlação carga x humor x horas; onboarding 90 dias; aprendizado de estimativas e taxonomias.</li>
+        <li><strong>S11</strong>: integração do banco de horas com a folha (exportação validada pelo DP); telemetria do SO (opcional).</li>
+        <li><strong>S12</strong>: revisão com Jurídico (retenção, RIPD), hardening, documentação operacional, transferência para operação e encerramento.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Equipe sugerida</h3>
+  <table class="compact">
+    <thead><tr><th style="width:44mm">Papel</th><th>Dedicação</th><th>Responsabilidade</th></tr></thead>
+    <tbody>
+      <tr><td>Líder técnico / arquiteto</td><td>Integral</td><td>Decisões, revisão, interface com Diretoria, G&amp;G e Jurídico</td></tr>
+      <tr><td>Engenheiro de dados (2)</td><td>Integral</td><td>Conectores, silver, motor de regras, gold, expurgo</td></tr>
+      <tr><td>Engenheiro de IA / backend Python</td><td>Integral</td><td>Serviço de IA, prompts, avaliação, governança e API</td></tr>
+      <tr><td>Desenvolvedor front-end</td><td>Integral a partir da S5</td><td>Web app do Organizador, aba Teams</td></tr>
+      <tr><td>Desenvolvedor do agente local (Node.js)</td><td>Parcial S1 a S6</td><td>Exportação WhatsApp, distribuição, telemetria</td></tr>
+      <tr><td>Analista de BI</td><td>Parcial</td><td>Power BI, RLS, relatórios</td></tr>
+      <tr><td>Infra e segurança</td><td>Parcial</td><td>Identidade, Key Vault, MDM, rede, Graph protegido, revisão de segurança</td></tr>
+      <tr><td>Analista de n8n / automação</td><td>Parcial</td><td>Fluxos de cards, lembretes, e-mails</td></tr>
+      <tr><td>G&amp;G (DP e DHO) e Jurídico</td><td>Parcial</td><td>Cadastro, regras de jornada, golden sets, política, RIPD, comunicado</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Critérios de aceite por fase</h3>
+  <ul class="small">
+    <li><strong>Fase 1</strong>: 100% das pessoas do cadastro com dados de Monitor e DP; cruzamento ponto x catraca reproduz o resultado da análise manual do DP para um mês de referência com divergência explicada; resumo das 08h entregue a todos; fluxo de aprovação com log auditado; RLS validada por teste com usuários de cada perfil.</li>
+    <li><strong>Fase 2</strong>: WhatsApp coletado em pelo menos 90% das estações ativas; Organizador com uso semanal por mais de 70% dos colaboradores; precisão de detecção de demanda acima de 80%; Termômetro publicado após política interna; relatórios mensais enviados.</li>
+    <li><strong>Fase 3</strong>: todos os KPIs do catálogo da Visão v2 disponíveis; fechamento mensal do DP sem planilhas manuais; RIPD concluído; operação assumida com runbooks.</li>
+  </ul>
+</section>
+
+<!-- ============================ 14 ============================ -->
+<section class="section">
+  <div class="kicker">Capítulo 14</div>
+  <h2>Riscos técnicos, dependências externas e provas de conceito</h2>
+  <table class="compact">
+    <thead><tr><th style="width:44mm">Risco ou dependência</th><th>Impacto</th><th>Mitigação</th></tr></thead>
+    <tbody>
+      <tr><td>Aprovação da Microsoft para APIs protegidas de mensagens do Teams</td><td>Sem ela, não há leitura de chats e canais; prazo de semanas</td><td>Solicitar na S1 com justificativa de negócio; enquanto isso, operar com e-mail, calendário, Planner, SULTS e fSense; avaliar o modelo de licenciamento por mensagem</td></tr>
+      <tr><td>fSense sem API suficiente</td><td>Ingestão manual ou por exportação</td><td>Confirmar com o fornecedor na S1; exportação agendada como plano B</td></tr>
+      <tr><td>Exportação do WhatsApp instável ou restrita</td><td>Perda da fonte em algumas estações</td><td>Biblioteca mantida, atualizações rápidas, somente leitura; fonte tratada como complementar; WhatsApp Business API para números de atendimento</td></tr>
+      <tr><td>Qualidade do cadastro de hierarquia</td><td>Permissões erradas</td><td>Saneamento com G&amp;G na S1; validações automáticas; divergências bloqueiam o acesso até resolução</td></tr>
+      <tr><td>Classificador com baixa precisão no início</td><td>Ruído para o colaborador, descrédito</td><td>Tudo entra como "proposto"; limiares conservadores; golden set; ajuste de prompts semanal nas primeiras 8 semanas</td></tr>
+      <tr><td>Custo de IA acima do previsto</td><td>Orçamento</td><td>Lotes, cache, modelos por tarefa, limite diário de gasto com alerta, medição desde a S3</td></tr>
+      <tr><td>Transcrição de reuniões não habilitada no tenant</td><td>Sem itens de ação automáticos</td><td>Ajuste de política de reuniões pela TI na S1</td></tr>
+      <tr><td>Desempenho do Power BI com RLS dinâmica</td><td>Dashboards lentos</td><td>Agregados em gold, importação diária onde possível, DirectQuery só no detalhe</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Provas de conceito da primeira quinzena</h3>
+  <ol class="small">
+    <li><strong>Graph</strong>: aplicativo registrado, permissões concedidas, leitura delta de calendário e e-mail de duas caixas de teste, transcrição de uma reunião.</li>
+    <li><strong>fSense</strong>: extração de um dia de dados de dez estações para o bronze.</li>
+    <li><strong>WhatsApp</strong>: agente local em duas estações, sincronização de histórico, exportação incremental, transcrição de áudios, envio ao receptor; validação de que nada é escrito na conta.</li>
+    <li><strong>Classificador</strong>: 200 threads reais anonimizadas classificadas, comparação com rotulagem humana, medição de custo por thread.</li>
+    <li><strong>Cards no Teams</strong>: card de aprovação com resposta registrada no serviço de governança.</li>
+    <li><strong>RLS</strong>: relatório Power BI de teste com três perfis (colaborador, gestor, diretor) sobre dados sintéticos.</li>
+  </ol>
+</section>
+
+<!-- ============================ ANEXO A ============================ -->
+<section class="section">
+  <div class="kicker">Anexo A</div>
+  <h2>Permissões Microsoft Graph e consultas</h2>
+  <table class="compact">
+    <thead><tr><th style="width:44mm">Permissão (aplicativo)</th><th>Uso</th><th style="width:40mm">Observação</th></tr></thead>
+    <tbody>
+      <tr><td>User.Read.All, Group.Read.All</td><td>Reconciliação de pessoas e equipes</td><td></td></tr>
+      <tr><td>Chat.Read.All, ChannelMessage.Read.All</td><td>Mensagens de chats e canais</td><td>APIs protegidas: formulário de solicitação à Microsoft; possível cobrança por mensagem em modo de exportação</td></tr>
+      <tr><td>OnlineMeetings.Read.All, OnlineMeetingTranscript.Read.All, CallRecords.Read.All</td><td>Reuniões, transcrições, participantes e duração</td><td>Política de acesso a aplicativos para reuniões</td></tr>
+      <tr><td>Mail.Read</td><td>E-mails</td><td>Restringir por ApplicationAccessPolicy às caixas corporativas</td></tr>
+      <tr><td>Calendars.Read</td><td>Eventos</td><td></td></tr>
+      <tr><td>Tasks.Read.All</td><td>Planner e To Do</td><td>Tasks.ReadWrite em aplicativo separado para a formalização assistida</td></tr>
+      <tr><td>Files.Read.All, Sites.Read.All</td><td>Metadados de OneDrive e SharePoint</td><td>Conteúdo nunca lido por padrão</td></tr>
+      <tr><td>TeamsAppInstallation.ReadWriteForUser.All, Chat.Create (aplicativo do bot)</td><td>Publicar a aba e, na Fase 2, o bot</td><td>Fase 2</td></tr>
+    </tbody>
+  </table>
+  <h3>Consultas de referência</h3>
+  <ul class="small">
+    <li>Delta de e-mail: <span class="mono">GET /users/{id}/mailFolders/inbox/messages/delta</span>; de eventos: <span class="mono">GET /users/{id}/calendarView/delta?startDateTime=...&amp;endDateTime=...</span>.</li>
+    <li>Mensagens de chat por usuário: <span class="mono">GET /users/{id}/chats/getAllMessages</span> (protegida) ou assinatura <span class="mono">/users/{id}/chats/getAllMessages</span> em <span class="mono">/subscriptions</span> com <span class="mono">includeResourceData</span> e certificado de cifragem.</li>
+    <li>Canais: <span class="mono">GET /teams/{id}/channels/{id}/messages/delta</span>.</li>
+    <li>Transcrições: <span class="mono">GET /users/{id}/onlineMeetings/{id}/transcripts/{id}/content?$format=text/vtt</span>.</li>
+    <li>Planner: <span class="mono">GET /planner/plans/{id}/tasks</span> e <span class="mono">GET /users/{id}/planner/tasks</span>.</li>
+  </ul>
+</section>
+
+<!-- ============================ ANEXO B ============================ -->
+<section class="section">
+  <div class="kicker">Anexo B</div>
+  <h2>Esquemas JSON das saídas dos agentes</h2>
+  <p class="small">Esquemas de referência para <span class="mono">output_config.format</span>. Todos com <span class="mono">additionalProperties: false</span> e campos obrigatórios.</p>
+  <h4>Extração de demandas</h4>
+  <pre class="mono" style="white-space:pre-wrap;background:var(--cream);padding:3mm;border-radius:2mm;font-size:7.6pt">{
+  "type": "object", "additionalProperties": false,
+  "required": ["demandas"],
+  "properties": {
+    "demandas": { "type": "array", "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["titulo","solicitante","origem","canal","prazo","prazo_tipo","tema","estimativa_h","confianca","evidencia"],
+      "properties": {
+        "titulo": {"type":"string","maxLength":120},
+        "solicitante": {"type":"string"},
+        "origem": {"enum":["gestor_direto","diretoria_ceo","outra_area","franqueado","cliente_final","fornecedor","rotina","autodemanda"]},
+        "canal": {"enum":["teams_chat","teams_reuniao","email","whatsapp","sults","planner","trello","intranet","presencial"]},
+        "prazo": {"type":["string","null"],"description":"ISO-8601 ou null"},
+        "prazo_tipo": {"enum":["explicito","inferido","nenhum"]},
+        "tema": {"type":"string"},
+        "estimativa_h": {"type":"number","minimum":0.25,"maximum":200},
+        "confianca": {"type":"number","minimum":0,"maximum":1},
+        "evidencia": {"type":"string","maxLength":300},
+        "demanda_existente_id": {"type":["string","null"]}
+      }}}
+  }
+}</pre>
+  <h4>Classificação de interação</h4>
+  <pre class="mono" style="white-space:pre-wrap;background:var(--cream);padding:3mm;border-radius:2mm;font-size:7.6pt">{
+  "type": "object", "additionalProperties": false,
+  "required": ["tom","urgencia","menciona_demanda","sensivel","tema"],
+  "properties": {
+    "tom": {"enum":["positivo","neutro","urgente","tenso","frustrado"]},
+    "urgencia": {"enum":["baixa","media","alta"]},
+    "menciona_demanda": {"type":"boolean"},
+    "sensivel": {"type":"boolean","description":"saúde, conflito pessoal, assédio, desligamento"},
+    "sensivel_categoria": {"enum":["saude","conflito","assedio","desligamento","outro","nenhuma"]},
+    "tema": {"type":"string"}
+  }
+}</pre>
+  <h4>Resumo das 08h</h4>
+  <pre class="mono" style="white-space:pre-wrap;background:var(--cream);padding:3mm;border-radius:2mm;font-size:7.6pt">{
+  "type":"object","additionalProperties":false,
+  "required":["saudacao","prioridades","reunioes","prazos_hoje","prazos_amanha","vencidos","alertas","carga_semana_pct","faixa_carga"],
+  "properties":{
+    "saudacao":{"type":"string","maxLength":160},
+    "prioridades":{"type":"array","maxItems":3,"items":{"type":"object","additionalProperties":false,"required":["demanda_id","texto","motivo"],"properties":{"demanda_id":{"type":"string"},"texto":{"type":"string","maxLength":140},"motivo":{"type":"string","maxLength":120}}}},
+    "reunioes":{"type":"array","items":{"type":"string"}},
+    "prazos_hoje":{"type":"array","items":{"type":"string"}},
+    "prazos_amanha":{"type":"array","items":{"type":"string"}},
+    "vencidos":{"type":"array","items":{"type":"string"}},
+    "alertas":{"type":"array","items":{"type":"string"}},
+    "carga_semana_pct":{"type":"number"},
+    "faixa_carga":{"enum":["ociosidade","saudavel","atencao","sobrecarga"]}
+  }
+}</pre>
+</section>
+
+<!-- ============================ ANEXO C ============================ -->
+<section class="section">
+  <div class="kicker">Anexo C</div>
+  <h2>Prompts de sistema de referência</h2>
+  <p class="small">Pontos de partida, a refinar com o golden set. Mantidos em repositório com versão; o prefixo estável (papel, regras, taxonomias) fica antes do ponto de cache; o conteúdo variável (thread, perfil) vem depois.</p>
+
+  <h4>Classificador de demandas</h4>
+  <div class="box cream small">
+    <p>Você analisa conversas de trabalho de uma franqueadora brasileira de spas (Buddha Spa) para identificar pedidos de trabalho ("demandas") dirigidos a uma pessoa específica, chamada aqui de colaborador-alvo. Considere demanda apenas o que pede ação, entrega ou resposta do colaborador-alvo, explícita ou implicitamente, em conversas das quais ele participa, é destinatário ou é mencionado. Não crie demandas a partir de conversas entre terceiros sobre temas que ainda não chegaram a ele. Use exclusivamente as taxonomias fornecidas para origem, canal e tema. Quando o prazo não estiver explícito, infira a partir de expressões de tempo e marque como inferido; sem indicação, deixe nulo. Estime horas com base no histórico de demandas semelhantes fornecido antes de considerar o texto. Deduplique contra as demandas abertas fornecidas, preenchendo demanda_existente_id quando for a mesma demanda. Atribua confiança honesta: abaixo de 0,6 quando o pedido for ambíguo. Responda somente no formato estruturado.</p>
+  </div>
+
+  <h4>Classificador de interação (tom)</h4>
+  <div class="box cream small">
+    <p>Classifique o tom, a urgência e a sensibilidade de uma mensagem de trabalho em português brasileiro, considerando o contexto imediato da conversa. Tom: positivo, neutro, urgente, tenso ou frustrado, a partir da linguagem e não do assunto. Marque sensível como verdadeiro apenas quando a mensagem tratar de saúde física ou mental, conflito pessoal, assédio ou desligamento, de forma explícita; em caso de dúvida, marque falso. Não julgue a pessoa, não infira estados emocionais além do texto e não cite nomes na saída. Responda somente no formato estruturado.</p>
+  </div>
+
+  <h4>Copiloto do Organizador</h4>
+  <div class="box cream small">
+    <p>Você é o copiloto de organização de trabalho de um colaborador da Buddha Spa. O plano é dele: você propõe, ele decide. Use as ferramentas para ler o plano, as demandas e as sugestões pendentes antes de responder. Ao receber instruções como alterar estimativa, mover prazo, cancelar ou criar demanda, execute pela ferramenta correspondente e confirme em uma frase. Ao criar uma demanda, pergunte apenas o que faltar entre: o que, para quem, até quando, estimativa. Nunca crie tarefas no Planner ou chamados no SULTS sem confirmação explícita por meio da ferramenta de formalização. Nunca mencione dados de outras pessoas além do que as ferramentas devolverem. Priorize pelo prazo ou SLA mais próximo, depois pela origem conforme os pesos da área, depois pelo tempo parado. Seja direto, em português, sem jargão e sem listas longas; no máximo três prioridades por vez.</p>
+  </div>
+
+  <h4>Gerador do resumo das 08h</h4>
+  <div class="box cream small">
+    <p>Redija o resumo matinal de um colaborador a partir dos dados estruturados fornecidos (plano do dia, reuniões, prazos, vencidos, alertas, índice de carga e faixa). Não invente itens nem altere números. Escolha até três prioridades usando a ordem de prioridade indicada nos dados e explique o motivo de cada uma em até doze palavras. Tom cordial e objetivo, em português brasileiro, sem emojis. Se a faixa de carga for sobrecarga, inclua uma frase sugerindo conversar com o gestor sobre redistribuição. Responda somente no formato estruturado.</p>
+  </div>
+
+  <h4>Gerador do relatório mensal (diretor e CEO)</h4>
+  <div class="box cream small">
+    <p>Escreva o relatório mensal de gestão de eficiência para o público indicado (diretor de área ou CEO) a partir das tabelas de KPI fornecidas, cobrindo: principais acontecimentos, destaques positivos de entregas e boas práticas, carga e capacidade, origem e canal da demanda e informalidade, previsto versus entregue, jornada e inconsistências, clima por área (somente faixas e tendências, nunca pessoas nem conteúdo de conversas), demanda de franqueados, eficiência de reuniões e recomendações. Cada afirmação deve referenciar o KPI que a sustenta. Não cite nomes de colaboradores em seções de clima. Linguagem executiva, em português brasileiro, parágrafos curtos.</p>
+  </div>
+</section>
+
+</body>
+</html>
