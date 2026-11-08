@@ -448,6 +448,7 @@
     <li><span class="mono">gold.jornada_diaria</span>: pessoa_id, data, horas_estimadas, horas_jornada, horas_extras, fora_horario_min, ociosidade_min, inconsistencias.</li>
     <li><span class="mono">gold.humor_area</span>: area_id, semana, indice, faixa, pct_tenso, fora_horario_pct, atrito_pares.</li>
     <li><span class="mono">gold.reunioes</span>, <span class="mono">gold.franqueado_demanda</span>, <span class="mono">gold.matriz_area</span>, <span class="mono">gold.alerta</span>, <span class="mono">gold.relatorio</span>.</li>
+    <li>Regra de rastreabilidade: todo mart agregado é derivado de uma view de fatos em nível de linha (<span class="mono">gold.fato_demanda</span>, <span class="mono">gold.fato_bloco_tempo</span>, <span class="mono">gold.fato_jornada</span>) com as mesmas chaves de filtro, de modo que a soma do detalhe sempre reproduz o indicador e o relatório detalhado é apenas um filtro sobre essas views.</li>
   </ul>
 
   <h3>Regras de retenção e expurgo (jobs diários)</h3>
@@ -587,12 +588,14 @@
     <li>Conjuntos de dados sobre Databricks SQL (DirectQuery ou importação diária, conforme desempenho); modelo semântico com tabelas gold e <span class="mono">gov.hierarquia</span>.</li>
     <li>Segurança em nível de linha dinâmica: a função de RLS resolve o usuário autenticado para pessoa_id e expande a árvore de liderados vigente; perfis especiais (CEO, Diretora de G&amp;G, DP) por grupo do Entra ID.</li>
     <li>Relatórios: Monitor (colaborador, gestor, diretor), DP (colaborador, gestor, DP), Termômetro (diretor, G&amp;G, CEO), Executivo (CEO). Páginas com filtros de período, pessoa, time, área, origem, canal, tipo.</li>
+    <li><strong>Relatório detalhado (drill-through)</strong>: toda visual tem drill-through para uma página de detalhe em nível de linha (demanda, bloco de tempo, evento de jornada), que recebe o filtro do ponto clicado e mantém os mesmos filtros de contexto; colunas: chegada, demanda, demandante, origem, canal, pessoa, departamento, planejamento, prazo/SLA, estimado/realizado, status e link para a fonte. A RLS vale igualmente na página de detalhe. Exportação para Excel habilitada; o evento de exportação é registrado em <span class="mono">gov.log</span> via API de auditoria do Power BI.</li>
     <li>Páginas do Termômetro publicadas em workspace separado, com acesso só aos grupos autorizados; nenhuma visual expõe texto de mensagem.</li>
   </ul>
 
   <h3>Web app</h3>
   <ul class="small">
     <li>React com autenticação Entra ID (MSAL); API em FastAPI; componentes: kanban, agenda semanal, gráficos por tema e origem, chat com streaming, upload, lista de sugestões do gestor, painel de DP do colaborador com contestação, "Meus dados", painel de parâmetros (TI e diretores) e painel de auditoria (G&amp;G, CEO).</li>
+    <li><strong>Grade de detalhe</strong> reutilizável (<span class="mono">/api/detalhe?entidade=demanda&amp;filtros=...</span>): mesma consulta que alimenta o drill-through do Power BI, com paginação, agrupamento, ordenação, histórico da linha e exportação; todo gráfico do web app abre essa grade com o filtro do ponto clicado.</li>
     <li>Toda chamada de API passa pelo serviço de permissões; a interface nunca recebe dados fora do perfil.</li>
   </ul>
 

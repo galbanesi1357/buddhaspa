@@ -170,13 +170,13 @@
       <li><span>Modelo conceitual de dados e taxonomias</span><span>pág. 22</span></li>
       <li><span>Catálogo consolidado de KPIs</span><span>pág. 23</span></li>
       <li><span>Governança de acesso, privacidade e LGPD</span><span>pág. 24</span></li>
-      <li><span>Funcionalidades complementares incorporadas ao escopo</span><span>pág. 25</span></li>
+      <li><span>Funcionalidades transversais de gestão</span><span>pág. 25</span></li>
       <li><span>Roadmap de implantação em 6 meses</span><span>pág. 26</span></li>
       <li><span>Riscos, premissas, decisões registradas e pendências</span><span>pág. 27</span></li>
     </ol>
   </div>
   <div class="callout" style="margin-top:6mm">
-    <strong>Como ler.</strong> Os capítulos 6 a 11 descrevem cada agente no mesmo formato: objetivo, o que consome, regras de negócio, KPIs, telas e saídas, quem acessa, alertas e o que o agente <em>não</em> faz. Os agentes 1 a 5 seguem a numeração das diretrizes originais da Diretoria; o Agente 6 concentra governança, logs e parametrização. As funcionalidades complementares (capítulo 15) já estão incorporadas às regras, KPIs e ao roadmap.
+    <strong>Como ler.</strong> Os capítulos 6 a 11 descrevem cada agente no mesmo formato: objetivo, o que consome, regras de negócio, KPIs, telas e saídas, quem acessa, alertas e o que o agente <em>não</em> faz. O Agente 6 concentra governança, logs e parametrização. O capítulo 15 reúne as funcionalidades transversais que usam os dados dos agentes e aparecem em seus KPIs, relatórios e no roadmap. Todo indicador de dashboard abre um relatório detalhado das linhas que o compõem (capítulo 6).
   </div>
 </section>
 
@@ -509,7 +509,31 @@
         <li>Eficiência de reuniões do time, demanda de franqueados por franquia e, para CEO e diretores, o rastreador de pedidos da diretoria e a matriz de demanda entre áreas.</li>
         <li>Novos colaboradores (primeiros 90 dias): sinalização de subcarga ou isolamento (poucas interações) e plano de integração.</li>
         <li>Alertas ativos: sobrecarga, ociosidade, gargalo, demanda sem dono.</li>
-        <li>Filtros: período, pessoa, time, área, origem, canal, tipo de atividade; exportação em PDF/Excel; drill-down até o fato de origem.</li>
+        <li>Filtros: período, pessoa, time, área, origem, canal, tipo de atividade; exportação em PDF/Excel; todo indicador abre o relatório detalhado das linhas que o compõem.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Do indicador ao detalhe: relatório detalhado de atividades</h3>
+  <p class="small">Todo número, barra, fatia ou célula de mapa de calor dos dashboards é clicável e abre o <strong>relatório detalhado</strong>: a lista das linhas que compõem aquele indicador, já filtrada pelo recorte clicado. Exemplo: ao clicar em "demandas originadas via SULTS", aparecem todas as demandas desse canal no período, com data de chegada, o que é, quem demandou, origem, pessoa responsável, departamento, planejamento, prazo ou SLA, estimativa e realizado, status e link para a fonte (chamado, tarefa, mensagem, ata).</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>Funcionamento</h4>
+      <ul class="small">
+        <li>Acessível a partir de qualquer dashboard (Monitor, DP, Reports) e também como tela própria, com os mesmos filtros: período, pessoa, time, departamento, origem, canal, demandante, tipo de atividade, planejamento, status e tema.</li>
+        <li>Mostra o filtro herdado do gráfico ("Canal = SULTS") e permite limpar, refinar, agrupar (por demandante, pessoa, tema, status) e ordenar.</li>
+        <li>Cada linha abre o detalhe: campos completos, histórico (chegada, classificação, entrada no Organizador, sugestões, ajustes aprovados) e o link para a fonte original.</li>
+        <li>Exportação em Excel e PDF com o recorte aplicado; a exportação fica em log.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Regras</h4>
+      <ul class="small">
+        <li>As mesmas permissões do dashboard de origem: o colaborador só vê as próprias linhas; o gestor, as dos liderados; o diretor, as da diretoria; CEO, tudo.</li>
+        <li>Dados de monitoramento permanecem somente leitura na tela; o botão "solicitar ajuste" abre o fluxo do Agente 6.</li>
+        <li>Para interações (mensagens, e-mails) o detalhe mostra metadados e a referência; o conteúdo só é acessível a quem participou da conversa ou ao diretor da área, com log nominal.</li>
+        <li>O Termômetro de Humor não tem relatório detalhado por pessoa; o detalhe mostra apenas sinais agregados e referências, conforme o capítulo 8.</li>
+        <li>Totais do relatório detalhado batem com o indicador clicado: é a prova de rastreabilidade de cada KPI.</li>
       </ul>
     </div>
   </div>
@@ -826,7 +850,7 @@
       <tr><td><strong>TI (administração)</strong></td><td class="c">Só metadados e logs</td><td class="c">Só metadados e logs</td><td class="c"><span class="no">—</span></td><td class="c">Só metadados e logs</td><td class="c">Relatório de logs</td><td class="c"><span class="yes">Tudo, com dupla aprovação</span></td></tr>
     </tbody>
   </table>
-  <p class="tiny muted">A equipe de TI administra o sistema sem acesso ao conteúdo das pessoas (modelo "zelador sem chave do armário"): vê que o dado existe, quando foi coletado e quem acessou, não o conteúdo. Acessos excepcionais de suporte exigem autorização da Diretora de G&amp;G e ficam em log.</p>
+  <p class="tiny muted">O relatório detalhado de atividades herda exatamente a permissão do dashboard a partir do qual foi aberto. A equipe de TI administra o sistema sem acesso ao conteúdo das pessoas (modelo "zelador sem chave do armário"): vê que o dado existe, quando foi coletado e quem acessou, não o conteúdo. Acessos excepcionais de suporte exigem autorização da Diretora de G&amp;G e ficam em log.</p>
 </section>
 
 <section class="cont">
@@ -1030,11 +1054,11 @@
 <!-- ============================ 15. COMPLEMENTOS ============================ -->
 <section class="section">
   <div class="kicker">Capítulo 15</div>
-  <h2>Funcionalidades complementares incorporadas ao escopo</h2>
-  <p class="lead">Catorze funcionalidades que ampliam o ganho de eficiência com baixo custo adicional, porque usam os mesmos dados. Todas foram aprovadas pela Diretoria e já estão refletidas nas regras, KPIs, relatórios e no roadmap. A tabela indica o agente responsável e a fase de entrega.</p>
+  <h2>Funcionalidades transversais de gestão</h2>
+  <p class="lead">Catorze funcionalidades que atravessam os agentes e usam os mesmos dados coletados. Elas já estão refletidas nas regras, KPIs e relatórios dos capítulos anteriores; a tabela consolida o que cada uma entrega, o agente responsável e a fase em que entra em produção.</p>
 
   <table class="compact">
-    <thead><tr><th style="width:38mm">Funcionalidade</th><th>O que faz e por que vale</th><th style="width:14mm">Agente</th><th style="width:10mm" class="c">Fase</th></tr></thead>
+    <thead><tr><th style="width:38mm">Funcionalidade</th><th>O que entrega</th><th style="width:14mm">Agente</th><th style="width:10mm" class="c">Fase</th></tr></thead>
     <tbody>
       <tr><td><strong>Eficiência de reuniões</strong></td><td>Horas de reunião por pessoa e área, participantes por reunião, reuniões sem pauta, sem ata ou sem item de ação, sobreposições, custo-hora estimado. A franqueadora tem forte cultura de reunião e nenhum indicador sobre ela.</td><td>1, 5</td><td class="c"><span class="pill p-fase2">F2</span></td></tr>
       <tr><td><strong>Matriz de demanda entre áreas</strong></td><td>Quem demanda quem, quanto, por qual canal e com que SLA. Mostra dependências estruturais (ex.: Marketing dependendo de TI, Operações de Jurídico) e alimenta a consultoria de processos do NR-1.</td><td>1</td><td class="c"><span class="pill p-fase3">F3</span></td></tr>
@@ -1158,21 +1182,20 @@
     <div class="box ok"><h4>Screenshots do fSense</h4><p class="small">A ferramenta já captura; o sistema não os consome nem exibe.</p></div>
     <div class="box ok"><h4>Faixas de carga</h4><p class="small">Até 65% possível ociosidade; 65 a 90% saudável; 90 a 100% atenção; acima de 100% sobrecarga.</p></div>
     <div class="box ok"><h4>Toda a empresa desde a Fase 1</h4><p class="small">Sem piloto; implantação completa em 6 meses em três fases de dois meses.</p></div>
-    <div class="box ok"><h4>Funcionalidades complementares</h4><p class="small">As catorze do capítulo 15 estão aprovadas e incorporadas ao escopo e ao roadmap.</p></div>
+    <div class="box ok"><h4>Retenção de conteúdo bruto</h4><p class="small">30 dias para o conteúdo de mensagens e transcrições; metadados e classificações permanecem. Jurídico formaliza no RIPD.</p></div>
     <div class="box ok"><h4>Visibilidade de jornada</h4><p class="small">Horas extras, fora do horário e ociosidade na jornada: apenas gestor, linha hierárquica, DP e G&amp;G. Inconsistências notificadas às 08h do dia seguinte ao colaborador e ao gestor.</p></div>
     <div class="box ok"><h4>Fontes</h4><p class="small">Planner como ferramenta oficial de tarefas; Asana residual; Feedz secundário e sem KPI principal; WhatsApp por exportação completa, não por leitura conversa a conversa.</p></div>
   </div>
 
-  <h3>Pendências para validação</h3>
   <div class="grid2">
-    <div class="box gold"><h4>1 · Retenção de conteúdo bruto de mensagens</h4><p class="small">Proposta: 30 dias. Depende de validação do Jurídico.</p></div>
-    <div class="box gold"><h4>2 · PJ no Agente 4</h4><p class="small">Proposta: apenas aderência à jornada contratual para gestão de capacidade, sem banco de horas. Confirmar com Jurídico.</p></div>
-    <div class="box gold"><h4>3 · Perímetro de pessoas</h4><p class="small">Proposta: toda a franqueadora e holding, incluindo operação internacional e Instituto, com gestor definido no cadastro de G&amp;G.</p></div>
-    <div class="box gold"><h4>4 · Viabilidade técnica da exportação do WhatsApp</h4><p class="small">TI valida em prova de conceito a exportação em lote com transcrição de áudios, conforme o documento técnico, antes da Fase 2.</p></div>
+    <div class="box ok"><h4>PJ no Agente 4</h4><p class="small">Apenas aderência à jornada contratual para gestão de capacidade, sem banco de horas nem folha.</p></div>
+    <div class="box ok"><h4>Perímetro de pessoas</h4><p class="small">Toda a franqueadora e holding, incluindo operação internacional e Instituto, com gestor definido no cadastro de G&amp;G.</p></div>
+    <div class="box ok"><h4>Exportação do WhatsApp</h4><p class="small">Abordagem de exportação em lote com transcrição de áudios confirmada; TI executa a prova de conceito na primeira quinzena da Fase 1.</p></div>
+    <div class="box ok"><h4>Relatório detalhado</h4><p class="small">Todo indicador abre a lista das linhas que o compõem, com filtros e exportação, herdando as permissões do dashboard (capítulo 6).</p></div>
   </div>
 
   <div class="callout green" style="margin-top:4mm">
-    <strong>Documento complementar.</strong> O documento "Requisitos Técnicos e Arquitetura" detalha, para o time de Tecnologia, a definição de cada agente e seus prompts, as integrações e APIs por fonte (Microsoft Graph, Databricks, fSense, Trello, agente local para WhatsApp Web e sistema operacional), o modelo de dados no lakehouse, a arquitetura de permissões e logs, a divisão entre no-code e código, infraestrutura, segurança e o plano de entrega por sprint para os 6 meses.
+    <strong>Documento técnico.</strong> O documento "Requisitos Técnicos e Arquitetura" detalha, para o time de Tecnologia, a definição de cada agente e seus prompts, as integrações e APIs por fonte (Microsoft Graph, Databricks, fSense, Trello, agente local para WhatsApp Web e sistema operacional), o modelo de dados no lakehouse, a arquitetura de permissões e logs, a divisão entre no-code e código, infraestrutura, segurança e o plano de entrega por sprint para os 6 meses.
   </div>
 </section>
 

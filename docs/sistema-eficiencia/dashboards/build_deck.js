@@ -209,8 +209,23 @@ async function icon(IconComp, color, size = 256) {
     'Mostra, sem opinião, o que está acontecendo: carga versus 44h, origem (gestor, outra área, franqueado, CEO, cliente), canal (Planner, SULTS, Teams, e-mail, WhatsApp) e planejamento (formal planejada, formal reativa, informal).',
     'Previsto x entregue, SLAs do SULTS, aderência de estimativa, mix de tipo de atividade, ferramentas mais usadas, rede de interações, fragmentação e blocos de foco.',
     'Visão consolidada do time: mapa de calor pessoa x semana, concentração de demanda, pontos únicos de falha, temas da semana e alertas de sobrecarga ou ociosidade.',
-    'O colaborador não altera o Monitor: se discorda, pede ajuste e o gestor decide via Teams, com De/Para e log.',
+    'Todo indicador abre o relatório detalhado das linhas que o compõem. O colaborador não altera o Monitor: se discorda, pede ajuste e o gestor decide via Teams, com De/Para e log.',
   ], 'Base factual dos demais agentes. O ranking é de carga, para redistribuição, nunca de desempenho.', '392617');
+
+  // relatório detalhado (drill-down)
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Agentes' });
+  s.addText('Do indicador ao detalhe: relatório detalhado de atividades', { placeholder: 'title' });
+  subtitle(s, 'Qualquer número, barra ou célula dos dashboards abre a lista das linhas que o compõem, com os mesmos filtros e permissões');
+  s.addText(bullets([
+    'Ao clicar, por exemplo, em "demandas via SULTS", aparecem todas as demandas desse canal: data de chegada, o que é, quem demandou, origem, pessoa, departamento, planejamento, prazo ou SLA, estimado e realizado, status e link para a fonte.',
+    'Filtros por período, pessoa, departamento, origem, canal, demandante, tipo, status e tema; agrupamento, ordenação e exportação em Excel e PDF.',
+    'Cada linha abre o histórico completo: chegada, classificação, entrada no Organizador, sugestões e ajustes aprovados.',
+    'Herda a permissão do dashboard de origem; totais do detalhe sempre batem com o indicador clicado.',
+  ], { fontSize: 12.5, color: '241A12', paraSpaceAfter: 9 }), { x: 0.6, y: 1.5, w: 4.0, h: 5.3, isTextBox: true, margin: 0, valign: 'top', fontFace: 'Calibri' });
+  rrect(s, { x: 4.78, y: 1.5, w: 8.0, h: 4.5, fill: { color: 'FFFFFF' }, line: { color: 'E6DDD3', width: 0.75 }, shadow: shadow() });
+  s.addImage({ path: DASH + 'relatorio_detalhado.png', x: 4.85, y: 1.57, w: 7.86, h: 4.42 });
+  txt(s, 'Mockup ilustrativo do relatório detalhado · dados fictícios', { x: 4.78, y: 6.05, w: 8, h: 0.3, fontSize: 9.5, color: '8C7F74', italic: true, align: 'right' });
+  s.addNotes('Rastreabilidade de cada KPI: o detalhe em linhas é a prova do indicador. Vale para Monitor, DP e Reports; o Termômetro mostra apenas sinais agregados.');
 
   // faixas de carga slide
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Agentes' });
@@ -317,8 +332,8 @@ async function icon(IconComp, color, size = 256) {
   // =============== 15. COMPLEMENTARES
   pres.addSection({ title: 'Escopo e entrega' });
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Escopo e entrega' });
-  s.addText('Funcionalidades complementares incorporadas ao escopo', { placeholder: 'title' });
-  subtitle(s, 'Catorze capacidades que usam os mesmos dados e ampliam o ganho de eficiência. Todas aprovadas e distribuídas no roadmap');
+  s.addText('Funcionalidades transversais de gestão', { placeholder: 'title' });
+  subtitle(s, 'Catorze capacidades que atravessam os agentes, usam os mesmos dados e entram em produção ao longo das três fases');
   const comp = [['cal', 'Eficiência de reuniões', 'horas, participantes, sem pauta ou ata, sobreposições'], ['map', 'Matriz de demanda área x área', 'quem demanda quem, com volume, canal e SLA'], ['brief', 'Demandas de franqueados', 'volume, tema e canal por franquia; o que vira FAQ'], ['target', 'Rastreador de pedidos do CEO e da diretoria', 'status e responsável sem precisar perguntar'], ['alert', 'Ponto único de falha', 'demandas que só uma pessoa atende; base para sucessão'], ['focus', 'Blocos de foco e fragmentação', 'tempo contínuo sem interrupção; blocos sugeridos'], ['moon', 'Fora do horário como risco NR-1', 'mensagens e atividade fora da janela, por pessoa e área'], ['check', 'Formalização assistida no Planner', 'demanda informal vira tarefa ou chamado com um clique'], ['up', 'Capacidade por área', 'horas de demanda versus disponíveis; insumo de dimensionamento'], ['users', 'Onboarding de novos colaboradores', 'plano dos 90 dias; sinal de subcarga ou isolamento'], ['tool', 'Shadow IT e uso não aprovado', 'aplicações relevantes por área para Segurança da Informação'], ['award', 'Reconhecimento positivo', 'relatórios destacam entregas no prazo e boas práticas'], ['link', 'Sincronização de nomenclaturas', 'Planner, Trello e SULTS com prioridade, status e prazo comparáveis'], ['sun', 'Modo "semana que vem"', 'toda sexta o plano da próxima semana e a visão do gestor para redistribuir']];
   comp.forEach((c, i) => {
     const col = i % 2, row = Math.floor(i / 2);
@@ -329,7 +344,7 @@ async function icon(IconComp, color, size = 256) {
     txt(s, c[1], { x: x + 0.68, y: y + 0.07, w: 5.2, h: 0.28, fontSize: 12, bold: true, color: C.text2 });
     txt(s, c[2], { x: x + 0.68, y: y + 0.35, w: 5.2, h: 0.28, fontSize: 10, color: '5F5148' });
   });
-  s.addNotes('Todas as funcionalidades complementares foram aceitas pela direção e passam a fazer parte do escopo, distribuídas entre as fases 1 a 3.');
+  s.addNotes('Funcionalidades transversais do sistema, distribuídas entre as fases 1 a 3 do roadmap.');
 
   // =============== 16. ROADMAP
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Escopo e entrega' });
@@ -364,14 +379,14 @@ async function icon(IconComp, color, size = 256) {
 
   // =============== 18. PENDÊNCIAS E PRÓXIMOS PASSOS
   s = pres.addSlide({ masterName: 'DARK', sectionTitle: 'Escopo e entrega' });
-  s.addText('Pendências para validação e próximos passos', { placeholder: 'title' });
+  s.addText('Decisões registradas e próximos passos', { placeholder: 'title' });
   rrect(s, { x: 0.8, y: 1.55, w: 5.7, h: 5.1, fill: { color: 'FFFFFF', transparency: 92 }, line: { color: 'D9B36A', width: 0.75, transparency: 40 } });
-  txt(s, 'Pendências de validação', { x: 1.05, y: 1.75, w: 5.2, h: 0.4, fontSize: 16, bold: true, color: 'D9B36A' });
-  s.addText(bullets(['Retenção do conteúdo bruto de mensagens: proposta de 30 dias, a validar com o Jurídico.', 'PJ no Agente 4: apenas aderência à jornada contratual para capacidade, sem banco de horas; confirmar com o Jurídico.', 'Perímetro de pessoas: operação internacional e Instituto entram desde a Fase 1, com gestor definido no cadastro de G&G.', 'Comunicado único aos colaboradores sobre fontes, finalidades, acessos e forma de contestação, nos termos já alinhados para o fSense.'], { fontSize: 12.5, color: 'FFFFFF', paraSpaceAfter: 9 }), { x: 1.05, y: 2.25, w: 5.2, h: 4.2, isTextBox: true, margin: 0, valign: 'top', fontFace: 'Calibri' });
+  txt(s, 'Decisões registradas', { x: 1.05, y: 1.75, w: 5.2, h: 0.4, fontSize: 16, bold: true, color: 'D9B36A' });
+  s.addText(bullets(['Retenção do conteúdo bruto de mensagens e transcrições: 30 dias; metadados e classificações permanecem.', 'PJ no Agente 4: apenas aderência à jornada contratual para capacidade, sem banco de horas nem folha.', 'Perímetro: toda a franqueadora e holding, incluindo operação internacional e Instituto, com gestor definido no cadastro de G&G.', 'WhatsApp por exportação em lote com transcrição de áudios; prova de conceito na primeira quinzena da Fase 1.', 'Todo indicador abre o relatório detalhado das linhas que o compõem, com filtros e exportação.'], { fontSize: 12.5, color: 'FFFFFF', paraSpaceAfter: 9 }), { x: 1.05, y: 2.25, w: 5.2, h: 4.2, isTextBox: true, margin: 0, valign: 'top', fontFace: 'Calibri' });
   rrect(s, { x: 6.85, y: 1.55, w: 5.7, h: 5.1, fill: { color: 'B8862B' }, line: { color: 'B8862B' } });
   txt(s, 'Próximos passos', { x: 7.1, y: 1.75, w: 5.2, h: 0.4, fontSize: 16, bold: true, color: 'FFFFFF' });
-  s.addText(bullets(['Tecnologia e G&G revisam o documento de visão e o documento técnico.', 'G&G saneia o cadastro de pessoas e hierarquia e define o cadastro vivo.', 'TI define a squad do projeto, as credenciais de leitura (Microsoft Graph, Databricks, fSense) e o ambiente no lakehouse.', 'Jurídico valida retenção, PJ e texto do comunicado.', 'Início da Fase 1 com toda a empresa; primeira leitura dos dashboards do Monitor e de DP em até 8 semanas.'], { fontSize: 12.5, color: 'FFFFFF', paraSpaceAfter: 9 }), { x: 7.1, y: 2.25, w: 5.2, h: 4.2, isTextBox: true, margin: 0, valign: 'top', fontFace: 'Calibri' });
-  s.addNotes('Fechamento. Três pendências jurídicas e cinco próximos passos para iniciar a Fase 1.');
+  s.addText(bullets(['Tecnologia e G&G revisam o documento de visão e o documento técnico.', 'G&G saneia o cadastro de pessoas e hierarquia e define o cadastro vivo.', 'TI define a squad do projeto, as credenciais de leitura (Microsoft Graph, Databricks, fSense) e o ambiente no lakehouse.', 'Jurídico formaliza retenção, PJ e comunicado único aos colaboradores no RIPD.', 'Início da Fase 1 com toda a empresa; primeira leitura dos dashboards do Monitor e de DP em até 8 semanas.'], { fontSize: 12.5, color: 'FFFFFF', paraSpaceAfter: 9 }), { x: 7.1, y: 2.25, w: 5.2, h: 4.2, isTextBox: true, margin: 0, valign: 'top', fontFace: 'Calibri' });
+  s.addNotes('Fechamento. Decisões já registradas pela Diretoria e cinco próximos passos para iniciar a Fase 1.');
 
   await pres.writeFile({ fileName: OUT });
   await applyTheme(OUT, THEME);

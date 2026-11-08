@@ -1,0 +1,97 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório detalhado de atividades</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.grid{grid-template-columns:repeat(12,1fr);grid-template-rows:122px 1fr}
+.crumb{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:12.5px}
+.crumb .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.crumb .x{margin-left:auto;color:var(--muted);font-size:12px}
+.kstrip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.kstrip div{background:var(--cream);border-radius:10px;padding:8px 12px}
+.kstrip .kpi{font-size:20px}
+.kstrip .l{font-size:11px;color:var(--muted);margin-top:3px}
+table.det{font-size:11.8px}
+table.det th{padding:0 6px 7px 0;font-size:10.5px}
+table.det td{padding:5px 6px 5px 0;border-bottom:1px solid #f0e9e1;white-space:nowrap}
+table.det td.w{white-space:normal;max-width:300px}
+table.det tr.sel td{background:#fbf6ee}
+.src{color:var(--info);text-decoration:underline;font-size:11px}
+.side h4{margin:0 0 6px 0;font-size:12px;color:var(--cafe2);text-transform:uppercase;letter-spacing:.05em}
+.kv{display:grid;grid-template-columns:118px 1fr;gap:4px 10px;font-size:12px;margin-bottom:12px}
+.kv span:nth-child(odd){color:var(--muted)}
+.tl2{border-left:2px solid var(--sand);margin-left:6px;padding-left:14px;display:flex;flex-direction:column;gap:9px}
+.tl2 div{position:relative;font-size:11.8px;color:var(--ink2)}
+.tl2 div::before{content:"";position:absolute;left:-19.5px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--gold);border:2px solid #fff;box-shadow:0 0 0 1px var(--sand)}
+.tl2 b{color:var(--ink);font-weight:600}
+.tl2 small{display:block;color:var(--muted);font-size:10.5px}
+.group{display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--muted)}
+.group span{border:1px solid var(--line);border-radius:6px;padding:3px 8px;background:#fff;color:var(--ink2)}
+.group span.on{background:var(--terra);color:#fff;border-color:var(--terra)}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}
+</style></head><body>
+<div class="topbar"><div class="logo"><img src="../../../novo_logo_BUDDHA_SPA_fundo_branco.png" alt=""></div><div class="brand">Sistema de Eficiência<small>Buddha Spa</small></div>
+<nav><span class="on">Monitor de Atividades</span><span>Organizador do time</span><span>Jornada do time</span><span>Aprovações · 3</span></nav><div class="sp"></div>
+<span class="chip">Alertas · 5</span><span class="chip"><span class="av">GO</span>Gestor(a) · Operações · SAF e Implantação</span></div>
+<div class="filters"><div class="title">Relatório detalhado de atividades<small>Linhas que compõem os indicadores do dashboard · Semana 45 · 02 a 08 nov 2026</small></div>
+<div class="f">Período <b>Últimas 4 semanas</b></div><div class="f">Departamento <b>SAF + Implantação</b></div><div class="f">Pessoa <b>Todas</b></div><div class="f">Canal <b>SULTS</b></div><div class="f">Origem <b>Todas</b></div><div class="f">Demandante <b>Todos</b></div><div class="f">Tipo <b>Todos</b></div><div class="f">Status <b>Abertas e concluídas</b></div>
+<div class="sp"></div><span class="btn">Exportar Excel</span><span class="btn">Exportar PDF</span><span class="btn primary">← Voltar ao dashboard</span></div>
+
+<div class="grid">
+  <div class="card" style="grid-column:span 12;padding:12px 18px;flex-direction:row;gap:16px;align-items:stretch">
+    <div class="crumb" style="flex:1.1"><span class="lbl">Filtro vindo do gráfico</span><span class="tag t1">Canal = SULTS</span><span class="tag">Origem e canal da demanda do time</span><span class="muted small">clique na barra "SULTS 38%" · 02 nov a 08 nov</span><span class="x">✕ limpar</span></div>
+    <div class="kstrip" style="flex:2">
+      <div><div class="kpi">38</div><div class="l">demandas no recorte</div></div>
+      <div><div class="kpi">81h</div><div class="l">estimadas · 64h realizadas</div></div>
+      <div><div class="kpi">29</div><div class="l">concluídas · 24 no prazo</div></div>
+      <div><div class="kpi">6</div><div class="l">abertas com SLA em até 48h</div></div>
+      <div><div class="kpi">3</div><div class="l">reabertas pelo franqueado</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="grid-column:span 9">
+    <div class="hd"><div><h3>Demandas · Canal SULTS · 38 linhas</h3><div class="sub">Cada linha é uma demanda com sua fonte de origem. Clique na linha para ver o detalhe e o histórico.</div></div>
+      <div class="group">Agrupar por <span class="on">Nenhum</span><span>Demandante</span><span>Pessoa</span><span>Tema</span><span>Status</span></div></div>
+    <table class="det">
+      <thead><tr><th>Chegada</th><th>Demanda</th><th>Demandante</th><th>Origem</th><th>Pessoa</th><th>Depto.</th><th>Planej.</th><th>Prazo / SLA</th><th>Est. / Real</th><th>Status</th><th>Fonte</th></tr></thead>
+      <tbody>
+        <tr><td>06/11 09:12</td><td class="w">Ajuste de agenda · unidade Moema</td><td>Franqueado Moema</td><td><span class="tag t1">Franqueado</span></td><td>Colab. F</td><td>SAF</td><td>formal reativa</td><td><span class="pill p-bad"><i></i>SLA 14h</span></td><td>1h / 0h40</td><td><span class="pill p-warn"><i></i>Em andamento</span></td><td><span class="src">#48213</span></td></tr>
+        <tr class="sel"><td>05/11 16:40</td><td class="w">Treinamento remoto · franqueado Curitiba</td><td>Franqueado Curitiba</td><td><span class="tag t1">Franqueado</span></td><td>Colab. C</td><td>Implantação</td><td>formal reativa</td><td><span class="pill p-warn"><i></i>SLA 31h</span></td><td>2h / —</td><td><span class="pill p-idle"><i></i>A fazer</span></td><td><span class="src">#48244</span></td></tr>
+        <tr><td>05/11 11:05</td><td class="w">Contrato unidade Santos · parecer jurídico</td><td>Franqueado Santos</td><td><span class="tag t1">Franqueado</span></td><td>Colab. B</td><td>Implantação</td><td>formal reativa</td><td><span class="pill p-warn"><i></i>SLA 46h</span></td><td>1h / 0h20</td><td><span class="pill p-info"><i></i>Aguardando Jurídico</span></td><td><span class="src">#48260</span></td></tr>
+        <tr><td>05/11 08:50</td><td class="w">Repasse de outubro · planilha atualizada</td><td>Franqueado Campinas</td><td><span class="tag t1">Franqueado</span></td><td>Colab. A</td><td>SAF</td><td>formal reativa</td><td><span class="pill p-warn"><i></i>SLA 22h</span></td><td>1h30 / —</td><td><span class="pill p-idle"><i></i>A fazer</span></td><td><span class="src">#48190</span></td></tr>
+        <tr><td>04/11 17:20</td><td class="w">Dúvida sobre política de vouchers corporativos</td><td>Franqueado Recife</td><td><span class="tag t1">Franqueado</span></td><td>Colab. H</td><td>SAF</td><td>formal reativa</td><td>no prazo</td><td>0h30 / 0h25</td><td><span class="pill p-ok"><i></i>Concluída</span></td><td><span class="src">#48187</span></td></tr>
+        <tr><td>04/11 14:02</td><td class="w">Cronograma de implantação · Recife</td><td>Coordenação Implantação</td><td><span class="tag t3">Gestor direto</span></td><td>Colab. H</td><td>Implantação</td><td>formal planejada</td><td>18/11</td><td>4h / 1h10</td><td><span class="pill p-warn"><i></i>Em andamento</span></td><td><span class="src">#48251</span></td></tr>
+        <tr><td>04/11 09:31</td><td class="w">Abertura de acesso ao sistema de agenda · nova recepcionista</td><td>Franqueado Moema</td><td><span class="tag t1">Franqueado</span></td><td>Colab. F</td><td>SAF</td><td>formal reativa</td><td>no prazo</td><td>0h30 / 0h35</td><td><span class="pill p-ok"><i></i>Concluída</span></td><td><span class="src">#48179</span></td></tr>
+        <tr><td>03/11 18:10</td><td class="w">Reclamação de cliente · atraso em sessão</td><td>Franqueado Campinas</td><td><span class="tag t1">Franqueado</span></td><td>Colab. C</td><td>SAF</td><td>formal reativa</td><td>no prazo</td><td>1h / 1h40</td><td><span class="pill p-ok"><i></i>Concluída</span></td><td><span class="src">#48171</span></td></tr>
+        <tr><td>03/11 10:45</td><td class="w">Checklist de inauguração · unidade Sorocaba</td><td>Expansão</td><td><span class="tag t2">Outra área</span></td><td>Colab. B</td><td>Implantação</td><td>formal planejada</td><td>12/11</td><td>6h / 3h20</td><td><span class="pill p-warn"><i></i>Em andamento</span></td><td><span class="src">#48160</span></td></tr>
+        <tr><td>02/11 16:30</td><td class="w">Conciliação de vouchers · outubro</td><td>Financeiro</td><td><span class="tag t2">Outra área</span></td><td>Colab. A</td><td>SAF</td><td>formal reativa</td><td>atrasada 1d</td><td>3h / 2h10</td><td><span class="pill p-bad"><i></i>Atrasada</span></td><td><span class="src">#48149</span></td></tr>
+        <tr><td>02/11 11:12</td><td class="w">Atualização do manual de atendimento · versão 3</td><td>Diretoria de Operações</td><td><span class="tag t4">Diretoria</span></td><td>Colab. A</td><td>Implantação</td><td>formal planejada</td><td>09/11</td><td>8h / 1h40</td><td><span class="pill p-warn"><i></i>Em andamento</span></td><td><span class="src">#48132</span></td></tr>
+        <tr><td>30/10 15:48</td><td class="w">Reabertura · ajuste de agenda não aplicado</td><td>Franqueado Moema</td><td><span class="tag t1">Franqueado</span></td><td>Colab. F</td><td>SAF</td><td>formal reativa</td><td>no prazo</td><td>0h30 / 0h50</td><td><span class="pill p-ok"><i></i>Concluída · reaberta</span></td><td><span class="src">#48101</span></td></tr>
+                      </tbody>
+    </table>
+    <div class="foot"><span>Mostrando 12 de 38 linhas · ordenado por chegada</span><span>Páginas 1 · 2 · 3</span></div>
+  </div>
+
+  <div class="card side" style="grid-column:span 3">
+    <h3>Detalhe da linha</h3><div class="sub">Treinamento remoto · franqueado Curitiba</div>
+    <div class="kv">
+      <span>Chamado</span><span class="src">#48244 · abrir no SULTS</span>
+      <span>Demandante</span><span>Franqueado Curitiba</span>
+      <span>Responsável</span><span>Colab. C · Implantação</span>
+      <span>Origem · canal</span><span>Franqueado · SULTS</span>
+      <span>Planejamento</span><span>formal reativa</span>
+      <span>SLA</span><span>48h · vence 07/11 16:40</span>
+      <span>Tema</span><span>Treinamento de sistema</span>
+      <span>Estimativa</span><span>2h (sistema) · 2h (colaborador)</span>
+      <span>Tipo predominante</span><span>Atendimento</span>
+    </div>
+    <h4>Histórico</h4>
+    <div class="tl2">
+      <div><b>Chegou no SULTS</b><small>05/11 16:40 · aberto pelo franqueado</small></div>
+      <div><b>Classificada pelo sistema</b><small>05/11 17:05 · origem franqueado · estimativa 2h · confiança 0,91</small></div>
+      <div><b>Entrou no Organizador</b><small>05/11 17:05 · aceita automaticamente (demanda formal)</small></div>
+      <div><b>Sugestão do gestor</b><small>06/11 08:12 · priorizar após manual v3 · aguardando aceite</small></div>
+      <div><b>Resumo das 08h</b><small>06/11 08:00 · listada como prazo de amanhã</small></div>
+    </div>
+    <div class="foot"><span>Dados de monitoramento · somente leitura</span><span class="src">Solicitar ajuste</span></div>
+  </div>
+</div>
+</body></html>
